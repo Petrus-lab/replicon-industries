@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow users to read/write their own profile and uploads
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Print job files access control
+    match /files/{fileId} {
+      allow create: if request.auth != null;
+      allow read, delete: if request.auth != null && resource.data.userId == request.auth.uid;
+    }
+
+    // Admin pricing configuration access (no role check yet)
+    match /config/{docId} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
