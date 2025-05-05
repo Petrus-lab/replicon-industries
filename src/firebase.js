@@ -21,7 +21,6 @@ export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const db = getFirestore(app);
 
-// ✅ This is the missing export!
 export const isAdminUser = async (user) => {
   if (!user) return false;
   const token = await getIdTokenResult(user);
