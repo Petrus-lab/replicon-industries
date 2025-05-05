@@ -1,25 +1,30 @@
 // src/firebase.js
 
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+import { getFirestore } from 'firebase/firestore';
+import { getIdTokenResult } from 'firebase/auth';
 
-// ✅ Your updated Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCofcjuxiaqb9m6SpoSEmdi0Bku9EccZK4",
   authDomain: "replicon-industries.firebaseapp.com",
   projectId: "replicon-industries",
-  storageBucket: "replicon-industries.firebasestorage.app",
+  storageBucket: "replicon-industries.appspot.com",
   messagingSenderId: "500105339531",
   appId: "1:500105339531:web:faa0473c4c3481fb1aea8e"
 };
 
-// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-const db = getFirestore(app);
-const storage = getStorage(app);
 
-export { auth, provider, db, storage };
+export const auth = getAuth(app);
+export const storage = getStorage(app);
+export const db = getFirestore(app);
+
+// ✅ This is the missing export!
+export const isAdminUser = async (user) => {
+  if (!user) return false;
+  const token = await getIdTokenResult(user);
+  return !!token.claims.admin;
+};
+
