@@ -1,10 +1,9 @@
 // src/firebase.js
 
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, getIdTokenResult } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { getFirestore } from 'firebase/firestore';
-import { getIdTokenResult } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCofcjuxiaqb9m6SpoSEmdi0Bku9EccZK4",
@@ -18,6 +17,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
+export const provider = new GoogleAuthProvider(); // ✅ <-- THIS LINE IS REQUIRED
 export const storage = getStorage(app);
 export const db = getFirestore(app);
 
@@ -26,4 +26,3 @@ export const isAdminUser = async (user) => {
   const token = await getIdTokenResult(user);
   return !!token.claims.admin;
 };
-
