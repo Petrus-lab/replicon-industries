@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { storage, db } from '../firebase';
 import { ref, uploadBytes } from 'firebase/storage';
-import { addDoc, collection } from 'firebase/firestore';
-import { Timestamp } from 'firebase/firestore';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
 
 function UploadForm({ user }) {
   const [file, setFile] = useState(null);
@@ -16,24 +15,30 @@ function UploadForm({ user }) {
       return;
     }
 
-    const fileRef = ref(storage, `uploads/${user.uid}/${file.name}`);
-    await uploadBytes(fileRef, file);
+    try {
+      const fileRef = ref(storage, `uploads/${user.uid}/${file.name}`);
+      await uploadBytes(fileRef, file);
+      console.log('✅ File uploaded to storage');
 
-    await addDoc(collection(db, 'jobs'), {
-      uid: user.uid,
-      email: user.email,
-      fileName: file.name,
-      filamentType,
-      color,
-      cost,
-      createdAt: Timestamp.now()
-    });
+      await addDoc(collection(db, 'jobs'), {
+        uid: user.uid,
+        email: user.email,
+        fileName: file.name,
+        filamentType,
+        color,
+        cost: parseFloat(cost),
+        createdAt: Timestamp.now()
+      });
 
-    alert('File uploaded and job created!');
-    setFile(null);
-    setFilamentType('');
-    setColor('');
-    setCost('');
+      alert('✅ File uploaded and job created!');
+      setFile(null);
+      setFilamentType('');
+      setColor('');
+      setCost('');
+    } catch (err) {
+      console.error('❌ Upload failed:', err);
+      alert('Upload failed. Check console for details.');
+    }
   };
 
   return (
