@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { storage, db } from '../firebase';
 import { ref, uploadBytes } from 'firebase/storage';
 import { addDoc, collection } from 'firebase/firestore';
+import { Timestamp } from 'firebase/firestore';
 
 function UploadForm({ user }) {
   const [file, setFile] = useState(null);
@@ -25,7 +26,7 @@ function UploadForm({ user }) {
       filamentType,
       color,
       cost,
-      createdAt: new Date()
+      createdAt: Timestamp.now()
     });
 
     alert('File uploaded and job created!');
