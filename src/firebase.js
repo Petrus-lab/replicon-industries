@@ -9,7 +9,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCofcjuxiaqb9m6SpoSEmdi0Bku9EccZK4",
   authDomain: "replicon-industries.firebaseapp.com",
   projectId: "replicon-industries",
-  storageBucket: "replicon-industries.appspot.com",
+  storageBucket: "replicon-industries.firebasestorage.app",
   messagingSenderId: "500105339531",
   appId: "1:500105339531:web:faa0473c4c3481fb1aea8e"
 };
