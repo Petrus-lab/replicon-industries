@@ -1,24 +1,17 @@
-// src/components/LogoutButton.jsx
 import React from 'react';
-import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 
-const LogoutButton = () => {
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        console.log("User signed out.");
-      })
-      .catch((error) => {
-        console.error("Error signing out:", error);
-      });
+function LogoutButton() {
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      window.location.reload(); // Refresh to return to AuthPage
+    } catch (err) {
+      alert('Logout failed: ' + err.message);
+    }
   };
 
-  return (
-    <button onClick={handleLogout}>
-      Logout
-    </button>
-  );
-};
+  return <button onClick={handleLogout}>Logout</button>;
+}
 
 export default LogoutButton;

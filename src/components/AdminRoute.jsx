@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { auth, isAdminUser } from '../firebase';
+import { auth } from '../firebase';
+import { getIdTokenResult } from 'firebase/auth';
 import AdminPanel from './AdminPanel';
 import AuthPage from './AuthPage';
 
@@ -10,8 +11,10 @@ const AdminRoute = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const isAdmin = await isAdminUser(user);
-        setIsAdmin(isAdmin);
+        // Force refresh to ensure latest custom claims are loaded
+        await user.getIdToken(true);
+        const token = await getIdTokenResult(user);
+        setIsAdmin(!!token.claims.admin);
       }
       setLoading(false);
     });
