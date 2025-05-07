@@ -1,3 +1,4 @@
+// src/components/AdminRoute.jsx
 import React, { useEffect, useState } from 'react';
 import { auth } from '../firebase';
 import { getIdTokenResult } from 'firebase/auth';
@@ -11,8 +12,7 @@ const AdminRoute = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        // Force refresh to ensure latest custom claims are loaded
-        await user.getIdToken(true);
+        await user.getIdToken(true); // force refresh to get latest claims
         const token = await getIdTokenResult(user);
         setIsAdmin(!!token.claims.admin);
       }
@@ -23,7 +23,14 @@ const AdminRoute = () => {
   }, []);
 
   if (loading) return <div>Loading...</div>;
-  return isAdmin ? <AdminPanel /> : <AuthPage />;
+  return (
+    <div>
+      <div style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
+        {isAdmin ? 'Admin View' : 'Client View'}
+      </div>
+      {isAdmin ? <AdminPanel /> : <AuthPage />}
+    </div>
+  );
 };
 
 export default AdminRoute;
