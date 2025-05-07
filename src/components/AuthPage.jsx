@@ -12,7 +12,8 @@ function AuthPage() {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
+      await result.user.getIdToken(true);
+	setUser(result.user);
     } catch (err) {
       alert(err.message);
     }
@@ -24,7 +25,8 @@ function AuthPage() {
     const password = e.target.password.value;
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      setUser(result.user);
+      await result.user.getIdToken(true);
+	setUser(result.user);
     } catch (err) {
       alert(err.message);
     }
@@ -36,7 +38,8 @@ function AuthPage() {
     const password = e.target.password.value;
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      setUser(result.user);
+      await result.user.getIdToken(true);
+	setUser(result.user);
     } catch (err) {
       alert(err.message);
     }
