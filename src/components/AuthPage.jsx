@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { auth, provider, db, storage } from '../firebase';
+import { auth, provider } from '../firebase';
 import { signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
 
 import UploadForm from './UploadForm';
 import ShippingForm from './ShippingForm';
+import LogoutButton from './LogoutButton';
 
 function AuthPage() {
   const [user, setUser] = useState(null);
@@ -62,6 +61,7 @@ function AuthPage() {
         </div>
       ) : (
         <>
+          <LogoutButton />
           <ShippingForm user={user} />
           <UploadForm user={user} />
         </>
