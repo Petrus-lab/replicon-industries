@@ -1,8 +1,8 @@
+// ✅ FILE: src/components/AdminPanel.jsx
 import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
 import { collection, getDocs } from 'firebase/firestore';
 import LogoutButton from './LogoutButton';
-
 
 function AdminPanel() {
   const [jobs, setJobs] = useState([]);
@@ -19,9 +19,10 @@ function AdminPanel() {
 
   return (
     <div style={{ marginTop: '2rem' }}>
-      <h2>Admin Panel</h2>
-	<LogoutButton />
-	{jobs.length === 0 ? (
+      <h1>👨‍💼 Admin Dashboard</h1> {/* ✅ Added header to identify admin */}
+      <LogoutButton /> {/* ✅ Confirmed this should always be visible */}
+      <h2>Print Jobs</h2>
+      {jobs.length === 0 ? (
         <p>No jobs found.</p>
       ) : (
         <table>

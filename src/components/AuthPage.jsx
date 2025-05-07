@@ -1,12 +1,11 @@
+// ✅ FILE: src/components/AuthPage.jsx
 import React, { useState } from 'react';
-import { auth, provider, db, storage } from '../firebase';
+import { auth, provider } from '../firebase';
 import {
   signInWithPopup,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
 } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
 
 import UploadForm from './UploadForm';
 import ShippingForm from './ShippingForm';
@@ -18,7 +17,6 @@ function AuthPage() {
   const handleGoogleSignIn = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
-      await result.user.getIdToken(true); // Force refresh to get admin claim
       setUser(result.user);
     } catch (err) {
       alert(err.message);
@@ -31,7 +29,6 @@ function AuthPage() {
     const password = e.target.password.value;
     try {
       const result = await signInWithEmailAndPassword(auth, email, password);
-      await result.user.getIdToken(true); // Force refresh to get admin claim
       setUser(result.user);
     } catch (err) {
       alert(err.message);
@@ -44,7 +41,6 @@ function AuthPage() {
     const password = e.target.password.value;
     try {
       const result = await createUserWithEmailAndPassword(auth, email, password);
-      await result.user.getIdToken(true); // Force refresh to get admin claim
       setUser(result.user);
     } catch (err) {
       alert(err.message);
@@ -55,7 +51,8 @@ function AuthPage() {
     <div style={{ padding: '2rem' }}>
       {!user ? (
         <div>
-          <LogoutButton />
+          <h1>🧑‍💻 Client Portal</h1> {/* ✅ Added header to identify client */}
+          <LogoutButton /> {/* ✅ Moved to always show on top */}
           <h2>Login or Sign Up</h2>
           <button onClick={handleGoogleSignIn}>Sign in with Google</button>
           <form onSubmit={handleEmailLogin}>
@@ -71,6 +68,8 @@ function AuthPage() {
         </div>
       ) : (
         <>
+          <h1>🧑‍💻 Client Dashboard</h1>
+          <LogoutButton />
           <ShippingForm user={user} />
           <UploadForm user={user} />
         </>
