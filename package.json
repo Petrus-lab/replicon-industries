@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@paypal/react-paypal-js": "^8.8.3",
     "firebase": "^10.7.1",
     "firebase-admin": "^13.3.0",
     "react": "^18.2.0",
@@ -16,8 +17,8 @@
     "eject": "react-scripts eject"
   },
   "browserslist": [
-    ">0.2%", 
-    "not dead", 
+    ">0.2%",
+    "not dead",
     "not op_mini all"
   ]
 }
