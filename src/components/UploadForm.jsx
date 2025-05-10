@@ -1,71 +1,110 @@
-import React, { useState } from 'react';
-import { storage, db } from '../firebase';
-import { ref, uploadBytes } from 'firebase/storage';
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
+// Path: src/components/UploadForm.jsx
 
-function UploadForm({ user }) {
+import React, { useState, useEffect } from 'react';
+import { db, auth } from '../firebase'; // Import Firebase and Firebase Authentication
+import { getDoc, doc } from 'firebase/firestore';
+
+const UploadForm = () => {
   const [file, setFile] = useState(null);
   const [filamentType, setFilamentType] = useState('');
   const [color, setColor] = useState('');
-  const [cost, setCost] = useState('');
+  const [cost, setCost] = useState(0);
+  const [markup, setMarkup] = useState(1.2); // Default markup value
+  const [isAdmin, setIsAdmin] = useState(false); // Check if the user is an admin
 
-  const handleUpload = async () => {
-    if (!file || !filamentType || !color || !cost) {
-      alert('Please fill in all fields and select a file.');
+  // Check if the user is an admin and fetch markup value
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const token = await user.getIdTokenResult();
+        setIsAdmin(token.claims.admin); // Check if the user has the 'admin' claim
+        
+        if (token.claims.admin) {
+          // Fetch markup from Firestore if user is admin
+          const markupDocRef = doc(db, 'settings', 'markupSettings');
+          const markupDoc = await getDoc(markupDocRef);
+          if (markupDoc.exists()) {
+            setMarkup(markupDoc.data().markup); // Set markup value
+          }
+        }
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleFilamentTypeChange = (e) => {
+    setFilamentType(e.target.value);
+  };
+
+  const handleColorChange = (e) => {
+    setColor(e.target.value);
+  };
+
+  const calculateCost = () => {
+    const baseCost = 10; // Example base cost
+    return baseCost * markup; // Apply markup to base cost
+  };
+
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file || !filamentType || !color) {
+      alert('Please fill in all fields');
       return;
     }
 
-    try {
-      const fileRef = ref(storage, `uploads/${user.uid}/${file.name}`);
-      await uploadBytes(fileRef, file);
-      console.log('✅ File uploaded to storage');
+    // Calculate job cost
+    const jobCost = calculateCost();
+    setCost(jobCost);
 
-      await addDoc(collection(db, 'jobs'), {
-        uid: user.uid,
-        email: user.email,
-        fileName: file.name,
-        filamentType,
-        color,
-        cost: parseFloat(cost),
-        createdAt: Timestamp.now()
-      });
-
-      alert('✅ File uploaded and job created!');
-      setFile(null);
-      setFilamentType('');
-      setColor('');
-      setCost('');
-    } catch (err) {
-      console.error('❌ Upload failed:', err);
-      alert('Upload failed. Check console for details.');
-    }
+    // Upload file to Firebase Storage and save data to Firestore
+    // Continue with your file upload and Firestore save logic here...
   };
 
   return (
-    <div style={{ marginTop: '2rem' }}>
-      <h3>Upload 3D File</h3>
-      <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-      <input
-        type="text"
-        placeholder="Filament Type (e.g., PLA)"
-        value={filamentType}
-        onChange={(e) => setFilamentType(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Color (e.g., Black)"
-        value={color}
-        onChange={(e) => setColor(e.target.value)}
-      />
-      <input
-        type="number"
-        placeholder="Estimated Cost (e.g., 50)"
-        value={cost}
-        onChange={(e) => setCost(e.target.value)}
-      />
-      <button onClick={handleUpload}>Submit Print Job</button>
+    <div>
+      <h2>Upload Job</h2>
+      <form onSubmit={handleUpload}>
+        <input type="file" onChange={handleFileChange} required />
+        <select onChange={handleFilamentTypeChange} value={filamentType} required>
+          <option value="">Select Filament Type</option>
+          <option value="PLA">PLA</option>
+          <option value="ABS">ABS</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Color"
+          value={color}
+          onChange={handleColorChange}
+          required
+        />
+        
+        {/* Only show the markup field if the user is an admin */}
+        {isAdmin && (
+          <div>
+            <label>Markup Percentage</label>
+            <input
+              type="number"
+              value={markup * 100} // Convert to percentage
+              onChange={(e) => setMarkup(e.target.value / 100)} // Convert back to multiplier
+              step="0.1"
+              min="1.0"
+              max="10.0"
+            />
+            <span>%</span>
+          </div>
+        )}
+
+        <button type="submit">Upload</button>
+      </form>
+      {cost > 0 && <div><h3>Estimated Job Cost: ${cost}</h3></div>}
     </div>
   );
-}
+};
 
 export default UploadForm;
