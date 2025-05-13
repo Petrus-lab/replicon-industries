@@ -1,0 +1,59 @@
+(Version 1.0 — Last Updated May 2025)
+
+✅ 1. Login System
+ Google Login (Sign in with Google works)
+
+ Email & Password Login (Sign up and login with email works)
+
+✅ 2. Client Portal
+ Shipping Address Form
+
+ Saves to Firestore under /shipping/{userId}
+
+ Confirmation message displayed
+
+ 3D File Upload Form
+
+ Uploads file to /uploads/{userId}/fileName in Storage
+
+ Creates job record in /jobs collection
+
+ Confirmation message displayed
+
+✅ 3. Admin Portal Access
+ Admin Account Recognized (admin@replicon.local / PrintReady!2025)
+
+ Admin panel loads when using ?admin=true or as detected admin user
+
+✅ 4. Admin Panel Functionality
+ Job Table Displays Submitted Jobs
+
+ Includes User, File Name, Filament, Color, Cost, Date
+
+ Shipping Address Displayed for Jobs
+
+✅ 5. Logout Functionality
+ Logout Button Works
+
+ Returns user to login screen
+
+ Clears session
+
+✅ 6. Deployment Verification
+ GitHub Main Branch Is Up-to-Date
+
+https://github.com/Petrus-lab/replicon-industries
+
+ Vercel Deploys Successfully
+
+https://replicon-industries.vercel.app
+
+✅ 7. Secure Firebase Rules
+ Firestore Rules Published
+
+Link to Rules
+
+ Storage Rules Published
+
+Link to Rules
+

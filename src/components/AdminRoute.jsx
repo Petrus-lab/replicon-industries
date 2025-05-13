@@ -1,4 +1,5 @@
-// src/components/AdminRoute.jsx
+// Path: src/components/AdminRoute.jsx
+
 import React, { useEffect, useState } from 'react';
 import { auth } from '../firebase';
 import { getIdTokenResult } from 'firebase/auth';
@@ -12,9 +13,13 @@ const AdminRoute = () => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        await user.getIdToken(true); // force refresh to get latest claims
-        const token = await getIdTokenResult(user);
-        setIsAdmin(!!token.claims.admin);
+        try {
+          await user.getIdToken(true);  // ✅ Force refresh to ensure latest claims
+          const token = await getIdTokenResult(user);
+          setIsAdmin(!!token.claims.admin);
+        } catch (error) {
+          console.error("❌ Error checking admin claims:", error);
+        }
       }
       setLoading(false);
     });
@@ -23,11 +28,14 @@ const AdminRoute = () => {
   }, []);
 
   if (loading) return <div>Loading...</div>;
+
   return (
     <div>
+      {/* ✅ Role Indicator */}
       <div style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
-        {isAdmin ? 'Admin View' : 'Client View'}
+        {isAdmin ? '🛠️ Admin View' : '👤 Client View'}
       </div>
+
       {isAdmin ? <AdminPanel /> : <AuthPage />}
     </div>
   );
