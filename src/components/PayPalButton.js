@@ -1,38 +1,46 @@
-// Path: src/components/PayPalButton.js
+// ✅ FILE: src/components/PayPalButton.jsx
 
 import React from 'react';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-import { db } from '../firebase'; // Import Firestore database
+import { db } from '../firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
-const PayPalButtonComponent = ({ jobId }) => {
+// ✅ Reads PayPal Client ID from environment variable or fallback placeholder
+const PAYPAL_CLIENT_ID = process.env.REACT_APP_PAYPAL_CLIENT_ID || 'your-paypal-client-id';
+
+const PayPalButtonComponent = ({ jobId, amount = '50.00', description = 'Replicon Industries Order' }) => {
+
   const updatePaymentStatus = async (jobId, status) => {
-    const jobDoc = doc(db, 'jobs', jobId);
-    await updateDoc(jobDoc, { paymentStatus: status });
+    try {
+      const jobDoc = doc(db, 'jobs', jobId);
+      await updateDoc(jobDoc, { paymentStatus: status });
+      console.log(`✅ Payment status updated for job ${jobId} to "${status}".`);
+    } catch (error) {
+      console.error(`❌ Failed to update payment status for job ${jobId}:`, error);
+    }
   };
 
   return (
-    <PayPalScriptProvider options={{ "client-id": "AXXQSc4zl-3p4f_L2GIf-osWPBLX5vtAmABoz33lVj2NuiSug7n0LtIhvFjGyW0Y2oGKkujK7TwHvC-p", "currency": "USD" }}>
+    <PayPalScriptProvider options={{ "client-id": PAYPAL_CLIENT_ID, "currency": "USD" }}>
       <PayPalButtons
+        style={{ layout: 'vertical' }}
         createOrder={(data, actions) => {
           return actions.order.create({
             purchase_units: [{
-              amount: {
-                value: '50.00', // Replace with the actual order amount
-              },
-              description: 'Replicon Industries Order',
+              amount: { value: amount },
+              description: description,
             }],
           });
         }}
         onApprove={(data, actions) => {
           return actions.order.capture().then((details) => {
-            alert('Transaction completed by ' + details.payer.name.given_name);
+            alert(`✅ Transaction completed by ${details.payer.name.given_name}`);
             updatePaymentStatus(jobId, 'Paid');
           });
         }}
         onError={(err) => {
-          console.error('PayPal error: ', err);
-          alert('There was an error processing your payment.');
+          console.error('❌ PayPal Error:', err);
+          alert('❌ There was an error processing your payment.');
         }}
       />
     </PayPalScriptProvider>
