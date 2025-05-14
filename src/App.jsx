@@ -1,38 +1,25 @@
-// ✅ FILE: src/App.jsx
-
-import React, { useEffect, useState } from 'react';
-import { auth } from './firebase';
-import AuthPage from './components/AuthPage';
-import AdminRoute from './components/AdminRoute';
+// src/App.jsx
+import React, { useState } from 'react';
+import AuthPage from './AuthPage';
+import UploadForm from './UploadForm';
+import ShippingForm from './ShippingForm';
+import AdminPanel from './AdminPanel';
+import PricingManager from './PricingManager';
+import Checkout from './Checkout';        // ← added import
 
 function App() {
-  const [checking, setChecking] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [user, setUser] = useState(null);
+  const [paypalEnabled, setPaypalEnabled] = useState(true);  // ← added toggle
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-      try {
-        if (currentUser) {
-          await currentUser.getIdToken(true); // ✅ Force refresh for updated claims
-          const tokenResult = await currentUser.getIdTokenResult();
-          setIsAdmin(!!tokenResult.claims.admin);
-          setUser(currentUser);
-          console.log("✅ User authenticated:", currentUser.email, "Admin:", !!tokenResult.claims.admin);
-        }
-      } catch (err) {
-        console.error("Error checking auth status:", err);
-      } finally {
-        setChecking(false);
-      }
-    });
+  return (
+    <div className="App">
+      {/* …your existing routes / layout… */}
 
-    return () => unsubscribe();
-  }, []);
+      {/* Example: show checkout after user selects amount */}
+      <Checkout amount="10.00" paypalEnabled={paypalEnabled} />
 
-  if (checking) return <div style={{ padding: '2rem' }}>🔄 Checking role...</div>;
-
-  return isAdmin ? <AdminRoute /> : <AuthPage />;
+      {/* You can add a real toggle switch to flip paypalEnabled */}
+    </div>
+  );
 }
 
 export default App;
