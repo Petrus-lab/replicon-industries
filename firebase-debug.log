@@ -1,0 +1,662 @@
+[debug] [2025-05-14T20:50:21.268Z] ----------------------------------------------------------------------
+[debug] [2025-05-14T20:50:21.271Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions --debug
+[debug] [2025-05-14T20:50:21.271Z] CLI Version:   14.3.1
+[debug] [2025-05-14T20:50:21.272Z] Platform:      win32
+[debug] [2025-05-14T20:50:21.272Z] Node Version:  v20.10.0
+[debug] [2025-05-14T20:50:21.272Z] Time:          Wed May 14 2025 22:50:21 GMT+0200 (South Africa Standard Time)
+[debug] [2025-05-14T20:50:21.272Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-14T20:50:21.482Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-14T20:50:21.483Z] > authorizing via signed-in user (p.a.abbott.personal@gmail.com)
+[debug] [2025-05-14T20:50:21.484Z] [iam] checking project replicon-industries for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-05-14T20:50:21.485Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:21.485Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:21.486Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions [none]
+[debug] [2025-05-14T20:50:21.486Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:21.487Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-05-14T20:50:23.147Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions 200
+[debug] [2025-05-14T20:50:23.148Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-05-14T20:50:23.148Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:23.148Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:23.149Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-05-14T20:50:23.149Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-05-14T20:50:24.947Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-05-14T20:50:24.947Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'replicon-industries'...
+[info] 
+[info] i  deploying functions 
+[debug] [2025-05-14T20:50:24.961Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:24.961Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:24.962Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2025-05-14T20:50:24.962Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:26.937Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com 200
+[debug] [2025-05-14T20:50:26.938Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2025-05-14T20:50:26.938Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:26.938Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:26.938Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries [none]
+[debug] [2025-05-14T20:50:27.259Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries 200
+[debug] [2025-05-14T20:50:27.260Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries {"projectNumber":"500105339531","projectId":"replicon-industries","lifecycleState":"ACTIVE","name":"Replicon Industries","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-05-04T11:54:22.640114Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:27.264Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:27.264Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:27.266Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:27.266Z] Checked if tokens are valid: true, expires at: 1747257135407
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:27.267Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:27.268Z] Checked if tokens are valid: true, expires at: 1747257135407
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:27.268Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:27.269Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:27.269Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-05-14T20:50:27.270Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:27.272Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com [none]
+[debug] [2025-05-14T20:50:27.272Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:27.280Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com [none]
+[debug] [2025-05-14T20:50:27.280Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:27.288Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com [none]
+[debug] [2025-05-14T20:50:27.289Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:28.895Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com 200
+[debug] [2025-05-14T20:50:28.895Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com [omitted]
+[info] +  functions: required API cloudfunctions.googleapis.com is enabled 
+[debug] [2025-05-14T20:50:29.062Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com 200
+[debug] [2025-05-14T20:50:29.062Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com [omitted]
+[info] +  functions: required API cloudbuild.googleapis.com is enabled 
+[debug] [2025-05-14T20:50:29.068Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com 200
+[debug] [2025-05-14T20:50:29.068Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2025-05-14T20:50:29.080Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com 200
+[debug] [2025-05-14T20:50:29.081Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com [omitted]
+[info] +  artifactregistry: required API artifactregistry.googleapis.com is enabled 
+[debug] [2025-05-14T20:50:29.082Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:29.083Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:29.083Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/replicon-industries/adminSdkConfig [none]
+[debug] [2025-05-14T20:50:29.923Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/replicon-industries/adminSdkConfig 200
+[debug] [2025-05-14T20:50:29.924Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/replicon-industries/adminSdkConfig {"projectId":"replicon-industries","storageBucket":"replicon-industries.firebasestorage.app"}
+[debug] [2025-05-14T20:50:29.926Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:29.926Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:29.927Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs [none]
+[debug] [2025-05-14T20:50:30.522Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs 200
+[debug] [2025-05-14T20:50:30.523Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs {"configs":[{"name":"projects/replicon-industries/configs/paypal"}]}
+[debug] [2025-05-14T20:50:30.524Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:30.525Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:30.526Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables [none]
+[debug] [2025-05-14T20:50:30.887Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables 200
+[debug] [2025-05-14T20:50:30.887Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables {"variables":[{"name":"projects/replicon-industries/configs/paypal/variables/client_id","updateTime":"2025-05-14T20:49:39.721650462Z"},{"name":"projects/replicon-industries/configs/paypal/variables/client_secret","updateTime":"2025-05-14T20:49:40.177106767Z"}]}
+[debug] [2025-05-14T20:50:30.889Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:30.889Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:30.889Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:30.890Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:30.891Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_id [none]
+[debug] [2025-05-14T20:50:30.893Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_secret [none]
+[debug] [2025-05-14T20:50:31.254Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_id 200
+[debug] [2025-05-14T20:50:31.255Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_id {"name":"projects/replicon-industries/configs/paypal/variables/client_id","updateTime":"2025-05-14T20:49:39.721650462Z","text":"AXXQSc4zl-3p4f_L2GIf-osWPBLX5vtAmABoz33lVj2NuiSug7n0LtIhvFjGyW0Y2oGKkujK7TwHvC-p"}
+[debug] [2025-05-14T20:50:31.443Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_secret 200
+[debug] [2025-05-14T20:50:31.443Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_secret {"name":"projects/replicon-industries/configs/paypal/variables/client_secret","updateTime":"2025-05-14T20:49:40.177106767Z","text":"EFFzyop065CBrN--r_WPSU9Mimo5RAz7DTXBNU60KLsP9ghnT2mGgRJ37K0sQfrI40_-HuDbVIrVcAd"}
+[debug] [2025-05-14T20:50:31.450Z] Validating nodejs source
+[warn] !  functions: Runtime Node.js 18 was deprecated on 2025-04-30 and will be decommissioned on 2025-10-31, after which you will not be able to deploy without upgrading. Consider upgrading now to avoid disruption. See https://cloud.google.com/functions/docs/runtime-support for full details on the lifecycle policy 
+[debug] [2025-05-14T20:50:32.775Z] > [functions] package.json contents: {
+  "name": "replicon-paypal-functions",
+  "description": "Firebase Cloud Functions for Replicon Industries PayPal integration",
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log --only paypal"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.3.2",
+    "node-fetch": "^2.6.7"
+  }
+}
+[debug] [2025-05-14T20:50:32.776Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2025-05-14T20:50:32.777Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-05-14T20:50:32.785Z] Found firebase-functions binary at 'C:\replicon-industries\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8718
+
+[debug] [2025-05-14T20:50:33.467Z] Got response from /__/functions.yaml {"endpoints":{"paypal":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"paypal"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:38.546Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:38.546Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:38.546Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com [none]
+[debug] [2025-05-14T20:50:38.547Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:40.605Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com 200
+[debug] [2025-05-14T20:50:40.605Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com [omitted]
+[info] +  extensions: required API firebaseextensions.googleapis.com is enabled 
+[debug] [2025-05-14T20:50:40.605Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-14T20:50:40.606Z] > authorizing via signed-in user (p.a.abbott.personal@gmail.com)
+[debug] [2025-05-14T20:50:40.606Z] [iam] checking project replicon-industries for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2025-05-14T20:50:40.607Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:40.607Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:40.607Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions [none]
+[debug] [2025-05-14T20:50:40.607Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:40.607Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-05-14T20:50:42.215Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions 200
+[debug] [2025-05-14T20:50:42.216Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-05-14T20:50:42.218Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:42.219Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:42.221Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/replicon-industries/instances pageSize=100&pageToken=
+[debug] [2025-05-14T20:50:44.121Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/replicon-industries/instances 200
+[debug] [2025-05-14T20:50:44.121Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/replicon-industries/instances {}
+[info] i  functions: preparing functions directory for uploading... 
+[info] i  functions: packaged C:\replicon-industries\functions (29.75 KB) for uploading 
+[debug] [2025-05-14T20:50:44.185Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:44.186Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:44.186Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/replicon-industries/locations/-/functions [none]
+[debug] [2025-05-14T20:50:45.229Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/replicon-industries/locations/-/functions 200
+[debug] [2025-05-14T20:50:45.230Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/replicon-industries/locations/-/functions {}
+[debug] [2025-05-14T20:50:45.231Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:45.232Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:45.233Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2025-05-14T20:50:46.342Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/-/functions 200
+[debug] [2025-05-14T20:50:46.342Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/-/functions {}
+[info] i  functions: ensuring required API run.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:46.350Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:46.351Z] Checked if tokens are valid: true, expires at: 1747257135407
+[info] i  functions: ensuring required API eventarc.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:46.351Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:46.352Z] Checked if tokens are valid: true, expires at: 1747257135407
+[info] i  functions: ensuring required API pubsub.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:46.353Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:46.353Z] Checked if tokens are valid: true, expires at: 1747257135407
+[info] i  functions: ensuring required API storage.googleapis.com is enabled... 
+[debug] [2025-05-14T20:50:46.354Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:46.354Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:46.355Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com [none]
+[debug] [2025-05-14T20:50:46.355Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:46.361Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com [none]
+[debug] [2025-05-14T20:50:46.362Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:46.368Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com [none]
+[debug] [2025-05-14T20:50:46.368Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:46.372Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com [none]
+[debug] [2025-05-14T20:50:46.372Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:48.120Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com 200
+[debug] [2025-05-14T20:50:48.120Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com [omitted]
+[info] +  functions: required API storage.googleapis.com is enabled 
+[debug] [2025-05-14T20:50:48.149Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com 200
+[debug] [2025-05-14T20:50:48.149Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com [omitted]
+[warn] !  functions: missing required API run.googleapis.com. Enabling now... 
+[debug] [2025-05-14T20:50:48.149Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:48.149Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:48.149Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com:enable [none]
+[debug] [2025-05-14T20:50:48.149Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com:enable x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:48.150Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com 200
+[debug] [2025-05-14T20:50:48.150Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com [omitted]
+[warn] !  functions: missing required API eventarc.googleapis.com. Enabling now... 
+[debug] [2025-05-14T20:50:48.150Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:48.150Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:48.151Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com:enable [none]
+[debug] [2025-05-14T20:50:48.151Z] >>> [apiv2][(partial)header] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com:enable x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:48.172Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com 200
+[debug] [2025-05-14T20:50:48.172Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com [omitted]
+[info] +  functions: required API pubsub.googleapis.com is enabled 
+[debug] [2025-05-14T20:50:48.997Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com:enable 200
+[debug] [2025-05-14T20:50:48.997Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com:enable [omitted]
+[debug] [2025-05-14T20:50:49.095Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com:enable 200
+[debug] [2025-05-14T20:50:49.096Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com:enable [omitted]
+[debug] [2025-05-14T20:50:59.003Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:59.004Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:59.004Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com [none]
+[debug] [2025-05-14T20:50:59.004Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:50:59.098Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:59.098Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:50:59.098Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com [none]
+[debug] [2025-05-14T20:50:59.099Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:51:00.794Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com 200
+[debug] [2025-05-14T20:51:00.794Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com [omitted]
+[info] +  functions: required API eventarc.googleapis.com is enabled 
+[debug] [2025-05-14T20:51:00.919Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com 200
+[debug] [2025-05-14T20:51:00.919Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com [omitted]
+[info] +  functions: required API run.googleapis.com is enabled 
+[info] i  functions: generating the service identity for pubsub.googleapis.com... 
+[debug] [2025-05-14T20:51:00.925Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:00.926Z] Checked if tokens are valid: true, expires at: 1747257135407
+[info] i  functions: generating the service identity for eventarc.googleapis.com... 
+[debug] [2025-05-14T20:51:00.926Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:00.927Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:00.927Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/pubsub.googleapis.com:generateServiceIdentity [none]
+[debug] [2025-05-14T20:51:00.928Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/eventarc.googleapis.com:generateServiceIdentity [none]
+[debug] [2025-05-14T20:51:01.619Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/eventarc.googleapis.com:generateServiceIdentity 200
+[debug] [2025-05-14T20:51:01.620Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/eventarc.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-500105339531@gcp-sa-eventarc.iam.gserviceaccount.com","uniqueId":"103910123386343931407"}}
+[debug] [2025-05-14T20:51:02.816Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/pubsub.googleapis.com:generateServiceIdentity 200
+[debug] [2025-05-14T20:51:02.816Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/pubsub.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-500105339531@gcp-sa-pubsub.iam.gserviceaccount.com","uniqueId":"106718135198384843772"}}
+[debug] [2025-05-14T20:51:02.821Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:02.821Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:02.821Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2025-05-14T20:51:02.821Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:51:03.326Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com 200
+[debug] [2025-05-14T20:51:03.327Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2025-05-14T20:51:03.327Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:03.328Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:03.328Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries [none]
+[debug] [2025-05-14T20:51:04.969Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries 200
+[debug] [2025-05-14T20:51:04.970Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries {"projectNumber":"500105339531","projectId":"replicon-industries","lifecycleState":"ACTIVE","name":"Replicon Industries","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-05-04T11:54:22.640114Z"}
+[debug] [2025-05-14T20:51:04.974Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:04.975Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:04.975Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/replicon-industries/billingInfo [none]
+[debug] [2025-05-14T20:51:06.136Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/replicon-industries/billingInfo 200
+[debug] [2025-05-14T20:51:06.137Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/replicon-industries/billingInfo {"name":"projects/replicon-industries/billingInfo","projectId":"replicon-industries","billingAccountName":"billingAccounts/0184EF-612097-8638CF","billingEnabled":true}
+[debug] [2025-05-14T20:51:06.141Z] [functions] found 1 new HTTP functions, testing setIamPolicy permission...
+[debug] [2025-05-14T20:51:06.142Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:06.143Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:06.143Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions [none]
+[debug] [2025-05-14T20:51:06.144Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:51:06.145Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["cloudfunctions.functions.setIamPolicy"]}
+[debug] [2025-05-14T20:51:06.421Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions 200
+[debug] [2025-05-14T20:51:06.421Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["cloudfunctions.functions.setIamPolicy"]}
+[debug] [2025-05-14T20:51:06.421Z] [functions] found setIamPolicy permission, proceeding with deploy
+[debug] [2025-05-14T20:51:06.422Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:06.422Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:06.423Z] >>> [apiv2][query] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions:generateUploadUrl [none]
+[debug] [2025-05-14T20:51:07.872Z] <<< [apiv2][status] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions:generateUploadUrl 200
+[debug] [2025-05-14T20:51:07.872Z] <<< [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions:generateUploadUrl {"uploadUrl":"https://storage.googleapis.com/gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com/cd247636-47b0-41af-bcb5-2016239d5372.zip?GoogleAccessId=service-500105339531@gcf-admin-robot.iam.gserviceaccount.com&Expires=1747257667&Signature=c%2BE4%2FZYSqRaft9RkF2SNwm%2BMmOn5vzzwNRDMn9gxvhCsdF0yKszwh%2FsEc0Ir4iJ%2F931sEpr3sEMy40L2akEYUrR6Xj%2BO73JDcEw%2BLp02wRnACGFR213KxdJTUz0wa2wyN5xuQp0zCvbXcBgyMpAGThQvKHjSrp996e1F1e3auobnf56nPDy3eahB0Xuc0DUyr0mgq2Sa0fGaaCAHnYI1pzvpbxLiREDo9k4S4XoU3zxVAiRj5e1sfCYqcZhkolome5%2Fxpi%2BqGxOYrNfDdeJDlzmMugtatxFvoDXmrkfAvsSi85C3AlI8OQEGqoVXOFJ79Co45x9X%2FuMvZAD07EnBSg%3D%3D","storageSource":{"bucket":"gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com","object":"cd247636-47b0-41af-bcb5-2016239d5372.zip"}}
+[debug] [2025-05-14T20:51:07.874Z] >>> [apiv2][query] PUT https://storage.googleapis.com/gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com/cd247636-47b0-41af-bcb5-2016239d5372.zip GoogleAccessId=service-500105339531%40gcf-admin-robot.iam.gserviceaccount.com&Expires=1747257667&Signature=c%2BE4%2FZYSqRaft9RkF2SNwm%2BMmOn5vzzwNRDMn9gxvhCsdF0yKszwh%2FsEc0Ir4iJ%2F931sEpr3sEMy40L2akEYUrR6Xj%2BO73JDcEw%2BLp02wRnACGFR213KxdJTUz0wa2wyN5xuQp0zCvbXcBgyMpAGThQvKHjSrp996e1F1e3auobnf56nPDy3eahB0Xuc0DUyr0mgq2Sa0fGaaCAHnYI1pzvpbxLiREDo9k4S4XoU3zxVAiRj5e1sfCYqcZhkolome5%2Fxpi%2BqGxOYrNfDdeJDlzmMugtatxFvoDXmrkfAvsSi85C3AlI8OQEGqoVXOFJ79Co45x9X%2FuMvZAD07EnBSg%3D%3D
+[debug] [2025-05-14T20:51:07.874Z] >>> [apiv2][body] PUT https://storage.googleapis.com/gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com/cd247636-47b0-41af-bcb5-2016239d5372.zip [stream]
+[debug] [2025-05-14T20:51:08.877Z] <<< [apiv2][status] PUT https://storage.googleapis.com/gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com/cd247636-47b0-41af-bcb5-2016239d5372.zip 200
+[debug] [2025-05-14T20:51:08.878Z] <<< [apiv2][body] PUT https://storage.googleapis.com/gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com/cd247636-47b0-41af-bcb5-2016239d5372.zip [omitted]
+[info] +  functions: functions folder uploaded successfully 
+[info] i  functions: creating Node.js 18 (2nd Gen) function paypal(us-central1)... 
+[debug] [2025-05-14T20:51:08.904Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:08.904Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:08.905Z] >>> [apiv2][query] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions functionId=paypal
+[debug] [2025-05-14T20:51:08.905Z] >>> [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions {"name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-uploads-500105339531.us-central1.cloudfunctions.appspot.com","object":"cd247636-47b0-41af-bcb5-2016239d5372.zip"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""}},"serviceConfig":{"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}","GCLOUD_PROJECT":"replicon-industries","EVENTARC_CLOUD_EVENT_SOURCE":"projects/replicon-industries/locations/us-central1/services/paypal","FUNCTION_TARGET":"paypal","LOG_EXECUTION_ID":"true"},"ingressSettings":null,"timeoutSeconds":null,"serviceAccountEmail":null,"availableMemory":"256Mi","minInstanceCount":null,"maxInstanceCount":null,"maxInstanceRequestConcurrency":80,"availableCpu":"1","vpcConnector":null,"vpcConnectorEgressSettings":null},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"}}
+[debug] [2025-05-14T20:51:11.362Z] <<< [apiv2][status] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions 200
+[debug] [2025-05-14T20:51:11.362Z] <<< [apiv2][body] POST https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/functions {"name":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-05-14T20:51:11.369714628Z","target":"projects/replicon-industries/locations/us-central1/functions/paypal","verb":"create","cancelRequested":false,"apiVersion":"v2"},"done":false}
+[debug] [2025-05-14T20:51:11.363Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:11.363Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:11.363Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 [none]
+[debug] [2025-05-14T20:51:12.203Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 200
+[debug] [2025-05-14T20:51:12.204Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 {"name":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-05-14T20:51:11.369714628Z","target":"projects/replicon-industries/locations/us-central1/functions/paypal","verb":"create","cancelRequested":false,"apiVersion":"v2","requestResource":{"@type":"type.googleapis.com/google.cloud.functions.v2.Function","name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"serviceAccount":"projects/replicon-industries/serviceAccounts/500105339531-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/replicon-industries/locations/us-central1/services/paypal","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}","GCLOUD_PROJECT":"replicon-industries","EVENTARC_CLOUD_EVENT_SOURCE":"projects/replicon-industries/locations/us-central1/services/paypal","FUNCTION_TARGET":"paypal","LOG_EXECUTION_ID":"true"},"ingressSettings":"ALLOW_ALL","serviceAccountEmail":"500105339531-compute@developer.gserviceaccount.com","availableMemory":"256Mi","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"},"environment":"GEN_2"},"stages":[{"name":"BUILD","state":"NOT_STARTED","stateMessages":[{"severity":"WARNING","type":"BuildAnalysisWarning","message":"Node.js 18 is no longer supported by the Node.js community as of 30 April, 2025. Runtime nodejs18 is currently deprecated for Cloud Functions. We recommend you to upgrade to the latest version of Node.js as soon as possible."}]},{"name":"SERVICE","state":"NOT_STARTED"}],"operationType":"CREATE_FUNCTION"},"done":false}
+[debug] [2025-05-14T20:51:12.705Z] [create-default-us-central1-paypal] Retrying task index 0
+[debug] [2025-05-14T20:51:12.706Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:12.707Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:12.708Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 [none]
+[debug] [2025-05-14T20:51:13.538Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 200
+[debug] [2025-05-14T20:51:13.539Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 {"name":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-05-14T20:51:11.369714628Z","target":"projects/replicon-industries/locations/us-central1/functions/paypal","verb":"create","cancelRequested":false,"apiVersion":"v2","requestResource":{"@type":"type.googleapis.com/google.cloud.functions.v2.Function","name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"serviceAccount":"projects/replicon-industries/serviceAccounts/500105339531-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/replicon-industries/locations/us-central1/services/paypal","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}","GCLOUD_PROJECT":"replicon-industries","EVENTARC_CLOUD_EVENT_SOURCE":"projects/replicon-industries/locations/us-central1/services/paypal","FUNCTION_TARGET":"paypal","LOG_EXECUTION_ID":"true"},"ingressSettings":"ALLOW_ALL","serviceAccountEmail":"500105339531-compute@developer.gserviceaccount.com","availableMemory":"256Mi","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"},"environment":"GEN_2"},"stages":[{"name":"BUILD","state":"NOT_STARTED","stateMessages":[{"severity":"WARNING","type":"BuildAnalysisWarning","message":"Node.js 18 is no longer supported by the Node.js community as of 30 April, 2025. Runtime nodejs18 is currently deprecated for Cloud Functions. We recommend you to upgrade to the latest version of Node.js as soon as possible."}]},{"name":"SERVICE","state":"NOT_STARTED"}],"operationType":"CREATE_FUNCTION"},"done":false}
+[debug] [2025-05-14T20:51:14.548Z] [create-default-us-central1-paypal] Retrying task index 0
+[debug] [2025-05-14T20:51:14.549Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:14.549Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:14.550Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 [none]
+[debug] [2025-05-14T20:51:15.380Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 200
+[debug] [2025-05-14T20:51:15.381Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 {"name":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-05-14T20:51:11.369714628Z","target":"projects/replicon-industries/locations/us-central1/functions/paypal","verb":"create","cancelRequested":false,"apiVersion":"v2","requestResource":{"@type":"type.googleapis.com/google.cloud.functions.v2.Function","name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"serviceAccount":"projects/replicon-industries/serviceAccounts/500105339531-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/replicon-industries/locations/us-central1/services/paypal","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}","GCLOUD_PROJECT":"replicon-industries","EVENTARC_CLOUD_EVENT_SOURCE":"projects/replicon-industries/locations/us-central1/services/paypal","FUNCTION_TARGET":"paypal","LOG_EXECUTION_ID":"true"},"ingressSettings":"ALLOW_ALL","serviceAccountEmail":"500105339531-compute@developer.gserviceaccount.com","availableMemory":"256Mi","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"},"environment":"GEN_2"},"stages":[{"name":"BUILD","state":"NOT_STARTED","stateMessages":[{"severity":"WARNING","type":"BuildAnalysisWarning","message":"Node.js 18 is no longer supported by the Node.js community as of 30 April, 2025. Runtime nodejs18 is currently deprecated for Cloud Functions. We recommend you to upgrade to the latest version of Node.js as soon as possible."}]},{"name":"SERVICE","state":"NOT_STARTED"}],"operationType":"CREATE_FUNCTION"},"done":false}
+[debug] [2025-05-14T20:51:17.390Z] [create-default-us-central1-paypal] Retrying task index 0
+[debug] [2025-05-14T20:51:17.390Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:17.391Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:17.391Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 [none]
+[debug] [2025-05-14T20:51:18.209Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 200
+[debug] [2025-05-14T20:51:18.210Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 {"name":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-05-14T20:51:11.369714628Z","target":"projects/replicon-industries/locations/us-central1/functions/paypal","verb":"create","cancelRequested":false,"apiVersion":"v2","requestResource":{"@type":"type.googleapis.com/google.cloud.functions.v2.Function","name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"serviceAccount":"projects/replicon-industries/serviceAccounts/500105339531-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/replicon-industries/locations/us-central1/services/paypal","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}","GCLOUD_PROJECT":"replicon-industries","EVENTARC_CLOUD_EVENT_SOURCE":"projects/replicon-industries/locations/us-central1/services/paypal","FUNCTION_TARGET":"paypal","LOG_EXECUTION_ID":"true"},"ingressSettings":"ALLOW_ALL","serviceAccountEmail":"500105339531-compute@developer.gserviceaccount.com","availableMemory":"256Mi","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"},"environment":"GEN_2"},"stages":[{"name":"BUILD","state":"NOT_STARTED","stateMessages":[{"severity":"WARNING","type":"BuildAnalysisWarning","message":"Node.js 18 is no longer supported by the Node.js community as of 30 April, 2025. Runtime nodejs18 is currently deprecated for Cloud Functions. We recommend you to upgrade to the latest version of Node.js as soon as possible."}]},{"name":"SERVICE","state":"NOT_STARTED"}],"operationType":"CREATE_FUNCTION"},"done":false}
+[debug] [2025-05-14T20:51:22.221Z] [create-default-us-central1-paypal] Retrying task index 0
+[debug] [2025-05-14T20:51:22.222Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:22.222Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:22.223Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 [none]
+[debug] [2025-05-14T20:51:23.116Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 200
+[debug] [2025-05-14T20:51:23.117Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 {"name":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005","metadata":{"@type":"type.googleapis.com/google.cloud.functions.v2.OperationMetadata","createTime":"2025-05-14T20:51:11.369714628Z","target":"projects/replicon-industries/locations/us-central1/functions/paypal","verb":"create","cancelRequested":false,"apiVersion":"v2","requestResource":{"@type":"type.googleapis.com/google.cloud.functions.v2.Function","name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"serviceAccount":"projects/replicon-industries/serviceAccounts/500105339531-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"serviceConfig":{"service":"projects/replicon-industries/locations/us-central1/services/paypal","timeoutSeconds":60,"environmentVariables":{"FIREBASE_CONFIG":"{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}","GCLOUD_PROJECT":"replicon-industries","EVENTARC_CLOUD_EVENT_SOURCE":"projects/replicon-industries/locations/us-central1/services/paypal","FUNCTION_TARGET":"paypal","LOG_EXECUTION_ID":"true"},"ingressSettings":"ALLOW_ALL","serviceAccountEmail":"500105339531-compute@developer.gserviceaccount.com","availableMemory":"256Mi","maxInstanceRequestConcurrency":80,"availableCpu":"1"},"labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"},"environment":"GEN_2"},"stages":[{"name":"BUILD","state":"NOT_STARTED","stateMessages":[{"severity":"WARNING","type":"BuildAnalysisWarning","message":"Node.js 18 is no longer supported by the Node.js community as of 30 April, 2025. Runtime nodejs18 is currently deprecated for Cloud Functions. We recommend you to upgrade to the latest version of Node.js as soon as possible."}]},{"name":"SERVICE","state":"NOT_STARTED"}],"operationType":"CREATE_FUNCTION"},"done":false}
+[debug] [2025-05-14T20:51:31.129Z] [create-default-us-central1-paypal] Retrying task index 0
+[debug] [2025-05-14T20:51:31.130Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:31.131Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:31.131Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 [none]
+[debug] [2025-05-14T20:51:37.217Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 404
+[debug] [2025-05-14T20:51:37.217Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 {"error":{"code":404,"message":"Resource 'projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005' was not found","status":"NOT_FOUND","details":[{"@type":"type.googleapis.com/google.rpc.ResourceInfo","resourceName":"projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005"}]}}
+[error] Request to https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 had HTTP Error: 404, Resource 'projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005' was not found
+[debug] [2025-05-14T20:51:37.223Z] Total Function Deployment time: 28332
+[debug] [2025-05-14T20:51:37.223Z] 1 Functions Deployed
+[debug] [2025-05-14T20:51:37.223Z] 1 Functions Errored
+[debug] [2025-05-14T20:51:37.223Z] 0 Function Deployments Aborted
+[debug] [2025-05-14T20:51:37.223Z] Average Function Deployment time: 28329
+[info] 
+[info] Functions deploy had errors with the following functions:
+	paypal(us-central1)
+[debug] [2025-05-14T20:51:37.591Z] Not printing URL for HTTPS function. Typically this means it didn't match a filter or we failed deployment
+[debug] [2025-05-14T20:51:37.593Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:37.593Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:37.594Z] >>> [apiv2][query] GET https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts [none]
+[debug] [2025-05-14T20:51:38.826Z] <<< [apiv2][status] GET https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts 200
+[debug] [2025-05-14T20:51:38.826Z] <<< [apiv2][body] GET https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts {"name":"projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts","format":"DOCKER","description":"This repository is created and used by Cloud Functions for storing function docker images.","labels":{"goog-managed-by":"cloudfunctions"},"createTime":"2025-05-14T20:51:22.188215Z","updateTime":"2025-05-14T20:51:22.188215Z","mode":"STANDARD_REPOSITORY","vulnerabilityScanningConfig":{"lastEnableTime":"2025-05-14T20:51:11.574667630Z","enablementState":"SCANNING_DISABLED","enablementStateReason":"API containerscanning.googleapis.com is not enabled."},"satisfiesPzi":true,"registryUri":"us-central1-docker.pkg.dev/replicon-industries/gcf-artifacts"}
+[warn] !  functions: No cleanup policy detected for repositories in us-central1. This may result in a small monthly bill as container images accumulate over time. 
+[info] i  functions: Configuring cleanup policy for repository in us-central1. Images older than 1 days will be automatically deleted. 
+[debug] [2025-05-14T20:51:38.841Z] Setting up artifact cleanup policy for region us-central1
+[debug] [2025-05-14T20:51:38.841Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:38.841Z] Checked if tokens are valid: true, expires at: 1747257135407
+[debug] [2025-05-14T20:51:38.841Z] >>> [apiv2][query] PATCH https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts updateMask=name%2CcleanupPolicies%2CcleanupPolicyDryRun%2Clabels
+[debug] [2025-05-14T20:51:38.842Z] >>> [apiv2][body] PATCH https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts {"name":"projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts","cleanupPolicies":{"firebase-functions-cleanup":{"id":"firebase-functions-cleanup","condition":{"tagState":"ANY","olderThan":"86400s"},"action":"DELETE"}},"cleanupPolicyDryRun":false,"labels":{"goog-managed-by":"cloudfunctions"}}
+[debug] [2025-05-14T20:51:39.697Z] <<< [apiv2][status] PATCH https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts 200
+[debug] [2025-05-14T20:51:39.698Z] <<< [apiv2][body] PATCH https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts {"name":"projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts","format":"DOCKER","description":"This repository is created and used by Cloud Functions for storing function docker images.","labels":{"goog-managed-by":"cloudfunctions"},"createTime":"2025-05-14T20:51:22.188215Z","updateTime":"2025-05-14T20:51:39.709615Z","mode":"STANDARD_REPOSITORY","cleanupPolicies":{"firebase-functions-cleanup":{"id":"firebase-functions-cleanup","action":"DELETE","condition":{"tagState":"ANY","olderThan":"86400s"}}},"vulnerabilityScanningConfig":{"lastEnableTime":"2025-05-14T20:51:11.574667630Z","enablementState":"SCANNING_DISABLED","enablementStateReason":"API containerscanning.googleapis.com is not enabled."},"satisfiesPzi":true}
+[info] i  functions: Configured cleanup policy for repository in us-central1. 
+[debug] [2025-05-14T20:51:39.698Z] Functions deploy failed.
+[debug] [2025-05-14T20:51:39.699Z] {
+  "endpoint": {
+    "id": "paypal",
+    "project": "replicon-industries",
+    "region": "us-central1",
+    "entryPoint": "paypal",
+    "platform": "gcfv2",
+    "runtime": "nodejs18",
+    "httpsTrigger": {},
+    "labels": {
+      "deployment-tool": "cli-firebase"
+    },
+    "serviceAccount": null,
+    "ingressSettings": null,
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "maxInstances": null,
+    "minInstances": null,
+    "concurrency": 80,
+    "vpc": null,
+    "environmentVariables": {
+      "FIREBASE_CONFIG": "{\"projectId\":\"replicon-industries\",\"storageBucket\":\"replicon-industries.firebasestorage.app\"}",
+      "GCLOUD_PROJECT": "replicon-industries",
+      "EVENTARC_CLOUD_EVENT_SOURCE": "projects/replicon-industries/locations/us-central1/services/paypal"
+    },
+    "codebase": "default",
+    "cpu": 1,
+    "targetedByOnly": false,
+    "hash": "8fa58215899f26f1b139cea34962a1aa4b350800"
+  },
+  "op": "create",
+  "original": {
+    "name": "FirebaseError",
+    "children": [],
+    "context": {
+      "body": {
+        "error": {
+          "code": 404,
+          "message": "Resource 'projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005' was not found",
+          "status": "NOT_FOUND",
+          "details": [
+            {
+              "@type": "type.googleapis.com/google.rpc.ResourceInfo",
+              "resourceName": "projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005"
+            }
+          ]
+        }
+      },
+      "response": {
+        "statusCode": 404
+      }
+    },
+    "exit": 1,
+    "message": "Request to https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005 had HTTP Error: 404, Resource 'projects/replicon-industries/locations/us-central1/operations/operation-1747255869753-6351eb572ca3c-59a4ca6d-34f7e005' was not found",
+    "status": 404,
+    "code": 404
+  }
+}
+[debug] [2025-05-14T20:51:39.884Z] Error: Failed to create function paypal in region us-central1
+    at C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:294:27
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Fabricator.createV2Function (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:278:30)
+    at async Fabricator.createEndpoint (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:137:13)
+    at async handle (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:89:17)
+[error] 
+[error] Error: There was an error deploying functions
+[debug] [2025-05-14T20:57:23.420Z] ----------------------------------------------------------------------
+[debug] [2025-05-14T20:57:23.423Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy --only functions
+[debug] [2025-05-14T20:57:23.423Z] CLI Version:   14.3.1
+[debug] [2025-05-14T20:57:23.423Z] Platform:      win32
+[debug] [2025-05-14T20:57:23.424Z] Node Version:  v20.10.0
+[debug] [2025-05-14T20:57:23.424Z] Time:          Wed May 14 2025 22:57:23 GMT+0200 (South Africa Standard Time)
+[debug] [2025-05-14T20:57:23.424Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-14T20:57:23.635Z] Object "/functions" in "firebase.json" has unknown property: {"additionalProperty":"platform"}
+[debug] [2025-05-14T20:57:23.636Z] Field "/functions" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-05-14T20:57:23.636Z] Field "/functions" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[debug] [2025-05-14T20:57:23.640Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-14T20:57:23.640Z] > authorizing via signed-in user (p.a.abbott.personal@gmail.com)
+[debug] [2025-05-14T20:57:23.641Z] [iam] checking project replicon-industries for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2025-05-14T20:57:23.642Z] Checked if tokens are valid: false, expires at: 1747257135407
+[debug] [2025-05-14T20:57:23.642Z] Checked if tokens are valid: false, expires at: 1747257135407
+[debug] [2025-05-14T20:57:23.642Z] > refreshing access token with scopes: []
+[debug] [2025-05-14T20:57:23.644Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-05-14T20:57:23.644Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-05-14T20:57:24.115Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-05-14T20:57:24.115Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-05-14T20:57:24.134Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions [none]
+[debug] [2025-05-14T20:57:24.134Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:24.135Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-05-14T20:57:25.904Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions 200
+[debug] [2025-05-14T20:57:25.905Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2025-05-14T20:57:25.905Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:25.905Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:25.906Z] >>> [apiv2][query] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions [none]
+[debug] [2025-05-14T20:57:25.906Z] >>> [apiv2][body] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2025-05-14T20:57:27.697Z] <<< [apiv2][status] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions 200
+[debug] [2025-05-14T20:57:27.697Z] <<< [apiv2][body] POST https://iam.googleapis.com/v1/projects/replicon-industries/serviceAccounts/replicon-industries@appspot.gserviceaccount.com:testIamPermissions {"permissions":["iam.serviceAccounts.actAs"]}
+[info] 
+[info] === Deploying to 'replicon-industries'...
+[info] 
+[info] i  deploying functions 
+[debug] [2025-05-14T20:57:27.711Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:27.711Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:27.711Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2025-05-14T20:57:27.711Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:29.774Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com 200
+[debug] [2025-05-14T20:57:29.774Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2025-05-14T20:57:29.775Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:29.775Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:29.776Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries [none]
+[debug] [2025-05-14T20:57:30.089Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries 200
+[debug] [2025-05-14T20:57:30.090Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries {"projectNumber":"500105339531","projectId":"replicon-industries","lifecycleState":"ACTIVE","name":"Replicon Industries","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-05-04T11:54:22.640114Z"}
+[info] i  functions: preparing codebase default for deployment 
+[info] i  functions: ensuring required API cloudfunctions.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:30.093Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:30.094Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:30.094Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:30.095Z] Checked if tokens are valid: true, expires at: 1747259843115
+[info] i  functions: ensuring required API cloudbuild.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:30.096Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:30.096Z] Checked if tokens are valid: true, expires at: 1747259843115
+[info] i  artifactregistry: ensuring required API artifactregistry.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:30.097Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:30.098Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:30.098Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com [none]
+[debug] [2025-05-14T20:57:30.098Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:30.100Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com [none]
+[debug] [2025-05-14T20:57:30.101Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:30.107Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com [none]
+[debug] [2025-05-14T20:57:30.107Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:30.113Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com [none]
+[debug] [2025-05-14T20:57:30.113Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:30.592Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com 200
+[debug] [2025-05-14T20:57:30.592Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudfunctions.googleapis.com [omitted]
+[info] +  functions: required API cloudfunctions.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:31.986Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com 200
+[debug] [2025-05-14T20:57:31.986Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2025-05-14T20:57:31.992Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com 200
+[debug] [2025-05-14T20:57:31.993Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/artifactregistry.googleapis.com [omitted]
+[info] +  artifactregistry: required API artifactregistry.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:31.994Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com 200
+[debug] [2025-05-14T20:57:31.995Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudbuild.googleapis.com [omitted]
+[info] +  functions: required API cloudbuild.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:31.995Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:31.995Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:31.995Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/replicon-industries/adminSdkConfig [none]
+[debug] [2025-05-14T20:57:33.198Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/replicon-industries/adminSdkConfig 200
+[debug] [2025-05-14T20:57:33.199Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/replicon-industries/adminSdkConfig {"projectId":"replicon-industries","storageBucket":"replicon-industries.firebasestorage.app"}
+[debug] [2025-05-14T20:57:33.199Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:33.199Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:33.200Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs [none]
+[debug] [2025-05-14T20:57:33.913Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs 200
+[debug] [2025-05-14T20:57:33.914Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs {"configs":[{"name":"projects/replicon-industries/configs/paypal"}]}
+[debug] [2025-05-14T20:57:33.915Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:33.915Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:33.915Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables [none]
+[debug] [2025-05-14T20:57:34.264Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables 200
+[debug] [2025-05-14T20:57:34.264Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables {"variables":[{"name":"projects/replicon-industries/configs/paypal/variables/client_id","updateTime":"2025-05-14T20:49:39.721650462Z"},{"name":"projects/replicon-industries/configs/paypal/variables/client_secret","updateTime":"2025-05-14T20:49:40.177106767Z"}]}
+[debug] [2025-05-14T20:57:34.266Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:34.267Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:34.267Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:34.267Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:34.268Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_id [none]
+[debug] [2025-05-14T20:57:34.270Z] >>> [apiv2][query] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_secret [none]
+[debug] [2025-05-14T20:57:34.611Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_id 200
+[debug] [2025-05-14T20:57:34.612Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_id {"name":"projects/replicon-industries/configs/paypal/variables/client_id","updateTime":"2025-05-14T20:49:39.721650462Z","text":"AXXQSc4zl-3p4f_L2GIf-osWPBLX5vtAmABoz33lVj2NuiSug7n0LtIhvFjGyW0Y2oGKkujK7TwHvC-p"}
+[debug] [2025-05-14T20:57:34.779Z] <<< [apiv2][status] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_secret 200
+[debug] [2025-05-14T20:57:34.780Z] <<< [apiv2][body] GET https://runtimeconfig.googleapis.com/v1beta1/projects/replicon-industries/configs/paypal/variables/client_secret {"name":"projects/replicon-industries/configs/paypal/variables/client_secret","updateTime":"2025-05-14T20:49:40.177106767Z","text":"EFFzyop065CBrN--r_WPSU9Mimo5RAz7DTXBNU60KLsP9ghnT2mGgRJ37K0sQfrI40_-HuDbVIrVcAd"}
+[debug] [2025-05-14T20:57:34.785Z] Validating nodejs source
+[warn] !  functions: Runtime Node.js 18 was deprecated on 2025-04-30 and will be decommissioned on 2025-10-31, after which you will not be able to deploy without upgrading. Consider upgrading now to avoid disruption. See https://cloud.google.com/functions/docs/runtime-support for full details on the lifecycle policy 
+[debug] [2025-05-14T20:57:36.166Z] > [functions] package.json contents: {
+  "name": "replicon-paypal-functions",
+  "description": "Firebase Cloud Functions for Replicon Industries PayPal integration",
+  "engines": {
+    "node": "18"
+  },
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log --only paypal"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "firebase-admin": "^13.4.0",
+    "firebase-functions": "^6.3.2",
+    "node-fetch": "^2.6.7"
+  }
+}
+[debug] [2025-05-14T20:57:36.166Z] Building nodejs source
+[info] i  functions: Loading and analyzing source code for codebase default to determine what to deploy 
+[debug] [2025-05-14T20:57:36.168Z] Could not find functions.yaml. Must use http discovery
+[debug] [2025-05-14T20:57:36.176Z] Found firebase-functions binary at 'C:\replicon-industries\functions\node_modules\.bin\firebase-functions'
+[info] Serving at port 8162
+
+[debug] [2025-05-14T20:57:36.856Z] Got response from /__/functions.yaml {"endpoints":{"paypal":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","labels":{},"httpsTrigger":{},"entryPoint":"paypal"}},"specVersion":"v1alpha1","requiredAPIs":[],"extensions":{}}
+[info] i  extensions: ensuring required API firebaseextensions.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:41.931Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:41.931Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:41.932Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com [none]
+[debug] [2025-05-14T20:57:41.932Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:43.719Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com 200
+[debug] [2025-05-14T20:57:43.719Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/firebaseextensions.googleapis.com [omitted]
+[info] +  extensions: required API firebaseextensions.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:43.721Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-14T20:57:43.722Z] > authorizing via signed-in user (p.a.abbott.personal@gmail.com)
+[debug] [2025-05-14T20:57:43.723Z] [iam] checking project replicon-industries for permissions ["firebase.projects.get","firebaseextensions.instances.list"]
+[debug] [2025-05-14T20:57:43.723Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:43.724Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:43.724Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions [none]
+[debug] [2025-05-14T20:57:43.724Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:43.724Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-05-14T20:57:45.313Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions 200
+[debug] [2025-05-14T20:57:45.313Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries:testIamPermissions {"permissions":["firebase.projects.get","firebaseextensions.instances.list"]}
+[debug] [2025-05-14T20:57:45.314Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:45.314Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:45.315Z] >>> [apiv2][query] GET https://firebaseextensions.googleapis.com/v1beta/projects/replicon-industries/instances pageSize=100&pageToken=
+[debug] [2025-05-14T20:57:47.196Z] <<< [apiv2][status] GET https://firebaseextensions.googleapis.com/v1beta/projects/replicon-industries/instances 200
+[debug] [2025-05-14T20:57:47.197Z] <<< [apiv2][body] GET https://firebaseextensions.googleapis.com/v1beta/projects/replicon-industries/instances {}
+[info] i  functions: preparing functions directory for uploading... 
+[info] i  functions: packaged C:\replicon-industries\functions (29.75 KB) for uploading 
+[debug] [2025-05-14T20:57:47.272Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:47.272Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:47.272Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/replicon-industries/locations/-/functions [none]
+[debug] [2025-05-14T20:57:48.296Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/replicon-industries/locations/-/functions 200
+[debug] [2025-05-14T20:57:48.297Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/replicon-industries/locations/-/functions {}
+[debug] [2025-05-14T20:57:48.298Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:48.298Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:48.299Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/-/functions filter=environment%3D%22GEN_2%22
+[debug] [2025-05-14T20:57:49.420Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/-/functions 200
+[debug] [2025-05-14T20:57:49.420Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v2/projects/replicon-industries/locations/-/functions {"functions":[{"name":"projects/replicon-industries/locations/us-central1/functions/paypal","buildConfig":{"build":"projects/500105339531/locations/us-central1/builds/975d1ada-ff58-473f-af84-2db155a37160","runtime":"nodejs18","entryPoint":"paypal","source":{"storageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"environmentVariables":{"GOOGLE_NODE_RUN_SCRIPTS":""},"dockerRepository":"projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts","sourceProvenance":{"resolvedStorageSource":{"bucket":"gcf-v2-sources-500105339531-us-central1","object":"paypal/function-source.zip","generation":"1747255870975679"}},"dockerRegistry":"ARTIFACT_REGISTRY","serviceAccount":"projects/replicon-industries/serviceAccounts/500105339531-compute@developer.gserviceaccount.com","automaticUpdatePolicy":{}},"state":"FAILED","updateTime":"2025-05-14T20:53:14.220648934Z","labels":{"deployment-tool":"cli-firebase","firebase-functions-hash":"8fa58215899f26f1b139cea34962a1aa4b350800"},"stateMessages":[{"severity":"ERROR","type":"CloudRunServiceNotFound","message":"Cloud Run service projects/replicon-industries/locations/us-central1/services/paypal for the function was not found. The function will not work correctly. Please redeploy."}],"environment":"GEN_2","url":"https://us-central1-replicon-industries.cloudfunctions.net/paypal","createTime":"2025-05-14T20:51:11.365152550Z","satisfiesPzi":true}]}
+[info] i  functions: ensuring required API run.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:49.430Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:49.431Z] Checked if tokens are valid: true, expires at: 1747259843115
+[info] i  functions: ensuring required API eventarc.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:49.432Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:49.432Z] Checked if tokens are valid: true, expires at: 1747259843115
+[info] i  functions: ensuring required API pubsub.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:49.434Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:49.434Z] Checked if tokens are valid: true, expires at: 1747259843115
+[info] i  functions: ensuring required API storage.googleapis.com is enabled... 
+[debug] [2025-05-14T20:57:49.436Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:49.436Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:49.437Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com [none]
+[debug] [2025-05-14T20:57:49.437Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:49.444Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com [none]
+[debug] [2025-05-14T20:57:49.445Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:49.451Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com [none]
+[debug] [2025-05-14T20:57:49.451Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:49.458Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com [none]
+[debug] [2025-05-14T20:57:49.458Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:51.244Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com 200
+[debug] [2025-05-14T20:57:51.244Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/run.googleapis.com [omitted]
+[info] +  functions: required API run.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:51.248Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com 200
+[debug] [2025-05-14T20:57:51.249Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/eventarc.googleapis.com [omitted]
+[info] +  functions: required API eventarc.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:51.254Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com 200
+[debug] [2025-05-14T20:57:51.255Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/pubsub.googleapis.com [omitted]
+[info] +  functions: required API pubsub.googleapis.com is enabled 
+[debug] [2025-05-14T20:57:51.259Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com 200
+[debug] [2025-05-14T20:57:51.260Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/storage.googleapis.com [omitted]
+[info] +  functions: required API storage.googleapis.com is enabled 
+[info] i  functions: generating the service identity for pubsub.googleapis.com... 
+[debug] [2025-05-14T20:57:51.262Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:51.262Z] Checked if tokens are valid: true, expires at: 1747259843115
+[info] i  functions: generating the service identity for eventarc.googleapis.com... 
+[debug] [2025-05-14T20:57:51.263Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:51.263Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:51.263Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/pubsub.googleapis.com:generateServiceIdentity [none]
+[debug] [2025-05-14T20:57:51.264Z] >>> [apiv2][query] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/eventarc.googleapis.com:generateServiceIdentity [none]
+[debug] [2025-05-14T20:57:51.704Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/pubsub.googleapis.com:generateServiceIdentity 200
+[debug] [2025-05-14T20:57:51.704Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/pubsub.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-500105339531@gcp-sa-pubsub.iam.gserviceaccount.com","uniqueId":"106718135198384843772"}}
+[debug] [2025-05-14T20:57:51.757Z] <<< [apiv2][status] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/eventarc.googleapis.com:generateServiceIdentity 200
+[debug] [2025-05-14T20:57:51.758Z] <<< [apiv2][body] POST https://serviceusage.googleapis.com/v1beta1/projects/500105339531/services/eventarc.googleapis.com:generateServiceIdentity {"name":"operations/finished.DONE_OPERATION","done":true,"response":{"@type":"type.googleapis.com/google.api.serviceusage.v1beta1.ServiceIdentity","email":"service-500105339531@gcp-sa-eventarc.iam.gserviceaccount.com","uniqueId":"103910123386343931407"}}
+[debug] [2025-05-14T20:57:51.764Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:51.764Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:51.765Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [none]
+[debug] [2025-05-14T20:57:51.765Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com x-goog-quota-user=projects/replicon-industries
+[debug] [2025-05-14T20:57:53.401Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com 200
+[debug] [2025-05-14T20:57:53.401Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/replicon-industries/services/cloudresourcemanager.googleapis.com [omitted]
+[debug] [2025-05-14T20:57:53.402Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:53.402Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:53.402Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries [none]
+[debug] [2025-05-14T20:57:55.031Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries 200
+[debug] [2025-05-14T20:57:55.031Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/projects/replicon-industries {"projectNumber":"500105339531","projectId":"replicon-industries","lifecycleState":"ACTIVE","name":"Replicon Industries","labels":{"firebase":"enabled","firebase-core":"disabled"},"createTime":"2025-05-04T11:54:22.640114Z"}
+[debug] [2025-05-14T20:57:55.032Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:55.032Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:55.032Z] >>> [apiv2][query] GET https://cloudbilling.googleapis.com/v1/projects/replicon-industries/billingInfo [none]
+[debug] [2025-05-14T20:57:56.197Z] <<< [apiv2][status] GET https://cloudbilling.googleapis.com/v1/projects/replicon-industries/billingInfo 200
+[debug] [2025-05-14T20:57:56.197Z] <<< [apiv2][body] GET https://cloudbilling.googleapis.com/v1/projects/replicon-industries/billingInfo {"name":"projects/replicon-industries/billingInfo","projectId":"replicon-industries","billingAccountName":"billingAccounts/0184EF-612097-8638CF","billingEnabled":true}
+[info] i  functions: updating Node.js 18 (2nd Gen) function paypal(us-central1)... 
+[debug] [2025-05-14T20:57:56.206Z] Precondition failed. Cannot update a GCFv2 function without storage
+[debug] [2025-05-14T20:57:56.220Z] Total Function Deployment time: 3
+[debug] [2025-05-14T20:57:56.220Z] 1 Functions Deployed
+[debug] [2025-05-14T20:57:56.221Z] 1 Functions Errored
+[debug] [2025-05-14T20:57:56.221Z] 0 Function Deployments Aborted
+[debug] [2025-05-14T20:57:56.221Z] Average Function Deployment time: 1
+[info] 
+[info] Functions deploy had errors with the following functions:
+	paypal(us-central1)
+[debug] [2025-05-14T20:57:56.620Z] Not printing URL for HTTPS function. Typically this means it didn't match a filter or we failed deployment
+[debug] [2025-05-14T20:57:56.621Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:56.622Z] Checked if tokens are valid: true, expires at: 1747259843115
+[debug] [2025-05-14T20:57:56.622Z] >>> [apiv2][query] GET https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts [none]
+[debug] [2025-05-14T20:57:57.847Z] <<< [apiv2][status] GET https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts 200
+[debug] [2025-05-14T20:57:57.847Z] <<< [apiv2][body] GET https://artifactregistry.googleapis.com/v1/projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts {"name":"projects/replicon-industries/locations/us-central1/repositories/gcf-artifacts","format":"DOCKER","description":"This repository is created and used by Cloud Functions for storing function docker images.","labels":{"goog-managed-by":"cloudfunctions"},"createTime":"2025-05-14T20:51:22.188215Z","updateTime":"2025-05-14T20:53:14.094715Z","mode":"STANDARD_REPOSITORY","cleanupPolicies":{"firebase-functions-cleanup":{"id":"firebase-functions-cleanup","action":"DELETE","condition":{"tagState":"ANY","olderThan":"86400s"}}},"sizeBytes":"81716863","vulnerabilityScanningConfig":{"lastEnableTime":"2025-05-14T20:51:11.574667630Z","enablementState":"SCANNING_DISABLED","enablementStateReason":"API containerscanning.googleapis.com is not enabled."},"satisfiesPzi":true,"registryUri":"us-central1-docker.pkg.dev/replicon-industries/gcf-artifacts"}
+[debug] [2025-05-14T20:57:57.847Z] Functions deploy failed.
+[debug] [2025-05-14T20:57:57.847Z] {}
+[debug] [2025-05-14T20:57:58.028Z] Error: Precondition failed
+    at Fabricator.updateV2Function (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:382:19)
+    at Fabricator.updateEndpoint (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:155:24)
+    at C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:110:71
+    at handle (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:89:23)
+    at Fabricator.applyChangeset (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:110:26)
+    at C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:69:40
+    at Array.map (<anonymous>)
+    at Fabricator.applyPlan (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\fabricator.js:68:54)
+    at release (C:\Users\André Abbott\AppData\Roaming\npm\node_modules\firebase-tools\lib\deploy\functions\release\index.js:76:31)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+[error] 
+[error] Error: There was an error deploying functions
