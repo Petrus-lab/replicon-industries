@@ -1,33 +1,44 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React from 'react';
 
-// —– import your components
-import AuthPage       from './components/AuthPage';
-import UploadForm     from './components/UploadForm';
-import ShippingForm   from './components/ShippingForm';
-import AdminPanel     from './components/AdminPanel';
-import PricingManager from './components/PricingManager';
-// import Checkout        from './Checkout';
+// —– Your existing page components
+import AuthPage        from './components/AuthPage';
+import UploadForm      from './components/UploadForm';
+import ShippingForm    from './components/ShippingForm';
+import PricingManager  from './components/PricingManager';
+import AdminPanel      from './components/AdminPanel';
 
 function App() {
-  // —– disable PayPal payments for now —–
-  const [paypalEnabled] = useState(false);
-
   return (
-    <div className="App">
-      {/* …your existing routes/layout… */}
+    <div className="App" style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h1>Replicon Industries Platform</h1>
 
-      {/* Payments are disabled for now */}
-      {/*
-        paypalEnabled && (
-          <Checkout amount="10.00" paypalEnabled={paypalEnabled} />
-        )
-      */}
+      <section style={{ margin: '2rem 0' }}>
+        <h2>1. Authentication</h2>
+        <AuthPage />
+      </section>
 
-      {/* rest of your app… */}
+      <section style={{ margin: '2rem 0' }}>
+        <h2>2. File Upload</h2>
+        <UploadForm />
+      </section>
+
+      <section style={{ margin: '2rem 0' }}>
+        <h2>3. Shipping Details</h2>
+        <ShippingForm />
+      </section>
+
+      <section style={{ margin: '2rem 0' }}>
+        <h2>4. Cost & Filament Management</h2>
+        <PricingManager />
+      </section>
+
+      <section style={{ margin: '2rem 0' }}>
+        <h2>5. Admin Dashboard</h2>
+        <AdminPanel />
+      </section>
     </div>
   );
 }
 
 export default App;
-
