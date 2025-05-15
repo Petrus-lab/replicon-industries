@@ -1,131 +1,70 @@
-// Path: src/components/UploadForm.jsx
+import React, { useState } from 'react';
 
-import React, { useState, useEffect } from 'react';
-import { db, storage, auth } from '../firebase';
-import { getDoc, doc, collection, addDoc } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
-
-const UploadForm = () => {
+export default function UploadForm() {
   const [file, setFile] = useState(null);
-  const [filamentType, setFilamentType] = useState('');
+  const [material, setMaterial] = useState('');
   const [color, setColor] = useState('');
-  const [cost, setCost] = useState(0);
-  const [markup, setMarkup] = useState(1.2); // Default markup (20%)
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [finish, setFinish] = useState('');
+  const [error, setError] = useState('');
 
-  // ✅ Fetch admin status and markup settings on load
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const token = await user.getIdTokenResult();
-        setIsAdmin(!!token.claims.admin);
+  const materials = ['PLA', 'ABS', 'PETG', 'Nylon', 'TPU'];
+  const colors = ['Black', 'White', 'Red', 'Blue', 'Green', 'Gray'];
+  const finishes = ['Raw', 'Supports Removed', 'Ready to Go'];
 
-        if (token.claims.admin) {
-          const markupDocRef = doc(db, 'settings', 'markupSettings');
-          const markupDoc = await getDoc(markupDocRef);
-          if (markupDoc.exists()) {
-            setMarkup(markupDoc.data().markup);
-          }
-        }
-      }
-    };
+  const handleFileChange = e => setFile(e.target.files[0]);
+  const handleMaterialChange = e => setMaterial(e.target.value);
+  const handleColorChange = e => setColor(e.target.value);
+  const handleFinishChange = e => setFinish(e.target.value);
 
-    fetchUserInfo();
-  }, []);
-
-  const calculateCost = () => {
-    const baseCost = 10; // Example base cost
-    return baseCost * markup;
-  };
-
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-  const handleFilamentTypeChange = (e) => setFilamentType(e.target.value);
-  const handleColorChange = (e) => setColor(e.target.value);
-
-  const handleUpload = async (e) => {
+  const handleSubmit = e => {
     e.preventDefault();
-
-    if (!file || !filamentType || !color) {
-      alert('Please fill in all fields and select a file.');
+    if (!file || !material || !color || !finish) {
+      setError('Please complete all fields before submitting.');
       return;
     }
 
-    try {
-      const user = auth.currentUser;
-      if (!user) {
-        alert('You must be logged in to upload a job.');
-        return;
-      }
-
-      const filePath = `uploads/${user.uid}/${file.name}`;
-      const fileRef = ref(storage, filePath);
-      await uploadBytes(fileRef, file);
-
-      const jobCost = calculateCost();
-      setCost(jobCost);
-
-      await addDoc(collection(db, 'jobs'), {
-        uid: user.uid,
-        email: user.email,
-        fileName: file.name,
-        filamentType,
-        color,
-        cost: jobCost,
-        createdAt: new Date()
-      });
-
-      alert('✅ File uploaded and job created successfully!');
-      setFile(null);
-      setFilamentType('');
-      setColor('');
-      setCost(0);
-
-    } catch (error) {
-      console.error("Upload failed:", error);
-      alert('❌ Upload failed. Please check the console for details.');
-    }
+    setError('');
+    console.log('File:', file);
+    console.log('Material:', material);
+    console.log('Color:', color);
+    console.log('Finish:', finish);
+    // TODO: Send to Firestore or upload service
   };
 
   return (
-    <div>
-      <h2>Upload Print Job</h2>
-      <form onSubmit={handleUpload}>
-        <input type="file" onChange={handleFileChange} required />
-        <select value={filamentType} onChange={handleFilamentTypeChange} required>
-          <option value="">Select Filament Type</option>
-          <option value="PLA">PLA</option>
-          <option value="ABS">ABS</option>
-        </select>
-        <input
-          type="text"
-          placeholder="Color (e.g., Black)"
-          value={color}
-          onChange={handleColorChange}
-          required
-        />
+    <form onSubmit={handleSubmit} style={{ maxWidth: 500, margin: '2rem auto' }}>
+      <h2>Upload Your 3D File</h2>
 
-        {isAdmin && (
-          <div>
-            <label>Markup Percentage:</label>
-            <input
-              type="number"
-              value={markup * 100}
-              onChange={(e) => setMarkup(e.target.value / 100)}
-              step="0.1"
-              min="1.0"
-              max="100.0"
-            />
-            <span>%</span>
-          </div>
-        )}
+      <label>Upload File (STL or OBJ):</label>
+      <input type="file" accept=".stl,.obj" onChange={handleFileChange} required />
 
-        <button type="submit">Submit Print Job</button>
-      </form>
+      <label>Select Material:</label>
+      <select value={material} onChange={handleMaterialChange} required>
+        <option value="">-- Select Material --</option>
+        {materials.map(m => (
+          <option key={m} value={m}>{m}</option>
+        ))}
+      </select>
 
-      {cost > 0 && <div><h3>Estimated Job Cost: ${cost.toFixed(2)}</h3></div>}
-    </div>
+      <label>Select Color:</label>
+      <select value={color} onChange={handleColorChange} required>
+        <option value="">-- Select Color --</option>
+        {colors.map(c => (
+          <option key={c} value={c}>{c}</option>
+        ))}
+      </select>
+
+      <label>Select Finish:</label>
+      <select value={finish} onChange={handleFinishChange} required>
+        <option value="">-- Select Finish --</option>
+        {finishes.map(f => (
+          <option key={f} value={f}>{f}</option>
+        ))}
+      </select>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      <button type="submit" style={{ marginTop: '1rem' }}>Submit</button>
+    </form>
   );
-};
-
-export default UploadForm;
+}
