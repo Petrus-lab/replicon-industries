@@ -1,89 +1,71 @@
-// ✅ FILE: src/components/AuthPage.jsx
-
+// src/components/AuthPage.jsx
 import React, { useState } from 'react';
-import { auth, provider } from '../firebase';
-import {
-  signInWithPopup,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
+import { auth } from '../firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 
-import UploadForm from './UploadForm';
-import ShippingForm from './ShippingForm';
-import LogoutButton from './LogoutButton';
+export default function AuthPage() {
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [email, setEmail]   = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError]   = useState(null);
 
-function AuthPage() {
-  const [user, setUser] = useState(null);
-
-  // ✅ Google Sign-In Handler
-  const handleGoogleSignIn = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      setUser(result.user);
-    } catch (err) {
-      console.error("Google Sign-In Error:", err);
-      alert(err.message);
-    }
-  };
-
-  // ✅ Email Login Handler
-  const handleEmailLogin = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    setError(null);
     try {
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      setUser(result.user);
+      if (isRegistering) {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
     } catch (err) {
-      console.error("Email Login Error:", err);
-      alert(err.message);
-    }
-  };
-
-  // ✅ Email Signup Handler
-  const handleEmailSignup = async (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-    try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      setUser(result.user);
-    } catch (err) {
-      console.error("Email Signup Error:", err);
-      alert(err.message);
+      setError(err.message);
     }
   };
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <LogoutButton /> {/* ✅ Always display logout button */}
-      {!user ? (
-        <div>
-          <h1>🧑‍💻 Client Portal</h1>
-          <h2>Login or Sign Up</h2>
-          <button onClick={handleGoogleSignIn}>Sign in with Google</button>
-
-          <form onSubmit={handleEmailLogin}>
-            <input name="email" type="email" placeholder="Email" required />
-            <input name="password" type="password" placeholder="Password" required />
-            <button type="submit">Login</button>
-          </form>
-
-          <form onSubmit={handleEmailSignup}>
-            <input name="email" type="email" placeholder="Email" required />
-            <input name="password" type="password" placeholder="Password" required />
-            <button type="submit">Sign Up</button>
-          </form>
+    <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center' }}>
+      <h1>{isRegistering ? 'Sign Up' : 'Sign In'}</h1>
+      <form onSubmit={handleSubmit}>
+        <div style={{ margin: '1rem 0' }}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+            style={{ width: '100%', padding: '0.5rem' }}
+          />
         </div>
-      ) : (
-        <div>
-          <h1>🧑‍💻 Client Dashboard</h1>
-          <ShippingForm user={user} />
-          <UploadForm user={user} />
+        <div style={{ margin: '1rem 0' }}>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+            style={{ width: '100%', padding: '0.5rem' }}
+          />
         </div>
-      )}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button type="submit" style={{ padding: '0.5rem 1rem' }}>
+          {isRegistering ? 'Create Account' : 'Sign In'}
+        </button>
+      </form>
+      <p style={{ marginTop: '1rem' }}>
+        {isRegistering
+          ? 'Already have an account? '
+          : "Don't have an account? "}
+        <button
+          onClick={() => {
+            setError(null);
+            setIsRegistering(!isRegistering);
+          }}
+          style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+        >
+          {isRegistering ? 'Sign In' : 'Sign Up'}
+        </button>
+      </p>
     </div>
   );
 }
-
-export default AuthPage;
