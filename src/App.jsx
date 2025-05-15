@@ -1,7 +1,8 @@
 // src/App.jsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { auth } from './firebase';
+import { onAuthStateChanged, getIdTokenResult, signOut } from 'firebase/auth';
 
-// —– Your existing page components
 import AuthPage        from './components/AuthPage';
 import UploadForm      from './components/UploadForm';
 import ShippingForm    from './components/ShippingForm';
@@ -9,34 +10,49 @@ import PricingManager  from './components/PricingManager';
 import AdminPanel      from './components/AdminPanel';
 
 function App() {
-  return (
-    <div className="App" style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h1>Replicon Industries Platform</h1>
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-      <section style={{ margin: '2rem 0' }}>
-        <h2>1. Authentication</h2>
-        <AuthPage />
-      </section>
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      if (u) {
+        setUser(u);
+        const tokenResult = await getIdTokenResult(u);
+        setIsAdmin(Boolean(tokenResult.claims.admin));
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
+    });
+    return unsubscribe;
+  }, []);
 
-      <section style={{ margin: '2rem 0' }}>
-        <h2>2. File Upload</h2>
-        <UploadForm />
-      </section>
+  const handleSignOut = () => {
+    signOut(auth).catch(console.error);
+  };
 
-      <section style={{ margin: '2rem 0' }}>
-        <h2>3. Shipping Details</h2>
-        <ShippingForm />
-      </section>
+  // 1) If not logged in, show AuthPage
+  if (!user) {
+    return <AuthPage />;
+  }
 
-      <section style={{ margin: '2rem 0' }}>
-        <h2>4. Cost & Filament Management</h2>
-        <PricingManager />
-      </section>
-
-      <section style={{ margin: '2rem 0' }}>
-        <h2>5. Admin Dashboard</h2>
+  // 2) If admin, show admin controls
+  if (isAdmin) {
+    return (
+      <div className="App">
+        <button onClick={handleSignOut}>Sign Out</button>
         <AdminPanel />
-      </section>
+      </div>
+    );
+  }
+
+  // 3) Otherwise, show client workflow
+  return (
+    <div className="App">
+      <button onClick={handleSignOut}>Sign Out</button>
+      <UploadForm />
+      <ShippingForm />
+      <PricingManager />
     </div>
   );
 }
