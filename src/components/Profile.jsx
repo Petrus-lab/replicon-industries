@@ -8,6 +8,9 @@ export default function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const finishes = ['raw', 'supports_removed', 'ready_to_go'];
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -25,7 +28,6 @@ export default function Profile() {
         if (profileSnap.exists()) {
           setProfile(profileSnap.data());
         } else {
-          // Create a default profile if not found
           const defaultProfile = {
             email: user.email,
             name: '',
@@ -47,16 +49,65 @@ export default function Profile() {
     fetchProfile();
   }, []);
 
+  const handleChange = (field) => (e) => {
+    setProfile({ ...profile, [field]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const user = auth.currentUser;
+      const profileRef = doc(db, 'users', user.uid);
+      await setDoc(profileRef, profile, { merge: true });
+      setSaving(false);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to save profile.');
+      setSaving(false);
+    }
+  };
+
   if (loading) return <p>Loading profile...</p>;
   if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
     <div style={{ maxWidth: 500, margin: '2rem auto' }}>
       <h2>My Profile</h2>
+
       <p><strong>Email:</strong> {profile.email}</p>
-      <p><strong>Name:</strong> {profile.name || 'Not set'}</p>
-      <p><strong>Phone Number:</strong> {profile.phoneNumber || 'Not set'}</p>
-      <p><strong>Default Finish:</strong> {profile.defaultFinish}</p>
+
+      <label>Name:</label>
+      <input
+        type="text"
+        value={profile.name}
+        onChange={handleChange('name')}
+        style={{ width: '100%', marginBottom: '1rem' }}
+      />
+
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        value={profile.phoneNumber}
+        onChange={handleChange('phoneNumber')}
+        style={{ width: '100%', marginBottom: '1rem' }}
+      />
+
+      <label>Default Finish:</label>
+      <select
+        value={profile.defaultFinish}
+        onChange={handleChange('defaultFinish')}
+        style={{ width: '100%', marginBottom: '1rem' }}
+      >
+        {finishes.map(finish => (
+          <option key={finish} value={finish}>
+            {finish.replace('_', ' ')}
+          </option>
+        ))}
+      </select>
+
+      <button onClick={handleSave} disabled={saving}>
+        {saving ? 'Saving...' : 'Save Changes'}
+      </button>
     </div>
   );
 }
