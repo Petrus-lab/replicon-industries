@@ -43,6 +43,14 @@ function App() {
       <div className="App" style={{ padding: '1rem' }}>
         <button onClick={handleSignOut}>Sign Out</button>
 
+        {/* Navigation for Admin */}
+        {isAdmin && (
+          <nav style={{ margin: '1rem 0' }}>
+            <Link to="/admin">Admin Dashboard</Link> |{' '}
+            <Link to="/admin/users">User Profiles</Link>
+          </nav>
+        )}
+
         {/* Navigation for Clients */}
         {!isAdmin && (
           <nav style={{ margin: '1rem 0' }}>
