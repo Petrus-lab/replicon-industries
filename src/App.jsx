@@ -1,15 +1,21 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { auth } from './firebase';
 import { onAuthStateChanged, getIdTokenResult, signOut } from 'firebase/auth';
 
-import AuthPage     from './components/AuthPage';
-import UploadForm   from './components/UploadForm';
-import ShippingForm from './components/ShippingForm';
-import AdminPanel   from './components/AdminPanel';
+// Components
+import AuthPage                  from './components/AuthPage';
+import UploadForm                from './components/UploadForm';
+import ShippingForm              from './components/ShippingForm';
+import AdminPanel                from './components/AdminPanel';
+import AdminUserProfileViewer    from './components/AdminUserProfileViewer';
+import Profile                   from './components/Profile';
+import UploadStatus              from './components/UploadStatus';
+import NotFound                  from './components/NotFound';
 
 function App() {
-  const [user, setUser]     = useState(null);
+  const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -28,35 +34,49 @@ function App() {
 
   const handleSignOut = () => signOut(auth).catch(console.error);
 
-  // 1) Unauthenticated → show AuthPage
   if (!user) {
     return <AuthPage />;
   }
 
-  // 2) Admin → AdminPanel (includes pricing config, etc.)
-  if (isAdmin) {
-    return (
-      <div className="App">
-        <button onClick={handleSignOut}>Sign Out</button>
-        <AdminPanel />
-      </div>
-    );
-  }
-
-  // 3) Client → only client workflows (no pricing manager here)
   return (
-    <div className="App">
-      <button onClick={handleSignOut}>Sign Out</button>
-      <h2>Client Dashboard</h2>
-      <section>
-        <h3>Upload Your 3D File</h3>
-        <UploadForm />
-      </section>
-      <section>
-        <h3>Enter Shipping Details</h3>
-        <ShippingForm />
-      </section>
-    </div>
+    <Router>
+      <div className="App" style={{ padding: '1rem' }}>
+        <button onClick={handleSignOut}>Sign Out</button>
+
+        {/* Navigation for Clients */}
+        {!isAdmin && (
+          <nav style={{ margin: '1rem 0' }}>
+            <Link to="/client/profile">Profile</Link> |{' '}
+            <Link to="/client/upload">Upload</Link> |{' '}
+            <Link to="/client/shipping">Shipping</Link> |{' '}
+            <Link to="/client/status">Status</Link>
+          </nav>
+        )}
+
+        <Routes>
+          {/* Admin Views */}
+          {isAdmin && (
+            <>
+              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/admin/users" element={<AdminUserProfileViewer />} />
+              <Route path="*" element={<Navigate to="/admin" />} />
+            </>
+          )}
+
+          {/* Client Views */}
+          {!isAdmin && (
+            <>
+              <Route path="/client/profile" element={<Profile />} />
+              <Route path="/client/upload" element={<UploadForm />} />
+              <Route path="/client/shipping" element={<ShippingForm />} />
+              <Route path="/client/status" element={<UploadStatus />} />
+              <Route path="/" element={<Navigate to="/client/profile" />} />
+              <Route path="*" element={<NotFound />} />
+            </>
+          )}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
