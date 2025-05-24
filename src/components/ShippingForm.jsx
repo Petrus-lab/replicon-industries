@@ -1,4 +1,7 @@
+// src/components/ShippingForm.jsx
 import React, { useState } from 'react';
+import { auth, db } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 export default function ShippingForm() {
   const [formData, setFormData] = useState({
@@ -11,94 +14,69 @@ export default function ShippingForm() {
     postalCode: '',
     country: '',
   });
+  const [error, setError]     = useState('');
+  const [success, setSuccess] = useState('');
 
   const handleChange = e => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setSuccess(''); setError('');
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    console.log('Shipping form submitted:', formData);
-    // TODO: send to Firestore or pass up to parent
+    setError(''); setSuccess('');
+    const user = auth.currentUser;
+    if (!user) {
+      setError('You must be logged in to save shipping info.');
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, 'shipping', user.uid), {
+        ...formData,
+        uid: user.uid,
+        email: user.email,
+      });
+      setSuccess('Shipping details saved.');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to save shipping details.');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ maxWidth: 500, margin: '2rem auto' }}>
       <h2>Shipping Details</h2>
 
+      {/* fields... */}
       <label>Full Name:</label>
-      <input
-        type="text"
-        name="fullName"
-        value={formData.fullName}
-        onChange={handleChange}
-        required
-      />
+      <input name="fullName" value={formData.fullName} onChange={handleChange} required />
 
       <label>Phone Number:</label>
-      <input
-        type="tel"
-        name="phoneNumber"
-        value={formData.phoneNumber}
-        onChange={handleChange}
-        required
-      />
+      <input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} required />
 
       <label>Address Line 1:</label>
-      <input
-        type="text"
-        name="addressLine1"
-        value={formData.addressLine1}
-        onChange={handleChange}
-        required
-      />
+      <input name="addressLine1" value={formData.addressLine1} onChange={handleChange} required />
 
-      <label>Address Line 2 (optional):</label>
-      <input
-        type="text"
-        name="addressLine2"
-        value={formData.addressLine2}
-        onChange={handleChange}
-      />
+      <label>Address Line 2:</label>
+      <input name="addressLine2" value={formData.addressLine2} onChange={handleChange} />
 
       <label>Suburb:</label>
-      <input
-        type="text"
-        name="suburb"
-        value={formData.suburb}
-        onChange={handleChange}
-        required
-      />
+      <input name="suburb" value={formData.suburb} onChange={handleChange} required />
 
       <label>City:</label>
-      <input
-        type="text"
-        name="city"
-        value={formData.city}
-        onChange={handleChange}
-        required
-      />
+      <input name="city" value={formData.city} onChange={handleChange} required />
 
       <label>Postal Code:</label>
-      <input
-        type="text"
-        name="postalCode"
-        value={formData.postalCode}
-        onChange={handleChange}
-        required
-      />
+      <input name="postalCode" value={formData.postalCode} onChange={handleChange} required />
 
       <label>Country:</label>
-      <input
-        type="text"
-        name="country"
-        value={formData.country}
-        onChange={handleChange}
-        required
-      />
+      <input name="country" value={formData.country} onChange={handleChange} required />
 
-      <button type="submit" style={{ marginTop: '1rem' }}>Submit</button>
+      {error   && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
+
+      <button type="submit" style={{ marginTop: '1rem' }}>Save Shipping</button>
     </form>
   );
 }
