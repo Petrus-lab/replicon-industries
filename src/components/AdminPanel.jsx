@@ -1,6 +1,7 @@
-// ✅ FILE: src/components/AdminPanel.jsx
+// src/components/AdminPanel.jsx
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';               // ← added for navigation
 import { db, auth } from '../firebase';
 import { collection, getDocs, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
@@ -123,6 +124,19 @@ const AdminPanel = () => {
     <div style={{ padding: '2rem' }}>
       <h2>Admin Panel - Logged in as {userEmail}</h2>
 
+      {/* ← ADMIN NAVIGATION BUTTONS */}
+      <div style={{ margin: '1rem 0' }}>
+        <Link to="/admin" style={{ marginRight: '1rem' }}>
+          <button>Dashboard Home</button>
+        </Link>
+        <Link to="/admin/users" style={{ marginRight: '1rem' }}>
+          <button>User Profiles</button>
+        </Link>
+        <Link to="/admin/pricing">
+          <button>Pricing Manager</button>
+        </Link>
+      </div>
+
       <div>
         <label>
           Markup (%):
@@ -184,11 +198,11 @@ const AdminPanel = () => {
 
       <h3>Users</h3>
       <ul>
-        {users.map(user => (
-          <li key={user.id}>
-            <p><strong>Email:</strong> {user.email}</p>
-            <p><strong>Name:</strong> {user.name}</p>
-            <p><strong>Admin:</strong> {user.isAdmin ? 'Yes' : 'No'}</p>
+        {users.map(u => (
+          <li key={u.id}>
+            <p><strong>Email:</strong> {u.email}</p>
+            <p><strong>Name:</strong> {u.name}</p>
+            <p><strong>Admin:</strong> {u.isAdmin ? 'Yes' : 'No'}</p>
           </li>
         ))}
       </ul>

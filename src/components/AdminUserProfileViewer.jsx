@@ -1,45 +1,46 @@
 // ✅ FILE: src/components/AdminUserProfileViewer.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 
-const AdminUserProfileViewer = ({ userId }) => {
-  const [profile, setProfile] = useState(null);
+export default function AdminUserProfileViewer() {
+  const [profiles, setProfiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const loadUserProfile = async () => {
-      const userRef = doc(db, 'users', userId);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        setProfile(userSnap.data());
-      } else {
-        setProfile(null);
+    const fetchProfiles = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'users'));
+        const users = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setProfiles(users);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load user profiles.');
+        setLoading(false);
       }
     };
 
-    if (userId) loadUserProfile();
-  }, [userId]);
+    fetchProfiles();
+  }, []);
 
-  if (profile === null) return <p>No profile data found for this user.</p>;
+  if (loading) return <p>Loading user profiles...</p>;
+  if (error) return <p style={{ color: 'red' }}>{error}</p>;
 
   return (
-    <div>
-      <h2>Admin View: User Profile</h2>
-      <p><strong>Email:</strong> {profile.email}</p>
-      <p><strong>Name:</strong> {profile.name || 'Not Provided'}</p>
-      <p><strong>Contact Number:</strong> {profile.contactNumber || 'Not Provided'}</p>
-      <p><strong>Address:</strong></p>
-      <div style={{ paddingLeft: '1rem' }}>
-        <p>{profile.defaultShipping?.address || 'N/A'}</p>
-        <p>{profile.defaultShipping?.suburb || 'N/A'}</p>
-        <p>{profile.defaultShipping?.city || 'N/A'}</p>
-        <p>{profile.defaultShipping?.zip || 'N/A'}</p>
-        <p>{profile.defaultShipping?.country || 'N/A'}</p>
-      </div>
-      <p><strong>Default Print Finish:</strong> {profile.printPreferences?.defaultFinish || 'Not Set'}</p>
+    <div style={{ maxWidth: 800, margin: '2rem auto' }}>
+      <h2>Admin - User Profiles</h2>
+      {profiles.length === 0 && <p>No users found.</p>}
+      {profiles.map(user => (
+        <div key={user.id} style={{ border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem' }}>
+          <p><strong>Email:</strong> {user.email}</p>
+          <p><strong>Name:</strong> {user.name || 'Not set'}</p>
+          <p><strong>Phone Number:</strong> {user.phoneNumber || 'Not set'}</p>
+          <p><strong>Default Finish:</strong> {user.defaultFinish || 'Not set'}</p>
+        </div>
+      ))}
     </div>
   );
-};
-
-export default AdminUserProfileViewer;
+}

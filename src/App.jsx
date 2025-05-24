@@ -10,6 +10,7 @@ import UploadForm                from './components/UploadForm';
 import ShippingForm              from './components/ShippingForm';
 import AdminPanel                from './components/AdminPanel';
 import AdminUserProfileViewer    from './components/AdminUserProfileViewer';
+import PricingManager            from './components/PricingManager';      // ← added
 import Profile                   from './components/Profile';
 import UploadStatus              from './components/UploadStatus';
 import NotFound                  from './components/NotFound';
@@ -47,7 +48,8 @@ function App() {
         {isAdmin && (
           <nav style={{ margin: '1rem 0' }}>
             <Link to="/admin">Admin Dashboard</Link> |{' '}
-            <Link to="/admin/users">User Profiles</Link>
+            <Link to="/admin/users">User Profiles</Link> |{' '}
+            <Link to="/admin/pricing">Pricing Manager</Link>
           </nav>
         )}
 
@@ -67,6 +69,7 @@ function App() {
             <>
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/admin/users" element={<AdminUserProfileViewer />} />
+              <Route path="/admin/pricing" element={<PricingManager />} />   {/* ← added */}
               <Route path="*" element={<Navigate to="/admin" />} />
             </>
           )}

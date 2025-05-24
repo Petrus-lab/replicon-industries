@@ -1,79 +1,156 @@
-// ✅ FILE: src/components/PricingManager.jsx
-
+// src/components/PricingManager.jsx
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-function PricingManager() {
-  const [baseCost, setBaseCost] = useState('');
-  const [markupPercentage, setMarkupPercentage] = useState('');
+export default function PricingManager() {
+  const [availableMaterials, setAvailableMaterials] = useState([]);
+  const [availableColors, setAvailableColors] = useState([]);
+  const [markup, setMarkup] = useState(0);
 
-  // ✅ Fetch existing pricing on load
+  const [newMaterial, setNewMaterial] = useState('');
+  const [newColor, setNewColor] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  // Firestore document references
+  const pricingRef = doc(db, 'settings', 'pricing');
+  const markupRef  = doc(db, 'settings', 'markupSettings');
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
-    const fetchPricing = async () => {
+    const fetchSettings = async () => {
       try {
-        const pricingDocRef = doc(db, 'settings', 'markupSettings');
-        const pricingSnap = await getDoc(pricingDocRef);
+        // Fetch pricing settings
+        const pricingSnap = await getDoc(pricingRef);
         if (pricingSnap.exists()) {
           const data = pricingSnap.data();
-          setBaseCost(data.baseCost || '');
-          setMarkupPercentage(data.markup ? data.markup * 100 : '');
+          setAvailableMaterials(data.availableMaterials || []);
+          setAvailableColors(data.availableColors || []);
         }
-      } catch (error) {
-        console.error('❌ Failed to fetch pricing settings:', error);
+
+        // Fetch markup settings
+        const markupSnap = await getDoc(markupRef);
+        if (markupSnap.exists()) {
+          const data = markupSnap.data();
+          setMarkup(data.markupSettings ?? 0);
+        }
+      } catch (err) {
+        console.error('Error loading pricing settings:', err);
+        setError('Failed to load settings.');
+      } finally {
+        setLoading(false);
       }
     };
-    fetchPricing();
+
+    fetchSettings();
   }, []);
 
-  // ✅ Save updated pricing
+  const handleAddMaterial = () => {
+    if (!newMaterial.trim()) return;
+    setAvailableMaterials(prev => [...prev, newMaterial.trim()]);
+    setNewMaterial('');
+  };
+
+  const handleRemoveMaterial = mat => {
+    setAvailableMaterials(prev => prev.filter(m => m !== mat));
+  };
+
+  const handleAddColor = () => {
+    if (!newColor.trim()) return;
+    setAvailableColors(prev => [...prev, newColor.trim()]);
+    setNewColor('');
+  };
+
+  const handleRemoveColor = col => {
+    setAvailableColors(prev => prev.filter(c => c !== col));
+  };
+
   const handleSave = async () => {
+    setSaving(true);
+    setError('');
     try {
-      await setDoc(doc(db, 'settings', 'markupSettings'), {
-        baseCost: parseFloat(baseCost),
-        markup: parseFloat(markupPercentage) / 100, // ✅ Convert back to decimal
-      });
-      alert('✅ Pricing settings saved successfully.');
-    } catch (error) {
-      console.error('❌ Failed to save pricing settings:', error);
-      alert('❌ Failed to save pricing settings. See console for details.');
+      // Save pricing arrays
+      await setDoc(pricingRef, {
+        availableMaterials,
+        availableColors
+      }, { merge: true });
+
+      // Save markup number
+      await setDoc(markupRef, {
+        markupSettings: Number(markup)
+      }, { merge: true });
+    } catch (err) {
+      console.error('Error saving pricing settings:', err);
+      setError('Failed to save settings.');
+    } finally {
+      setSaving(false);
     }
   };
 
+  if (loading) return <p>Loading settings...</p>;
+  if (error)   return <p style={{ color: 'red' }}>{error}</p>;
+
   return (
-    <div style={{ marginTop: '2rem' }}>
-      <h2>💰 Pricing Configuration</h2>
-      <div>
-        <label>
-          Base Production Cost:
-          <input
-            type="number"
-            value={baseCost}
-            onChange={(e) => setBaseCost(e.target.value)}
-            placeholder="e.g., 10.00"
-            min="0"
-            step="0.01"
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          Markup Percentage (%):
-          <input
-            type="number"
-            value={markupPercentage}
-            onChange={(e) => setMarkupPercentage(e.target.value)}
-            placeholder="e.g., 20 for 20%"
-            min="0"
-            step="0.1"
-          />
-        </label>
-      </div>
-      <button onClick={handleSave} style={{ marginTop: '1rem' }}>
-        Save Settings
+    <div style={{ maxWidth: 600, margin: '2rem auto' }}>
+      <h2>Pricing Manager</h2>
+
+      <section style={{ marginBottom: '1.5rem' }}>
+        <h3>Materials</h3>
+        <ul>
+          {availableMaterials.map(mat => (
+            <li key={mat}>
+              {mat}{' '}
+              <button onClick={() => handleRemoveMaterial(mat)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+        <input
+          type="text"
+          placeholder="New material"
+          value={newMaterial}
+          onChange={e => setNewMaterial(e.target.value)}
+        />
+        <button onClick={handleAddMaterial}>Add Material</button>
+      </section>
+
+      <section style={{ marginBottom: '1.5rem' }}>
+        <h3>Colors</h3>
+        <ul>
+          {availableColors.map(col => (
+            <li key={col}>
+              {col}{' '}
+              <button onClick={() => handleRemoveColor(col)}>Remove</button>
+            </li>
+          ))}
+        </ul>
+        <input
+          type="text"
+          placeholder="New color"
+          value={newColor}
+          onChange={e => setNewColor(e.target.value)}
+        />
+        <button onClick={handleAddColor}>Add Color</button>
+      </section>
+
+      <section style={{ marginBottom: '1.5rem' }}>
+        <h3>Markup Percentage</h3>
+        <input
+          type="number"
+          min="0"
+          step="0.1"
+          value={markup}
+          onChange={e => setMarkup(e.target.value)}
+        />{' '}
+        %
+      </section>
+
+      <button onClick={handleSave} disabled={saving}>
+        {saving ? 'Saving...' : 'Save Settings'}
       </button>
+
+      {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
     </div>
   );
 }
-
-export default PricingManager;
