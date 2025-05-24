@@ -19,26 +19,24 @@ export default function Orders() {
       return;
     }
 
-    // Listen for orders belonging to this user
+    // Listen for real orders in /orders
     const q = query(
       collection(db, 'orders'),
       where('userId', '==', user.uid)
     );
 
-    const unsub = onSnapshot(q, snapshot => {
-      const list = snapshot.docs
+    const unsub = onSnapshot(q, snap => {
+      const list = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
-        // optional: sort by cost or any other field
         .sort((a, b) => {
-          // Sort by creation order if you added createdAt
           const ta = a.createdAt?.toDate ? a.createdAt.toDate() : 0;
           const tb = b.createdAt?.toDate ? b.createdAt.toDate() : 0;
           return tb - ta;
         });
       setOrders(list);
       setLoading(false);
-    }, error => {
-      console.error('Error fetching orders:', error);
+    }, err => {
+      console.error('Error fetching orders:', err);
       setLoading(false);
     });
 
@@ -60,18 +58,11 @@ export default function Orders() {
             marginBottom: '1rem'
           }}>
             <p><strong>Order ID:</strong> {o.id}</p>
+            {o.jobId && <p><strong>From Job:</strong> {o.jobId}</p>}
             <p><strong>Material:</strong> {o.material}</p>
+            <p><strong>Finish:</strong> {o.finish}</p>
             <p><strong>Color:</strong> {o.color}</p>
-            <p><strong>Finish:</strong> {o.finish || 'N/A'}</p>
-            <p><strong>Cost:</strong> ${o.cost.toFixed(2)}</p>
-            {o.fileUrl && (
-              <p>
-                <strong>File:</strong>{' '}
-                <a href={o.fileUrl} target="_blank" rel="noopener noreferrer">
-                  View
-                </a>
-              </p>
-            )}
+            <p><strong>Cost:</strong> ${ (o.cost || 0).toFixed(2) }</p>
             <p><strong>Status:</strong> {o.status}</p>
             {o.createdAt?.toDate && (
               <p>
