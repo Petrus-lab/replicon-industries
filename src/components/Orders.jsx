@@ -9,23 +9,21 @@ import {
 } from 'firebase/firestore';
 
 export default function Orders() {
-  const [orders, setOrders]     = useState([]);
-  const [loading, setLoading]   = useState(true);
+  const [orders, setOrders] = useState(null);
 
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) {
-      setLoading(false);
+      setOrders([]);
       return;
     }
 
-    // Listen for real orders in /orders
-    const q = query(
+    const ordersQ = query(
       collection(db, 'orders'),
       where('userId', '==', user.uid)
     );
 
-    const unsub = onSnapshot(q, snap => {
+    const unsub = onSnapshot(ordersQ, snap => {
       const list = snap.docs
         .map(d => ({ id: d.id, ...d.data() }))
         .sort((a, b) => {
@@ -34,17 +32,16 @@ export default function Orders() {
           return tb - ta;
         });
       setOrders(list);
-      setLoading(false);
     }, err => {
       console.error('Error fetching orders:', err);
-      setLoading(false);
+      setOrders([]);
     });
 
     return () => unsub();
   }, []);
 
-  if (loading) return <p>Loading your orders...</p>;
-  if (!orders.length) return <p>You have no orders yet.</p>;
+  if (orders === null) return <p>Loading your orders...</p>;
+  if (orders.length === 0) return <p>You have no orders yet.</p>;
 
   return (
     <div style={{ maxWidth: 600, margin: '2rem auto', fontFamily: 'sans-serif' }}>
@@ -58,7 +55,7 @@ export default function Orders() {
             marginBottom: '1rem'
           }}>
             <p><strong>Order ID:</strong> {o.id}</p>
-            {o.jobId && <p><strong>From Job:</strong> {o.jobId}</p>}
+            <p><strong>Job ID:</strong> {o.jobId}</p>
             <p><strong>Material:</strong> {o.material}</p>
             <p><strong>Finish:</strong> {o.finish}</p>
             <p><strong>Color:</strong> {o.color}</p>
