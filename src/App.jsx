@@ -8,15 +8,16 @@ import { onAuthStateChanged, getIdTokenResult, signOut } from 'firebase/auth';
 import AuthPage                  from './components/AuthPage';
 import UploadForm                from './components/UploadForm';
 import ShippingForm              from './components/ShippingForm';
+import UploadStatus              from './components/UploadStatus';
+import Orders                    from './components/Orders';
 import AdminPanel                from './components/AdminPanel';
 import AdminUserProfileViewer    from './components/AdminUserProfileViewer';
-import PricingManager            from './components/PricingManager';      // ← added
+import PricingManager            from './components/PricingManager';
 import Profile                   from './components/Profile';
-import UploadStatus              from './components/UploadStatus';
 import NotFound                  from './components/NotFound';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser]       = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -58,6 +59,7 @@ function App() {
           <nav style={{ margin: '1rem 0' }}>
             <Link to="/client/profile">Profile</Link> |{' '}
             <Link to="/client/upload">Upload</Link> |{' '}
+            <Link to="/client/orders">Orders</Link> |{' '}
             <Link to="/client/shipping">Shipping</Link> |{' '}
             <Link to="/client/status">Status</Link>
           </nav>
@@ -69,7 +71,7 @@ function App() {
             <>
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/admin/users" element={<AdminUserProfileViewer />} />
-              <Route path="/admin/pricing" element={<PricingManager />} />   {/* ← added */}
+              <Route path="/admin/pricing" element={<PricingManager />} />
               <Route path="*" element={<Navigate to="/admin" />} />
             </>
           )}
@@ -79,6 +81,7 @@ function App() {
             <>
               <Route path="/client/profile" element={<Profile />} />
               <Route path="/client/upload" element={<UploadForm />} />
+              <Route path="/client/orders" element={<Orders />} />
               <Route path="/client/shipping" element={<ShippingForm />} />
               <Route path="/client/status" element={<UploadStatus />} />
               <Route path="/" element={<Navigate to="/client/profile" />} />
