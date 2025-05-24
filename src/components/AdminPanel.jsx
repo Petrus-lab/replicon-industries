@@ -21,8 +21,6 @@ const AdminPanel = () => {
   const [shippingAddresses, setShippingAddresses] = useState({});
   const [markup, setMarkup] = useState(1.2);
   const [userEmail, setUserEmail] = useState("");
-  const [materials, setMaterials] = useState([]);
-  const [colors, setColors] = useState([]);
 
   const statusOptions = ['pending', 'processing', 'shipped'];
 
@@ -33,7 +31,7 @@ const AdminPanel = () => {
         const jobSnap = await getDocs(collection(db, 'jobs'));
         setJobs(jobSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
-        // Orders (for admin overview)
+        // Orders
         const orderSnap = await getDocs(collection(db, 'orders'));
         setOrders(orderSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
@@ -41,17 +39,6 @@ const AdminPanel = () => {
         const userSnap = await getDocs(collection(db, 'users'));
         const userList = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
         setUsers(userList);
-
-        // Pricing settings
-        const pricingSnap = await getDoc(doc(db, 'settings', 'pricing'));
-        if (pricingSnap.exists()) {
-          setMaterials(pricingSnap.data().availableMaterials || []);
-          setColors(pricingSnap.data().availableColors || []);
-        }
-        const markupSnap = await getDoc(doc(db, 'settings', 'markupSettings'));
-        if (markupSnap.exists()) {
-          setMarkup(markupSnap.data().markupSettings ?? 1.2);
-        }
 
         // Shipping addresses
         const addresses = {};
@@ -62,6 +49,12 @@ const AdminPanel = () => {
           }
         }
         setShippingAddresses(addresses);
+
+        // Markup settings
+        const markupSnap = await getDoc(doc(db, 'settings', 'markupSettings'));
+        if (markupSnap.exists()) {
+          setMarkup(markupSnap.data().markupSettings ?? 1.2);
+        }
 
         // Admin email
         const currentUser = auth.currentUser;
@@ -75,7 +68,7 @@ const AdminPanel = () => {
     fetchData();
   }, []);
 
-  // Update both /jobs and any matching /orders
+  // Update both job and any linked order statuses
   const updateJobStatus = async (jobId, newStatus) => {
     try {
       // Update the job document
@@ -91,10 +84,9 @@ const AdminPanel = () => {
       ordersSnap.forEach(orderDoc => {
         updateDoc(orderDoc.ref, { status: newStatus });
       });
-      // Refresh local orders array
       setOrders(orders.map(o => o.jobId === jobId ? { ...o, status: newStatus } : o));
     } catch (error) {
-      console.error("Error updating job/order status:", error);
+      console.error("Error updating status:", error);
     }
   };
 
@@ -136,14 +128,14 @@ const AdminPanel = () => {
     <div style={{ padding: '2rem' }}>
       <h2>Admin Panel - Logged in as {userEmail}</h2>
 
-      {/* Navigation */}
+      {/* Admin Navigation */}
       <nav style={{ margin: '1rem 0', display: 'flex', gap: '1rem' }}>
         <Link to="/admin"><button>Dashboard Home</button></Link>
         <Link to="/admin/users"><button>User Profiles</button></Link>
         <Link to="/admin/pricing"><button>Pricing Manager</button></Link>
       </nav>
 
-      {/* Markup */}
+      {/* Markup Control */}
       <div style={{ margin: '1rem 0' }}>
         <label>
           Markup (%):
@@ -172,7 +164,9 @@ const AdminPanel = () => {
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {jobs.map(job => (
           <li key={job.id} style={{
-            border: '1px solid #ccc', padding: '1rem', marginBottom: '1rem'
+            border: '1px solid #ccc',
+            padding: '1rem',
+            marginBottom: '1rem'
           }}>
             <p><strong>File Name:</strong> {job.fileName}</p>
             <p><strong>Status:</strong>
@@ -211,8 +205,7 @@ const AdminPanel = () => {
       <ul>
         {orders.map(o => (
           <li key={o.id}>
-            <strong>Order:</strong> {o.id}
-            {' — '}<strong>Status:</strong> {o.status}
+            <strong>Order:</strong> {o.id} — <strong>Status:</strong> {o.status}
           </li>
         ))}
       </ul>
