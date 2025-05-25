@@ -53,7 +53,10 @@ export default function InventoryManager() {
   };
 
   const handleAdd = async () => {
-    const { material, color, finish, supplier, orderNumber, arrivalDate } = newItem;
+    const {
+      material, color, finish,
+      supplier, orderNumber, arrivalDate
+    } = newItem;
     if (!material || !color || !finish || !supplier || !orderNumber || !arrivalDate) {
       setError('All fields are required.');
       return;
@@ -61,14 +64,9 @@ export default function InventoryManager() {
     try {
       await addDoc(collection(db, 'inventory'), newItem);
       setNewItem({
-        material: '',
-        color: '',
-        finish: '',
-        stockLevel: 0,
-        reorderThreshold: 0,
-        supplier: '',
-        orderNumber: '',
-        arrivalDate: ''
+        material:'', color:'', finish:'',
+        stockLevel:0, reorderThreshold:0,
+        supplier:'', orderNumber:'', arrivalDate:''
       });
       setError('');
     } catch {
@@ -92,30 +90,40 @@ export default function InventoryManager() {
     }
   };
 
-  // background color by stock status
-  const rowColor = (stock, threshold) => {
-    if (stock <= 0) return '#f5c6cb';      // dark red
-    if (stock <= threshold) return '#ffe8a1'; // dark orange
-    return '#c3e6cb';                      // dark green
+  // Prompt for new batch and add as separate item
+  const handleResupply = async item => {
+    const orderNumber = prompt('New Order Number:');
+    if (!orderNumber) return;
+    const supplier = prompt('Supplier for new batch:');
+    if (!supplier) return;
+    const qtyStr = prompt('Quantity in stock for new batch:');
+    const qty = parseInt(qtyStr, 10);
+    if (isNaN(qty) || qty < 0) {
+      alert('Invalid quantity');
+      return;
+    }
+    const arrivalDate = new Date().toISOString().split('T')[0];
+    try {
+      await addDoc(collection(db, 'inventory'), {
+        material: item.material,
+        color: item.color,
+        finish: item.finish,
+        stockLevel: qty,
+        reorderThreshold: item.reorderThreshold,
+        supplier,
+        orderNumber,
+        arrivalDate
+      });
+    } catch (err) {
+      console.error('Error adding resupply batch:', err);
+    }
   };
 
-  // sort by urgency
-  const sortedItems = [...items].sort((a, b) => {
-    const priority = item =>
-      item.stockLevel <= 0 ? 0 :
-      item.stockLevel <= item.reorderThreshold ? 1 :
-      2;
-    const pa = priority(a), pb = priority(b);
-    if (pa !== pb) return pa - pb;
-    // within red group, oldest arrival first
-    if (pa === 0) {
-      const da = new Date(a.arrivalDate).getTime() || 0;
-      const db_ = new Date(b.arrivalDate).getTime() || 0;
-      return da - db_;
-    }
-    // within other groups, lowest stock first
-    return a.stockLevel - b.stockLevel;
-  });
+  const rowColor = (stock, threshold) => {
+    if (stock <= 0) return '#f5c6cb';
+    if (stock <= threshold) return '#ffe8a1';
+    return '#c3e6cb';
+  };
 
   if (loading) return <p>Loading inventory…</p>;
   if (error)   return <p style={{ color: 'red' }}>{error}</p>;
@@ -151,23 +159,42 @@ export default function InventoryManager() {
               <label style={{ whiteSpace:'nowrap' }}>{label}</label>
               <input
                 name={name}
-                type={name.includes('Date') ? 'date' : name.includes('Level')||name.includes('Threshold')?'number':'text'}
+                type={
+                  name === 'arrivalDate' ? 'date'
+                  : name.includes('Level')||name.includes('Threshold') ? 'number'
+                  : 'text'
+                }
                 min={name.includes('Level')||name.includes('Threshold')?0:undefined}
                 step={name.includes('Level')||name.includes('Threshold')?1:undefined}
                 value={newItem[name]}
                 onChange={handleChange}
-                style={{ width: '100%' }}
+                style={{ width:'100%' }}
               />
             </div>
           ))}
-          <button onClick={handleAdd} style={{ height: '2.5rem' }}>Add Item</button>
+          <button onClick={handleAdd} style={{ height: '2.5rem' }}>
+            Add Item
+          </button>
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p style={{ color:'red' }}>{error}</p>}
       </div>
 
       {/* List & Manage Items */}
       <ul style={{ listStyle:'none', padding:0 }}>
-        {sortedItems.map(item => (
+        {items.sort((a, b) => {
+          const prio = x =>
+            x.stockLevel <= 0 ? 0
+            : x.stockLevel <= x.reorderThreshold ? 1
+            : 2;
+          const pa = prio(a), pb = prio(b);
+          if (pa !== pb) return pa - pb;
+          if (pa === 0) {
+            const da = new Date(a.arrivalDate).getTime();
+            const db_ = new Date(b.arrivalDate).getTime();
+            return da - db_;
+          }
+          return a.stockLevel - b.stockLevel;
+        }).map(item => (
           <li key={item.id} style={{
             backgroundColor: rowColor(item.stockLevel, item.reorderThreshold),
             border:'1px solid #ddd',
@@ -176,54 +203,62 @@ export default function InventoryManager() {
             marginBottom:'1rem',
             display:'grid',
             gridTemplateColumns:
-              '1fr 1fr 1fr 100px 150px 1fr 1fr 120px 80px',
+              '1fr 1fr 1fr 100px 150px 1fr 1fr 120px 80px 80px',
             columnGap:'0.5rem',
             alignItems:'center'
           }}>
             <div>{item.material}</div>
             <div>{item.color}</div>
             <div>{item.finish}</div>
-
             <input
               type="number"
-              min="0"
-              step="1"
+              min="0" step="1"
               value={item.stockLevel}
-              onChange={e => handleUpdate(item.id,'stockLevel',Number(e.target.value))}
+              onChange={e =>
+                handleUpdate(item.id,'stockLevel',Number(e.target.value))
+              }
               style={{ width:'100%', height:'2rem' }}
             />
-
             <input
               type="number"
-              min="0"
-              step="1"
+              min="0" step="1"
               value={item.reorderThreshold}
-              onChange={e => handleUpdate(item.id,'reorderThreshold',Number(e.target.value))}
+              onChange={e =>
+                handleUpdate(item.id,'reorderThreshold',Number(e.target.value))
+              }
               style={{ width:'100%', height:'2rem' }}
             />
-
             <input
               type="text"
               value={item.supplier}
-              onChange={e => handleUpdate(item.id,'supplier',e.target.value)}
+              onChange={e =>
+                handleUpdate(item.id,'supplier',e.target.value)
+              }
               style={{ height:'2rem' }}
             />
-
             <input
               type="text"
               value={item.orderNumber}
-              onChange={e => handleUpdate(item.id,'orderNumber',e.target.value)}
+              onChange={e =>
+                handleUpdate(item.id,'orderNumber',e.target.value)
+              }
               style={{ height:'2rem' }}
             />
-
             <input
               type="date"
               value={item.arrivalDate}
-              onChange={e => handleUpdate(item.id,'arrivalDate',e.target.value)}
+              onChange={e =>
+                handleUpdate(item.id,'arrivalDate',e.target.value)
+              }
               style={{ height:'2rem' }}
             />
 
-            <button onClick={()=>handleDelete(item.id)}>Delete</button>
+            <button onClick={() => handleResupply(item)}>
+              Resupply
+            </button>
+            <button onClick={() => handleDelete(item.id)}>
+              Delete
+            </button>
           </li>
         ))}
       </ul>
