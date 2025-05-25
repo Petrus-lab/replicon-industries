@@ -5,9 +5,6 @@ import {
   collection,
   doc,
   addDoc,
-  getDocs,
-  query,
-  where,
   updateDoc,
   deleteDoc,
   onSnapshot
@@ -78,25 +75,22 @@ export default function InventoryManager() {
   };
 
   const handleUpdate = async (id, field, value) => {
-    // grab original item details before update
     const original = items.find(i => i.id === id);
     if (!original) return;
 
     try {
-      // update the field
+      // 1) update the field
       await updateDoc(doc(db, 'inventory', id), { [field]: value });
 
-      // if stockLevel set to zero, check for newer batch
+      // 2) if stockLevel set to zero, only delete if a newer batch exists
       if (field === 'stockLevel' && value === 0) {
-        const newerQ = query(
-          collection(db, 'inventory'),
-          where('material','==',original.material),
-          where('color','==',original.color),
-          where('finish','==',original.finish),
-          where('arrivalDate','>', original.arrivalDate)
+        const newerExists = items.some(i =>
+          i.material === original.material &&
+          i.color === original.color &&
+          i.finish === original.finish &&
+          i.arrivalDate > original.arrivalDate
         );
-        const snap = await getDocs(newerQ);
-        if (snap.docs.length > 0) {
+        if (newerExists) {
           await deleteDoc(doc(db, 'inventory', id));
         }
       }
@@ -159,16 +153,11 @@ export default function InventoryManager() {
       <h2>Inventory Manager</h2>
 
       {/* Add New Item */}
-      <div style={{
-        marginBottom: '1.5rem',
-        borderBottom: '1px solid #ccc',
-        paddingBottom: '1rem'
-      }}>
+      <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
         <h3>Add New Item</h3>
         <div style={{
           display: 'grid',
-          gridTemplateColumns:
-            '1fr 1fr 1fr 100px 150px 1fr 1fr 120px auto',
+          gridTemplateColumns: '1fr 1fr 1fr 100px 150px 1fr 1fr 120px auto',
           gap: '0.5rem'
         }}>
           {[
@@ -186,9 +175,9 @@ export default function InventoryManager() {
               <input
                 name={name}
                 type={
-                  name === 'arrivalDate' ? 'date'
-                  : name.includes('Level')||name.includes('Threshold') ? 'number'
-                  : 'text'
+                  name === 'arrivalDate' ? 'date' :
+                  name.includes('Level')||name.includes('Threshold') ? 'number' :
+                  'text'
                 }
                 min={name.includes('Level')||name.includes('Threshold')?0:undefined}
                 step={name.includes('Level')||name.includes('Threshold')?1:undefined}
@@ -198,95 +187,81 @@ export default function InventoryManager() {
               />
             </div>
           ))}
-          <button onClick={handleAdd} style={{ height: '2.5rem' }}>
-            Add Item
-          </button>
+          <button onClick={handleAdd} style={{ height: '2.5rem' }}>Add Item</button>
         </div>
         {error && <p style={{ color:'red' }}>{error}</p>}
       </div>
 
       {/* List & Manage Items */}
       <ul style={{ listStyle:'none', padding:0 }}>
-        {items.sort((a,b) => {
-          const prio = x =>
-            x.stockLevel <= 0 ? 0 :
-            x.stockLevel <= x.reorderThreshold ? 1 :
-            2;
-          const pa = prio(a), pb = prio(b);
-          if (pa !== pb) return pa - pb;
-          if (pa === 0) {
-            const da = new Date(a.arrivalDate).getTime();
-            const db_ = new Date(b.arrivalDate).getTime();
-            return da - db_;
-          }
-          return a.stockLevel - b.stockLevel;
-        }).map(item => (
-          <li key={item.id} style={{
-            backgroundColor: rowColor(item.stockLevel, item.reorderThreshold),
-            border:'1px solid #ddd',
-            borderRadius:4,
-            padding:'1rem',
-            marginBottom:'1rem',
-            display:'grid',
-            gridTemplateColumns:
-              '1fr 1fr 1fr 100px 150px 1fr 1fr 120px 80px 80px',
-            columnGap:'0.5rem',
-            alignItems:'center'
-          }}>
-            <div>{item.material}</div>
-            <div>{item.color}</div>
-            <div>{item.finish}</div>
-            <input
-              type="number"
-              min="0" step="1"
-              value={item.stockLevel}
-              onChange={e =>
-                handleUpdate(item.id,'stockLevel',Number(e.target.value))
-              }
-              style={{ width:'100%', height:'2rem' }}
-            />
-            <input
-              type="number"
-              min="0" step="1"
-              value={item.reorderThreshold}
-              onChange={e =>
-                handleUpdate(item.id,'reorderThreshold',Number(e.target.value))
-              }
-              style={{ width:'100%', height:'2rem' }}
-            />
-            <input
-              type="text"
-              value={item.supplier}
-              onChange={e =>
-                handleUpdate(item.id,'supplier',e.target.value)
-              }
-              style={{ height:'2rem' }}
-            />
-            <input
-              type="text"
-              value={item.orderNumber}
-              onChange={e =>
-                handleUpdate(item.id,'orderNumber',e.target.value)
-              }
-              style={{ height:'2rem' }}
-            />
-            <input
-              type="date"
-              value={item.arrivalDate}
-              onChange={e =>
-                handleUpdate(item.id,'arrivalDate',e.target.value)
-              }
-              style={{ height:'2rem' }}
-            />
+        {items
+          .sort((a,b) => {
+            const prio = x => x.stockLevel <= 0 ? 0
+              : x.stockLevel <= x.reorderThreshold ? 1
+              : 2;
+            const pa = prio(a), pb = prio(b);
+            if (pa !== pb) return pa - pb;
+            if (pa === 0) return new Date(a.arrivalDate) - new Date(b.arrivalDate);
+            return a.stockLevel - b.stockLevel;
+          })
+          .map(item => (
+            <li key={item.id} style={{
+              backgroundColor: rowColor(item.stockLevel, item.reorderThreshold),
+              border:'1px solid #ddd',
+              borderRadius:4,
+              padding:'1rem',
+              marginBottom:'1rem',
+              display:'grid',
+              gridTemplateColumns:'1fr 1fr 1fr 100px 150px 1fr 1fr 120px 80px 80px',
+              columnGap:'0.5rem',
+              alignItems:'center'
+            }}>
+              <div>{item.material}</div>
+              <div>{item.color}</div>
+              <div>{item.finish}</div>
 
-            <button onClick={() => handleResupply(item)}>
-              Resupply
-            </button>
-            <button onClick={() => handleDelete(item.id)}>
-              Delete
-            </button>
-          </li>
-        ))}
+              <input
+                type="number"
+                min="0" step="1"
+                value={item.stockLevel}
+                onChange={e => handleUpdate(item.id,'stockLevel',Number(e.target.value))}
+                style={{ width:'100%', height:'2rem' }}
+              />
+
+              <input
+                type="number"
+                min="0" step="1"
+                value={item.reorderThreshold}
+                onChange={e => handleUpdate(item.id,'reorderThreshold',Number(e.target.value))}
+                style={{ width:'100%', height:'2rem' }}
+              />
+
+              <input
+                type="text"
+                value={item.supplier}
+                onChange={e => handleUpdate(item.id,'supplier',e.target.value)}
+                style={{ height:'2rem' }}
+              />
+
+              <input
+                type="text"
+                value={item.orderNumber}
+                onChange={e => handleUpdate(item.id,'orderNumber',e.target.value)}
+                style={{ height:'2rem' }}
+              />
+
+              <input
+                type="date"
+                value={item.arrivalDate}
+                onChange={e => handleUpdate(item.id,'arrivalDate',e.target.value)}
+                style={{ height:'2rem' }}
+              />
+
+              <button onClick={() => handleResupply(item)}>Resupply</button>
+              <button onClick={() => handleDelete(item.id)}>Delete</button>
+            </li>
+          ))
+        }
       </ul>
     </div>
   );
