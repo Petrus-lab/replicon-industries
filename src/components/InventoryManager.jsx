@@ -5,6 +5,9 @@ import {
   collection,
   doc,
   addDoc,
+  getDocs,
+  query,
+  where,
   updateDoc,
   deleteDoc,
   onSnapshot
@@ -75,8 +78,28 @@ export default function InventoryManager() {
   };
 
   const handleUpdate = async (id, field, value) => {
+    // grab original item details before update
+    const original = items.find(i => i.id === id);
+    if (!original) return;
+
     try {
+      // update the field
       await updateDoc(doc(db, 'inventory', id), { [field]: value });
+
+      // if stockLevel set to zero, check for newer batch
+      if (field === 'stockLevel' && value === 0) {
+        const newerQ = query(
+          collection(db, 'inventory'),
+          where('material','==',original.material),
+          where('color','==',original.color),
+          where('finish','==',original.finish),
+          where('arrivalDate','>', original.arrivalDate)
+        );
+        const snap = await getDocs(newerQ);
+        if (snap.docs.length > 0) {
+          await deleteDoc(doc(db, 'inventory', id));
+        }
+      }
     } catch (err) {
       console.error('Error updating item:', err);
     }
@@ -90,7 +113,6 @@ export default function InventoryManager() {
     }
   };
 
-  // Prompt for new batch and add as separate item
   const handleResupply = async item => {
     const orderNumber = prompt('New Order Number:');
     if (!orderNumber) return;
@@ -102,7 +124,11 @@ export default function InventoryManager() {
       alert('Invalid quantity');
       return;
     }
-    const arrivalDate = new Date().toISOString().split('T')[0];
+    const arrivalDate = prompt(
+      'Arrival Date (YYYY-MM-DD):',
+      new Date().toISOString().split('T')[0]
+    );
+    if (!arrivalDate) return;
     try {
       await addDoc(collection(db, 'inventory'), {
         material: item.material,
@@ -181,11 +207,11 @@ export default function InventoryManager() {
 
       {/* List & Manage Items */}
       <ul style={{ listStyle:'none', padding:0 }}>
-        {items.sort((a, b) => {
+        {items.sort((a,b) => {
           const prio = x =>
-            x.stockLevel <= 0 ? 0
-            : x.stockLevel <= x.reorderThreshold ? 1
-            : 2;
+            x.stockLevel <= 0 ? 0 :
+            x.stockLevel <= x.reorderThreshold ? 1 :
+            2;
           const pa = prio(a), pb = prio(b);
           if (pa !== pb) return pa - pb;
           if (pa === 0) {
