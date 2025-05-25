@@ -90,10 +90,10 @@ export default function InventoryManager() {
     }
   };
 
-  const stockColor = (stock, threshold) => {
-    if (stock <= 0) return 'red';
-    if (stock <= threshold) return 'orange';
-    return 'green';
+  const rowColor = (stock, threshold) => {
+    if (stock <= 0) return '#f5c6cb';
+    if (stock <= threshold) return '#ffe8a1';
+    return '#c3e6cb';
   };
 
   if (loading) return <p>Loading inventory…</p>;
@@ -104,59 +104,88 @@ export default function InventoryManager() {
       <h2>Inventory Manager</h2>
 
       {/* Add New Item */}
-      <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid #ccc', paddingBottom: '1rem' }}>
+      <div style={{
+        marginBottom: '1.5rem',
+        borderBottom: '1px solid #ccc',
+        paddingBottom: '1rem'
+      }}>
         <h3>Add New Item</h3>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr) auto',
+          gridTemplateColumns: '1fr 1fr 1fr 100px 150px 1fr 120px auto',
           gap: '0.5rem'
         }}>
-          <input
-            name="material"
-            placeholder="Material (e.g. PLA)"
-            value={newItem.material}
-            onChange={handleChange}
-          />
-          <input
-            name="color"
-            placeholder="Color (e.g. Red)"
-            value={newItem.color}
-            onChange={handleChange}
-          />
-          <input
-            name="finish"
-            placeholder="Finish (matte/glossy/…)”"
-            value={newItem.finish}
-            onChange={handleChange}
-          />
-          <input
-            name="stockLevel"
-            type="number"
-            placeholder="Quantity in Stock"
-            value={newItem.stockLevel}
-            onChange={handleChange}
-          />
-          <input
-            name="reorderThreshold"
-            type="number"
-            placeholder="Reorder Threshold"
-            value={newItem.reorderThreshold}
-            onChange={handleChange}
-          />
-          <input
-            name="supplier"
-            placeholder="Supplier"
-            value={newItem.supplier}
-            onChange={handleChange}
-          />
-          <input
-            name="arrivalDate"
-            type="date"
-            placeholder="Arrival Date"
-            value={newItem.arrivalDate}
-            onChange={handleChange}
-          />
-          <button onClick={handleAdd}>Add Item</button>
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Material</label>
+            <input
+              name="material"
+              value={newItem.material}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Color</label>
+            <input
+              name="color"
+              value={newItem.color}
+              onChange={handleChange}
+            />
+          </div>
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Finish</label>
+            <input
+              name="finish"
+              value={newItem.finish}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Qty in Stock</label>
+            <input
+              name="stockLevel"
+              type="number"
+              min="0"
+              step="1"
+              value={newItem.stockLevel}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Reorder Threshold</label>
+            <input
+              name="reorderThreshold"
+              type="number"
+              min="0"
+              step="1"
+              value={newItem.reorderThreshold}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Supplier</label>
+            <input
+              name="supplier"
+              value={newItem.supplier}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label style={{ whiteSpace: 'nowrap' }}>Arrival Date</label>
+            <input
+              name="arrivalDate"
+              type="date"
+              value={newItem.arrivalDate}
+              onChange={handleChange}
+            />
+          </div>
+
+          <button onClick={handleAdd} style={{ height: '2.5rem' }}>
+            Add Item
+          </button>
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
@@ -165,12 +194,13 @@ export default function InventoryManager() {
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {items.map(item => (
           <li key={item.id} style={{
+            backgroundColor: rowColor(item.stockLevel, item.reorderThreshold),
             border: '1px solid #ddd',
             borderRadius: 4,
             padding: '1rem',
             marginBottom: '1rem',
             display: 'grid',
-            gridTemplateColumns: 'repeat(7, 1fr) 80px',
+            gridTemplateColumns: '1fr 1fr 1fr 100px 150px 1fr 120px 80px',
             columnGap: '0.5rem',
             alignItems: 'center'
           }}>
@@ -180,31 +210,42 @@ export default function InventoryManager() {
 
             <input
               type="number"
+              min="0"
+              step="1"
               value={item.stockLevel}
-              onChange={e => handleUpdate(item.id, 'stockLevel', Number(e.target.value))}
-              style={{
-                width: '100%',
-                color: stockColor(item.stockLevel, item.reorderThreshold)
-              }}
+              onChange={e =>
+                handleUpdate(item.id, 'stockLevel', Number(e.target.value))
+              }
+              style={{ width: '100%', height: '2rem' }}
             />
 
             <input
               type="number"
+              min="0"
+              step="1"
               value={item.reorderThreshold}
-              onChange={e => handleUpdate(item.id, 'reorderThreshold', Number(e.target.value))}
-              style={{ width: '100%' }}
+              onChange={e =>
+                handleUpdate(item.id, 'reorderThreshold', Number(e.target.value))
+              }
+              style={{ width: '100%', height: '2rem' }}
             />
 
             <input
               type="text"
               value={item.supplier}
-              onChange={e => handleUpdate(item.id, 'supplier', e.target.value)}
+              onChange={e =>
+                handleUpdate(item.id, 'supplier', e.target.value)
+              }
+              style={{ height: '2rem' }}
             />
 
             <input
               type="date"
               value={item.arrivalDate}
-              onChange={e => handleUpdate(item.id, 'arrivalDate', e.target.value)}
+              onChange={e =>
+                handleUpdate(item.id, 'arrivalDate', e.target.value)
+              }
+              style={{ height: '2rem' }}
             />
 
             <button onClick={() => handleDelete(item.id)}>Delete</button>
