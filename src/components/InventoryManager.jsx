@@ -1,5 +1,5 @@
 // ✅ FILE: src/components/InventoryManager.jsx
-// FINAL: Resupply deletes old batch if qty 0 + full row/column alignment
+// FINAL: Restored clean layout, field alignment, and cosmetics for clarity
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
@@ -90,7 +90,6 @@ export default function InventoryManager() {
       );
       if (hasNewerBatch) {
         await deleteDoc(ref);
-        console.log(`Deleted [${id}] — replaced by newer batch.`);
       }
     }
   };
@@ -128,10 +127,8 @@ export default function InventoryManager() {
       preRollPrice: Math.max(0, preRollPrice)
     });
 
-    // ✅ Delete the old batch if stockLevel was 0
     if (item.stockLevel === 0) {
       await deleteDoc(doc(db, 'inventory', item.id));
-      console.log(`Deleted zero-stock batch [${item.id}] after resupply.`);
     }
   };
 
@@ -150,13 +147,12 @@ export default function InventoryManager() {
   });
 
   return (
-    <div style={{ maxWidth: 1220, margin: '2rem auto', fontFamily: 'sans-serif' }}>
+    <div style={{ maxWidth: '100%', margin: '2rem auto', padding: '1rem', fontFamily: 'sans-serif' }}>
       <h2>Inventory Manager</h2>
 
-      {/* Add Form */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(11, 1fr) 1fr auto',
+        gridTemplateColumns: 'repeat(12, minmax(100px, 1fr)) auto auto',
         gap: '0.5rem',
         alignItems: 'end',
         marginBottom: '1rem'
@@ -201,22 +197,21 @@ export default function InventoryManager() {
             )}
           </div>
         ))}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <label style={{ fontWeight: 'bold', fontSize: '0.85rem', visibility: 'hidden' }}>Add</label>
-          <button onClick={handleAdd} style={{ height: '100%' }}>Add</button>
+        <div style={{ display: 'flex', flexDirection: 'column', marginTop: '-3mm' }}>
+          <label style={{ visibility: 'hidden' }}>Add</label>
+          <button onClick={handleAdd} style={{ padding: '6px', height: '38px' }}>Add</button>
         </div>
-        <div /> {/* Empty column for delete button */}
+        <div /> {/* Empty column for delete spacing */}
       </div>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* Inventory Items */}
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {sorted.map(item => (
           <li key={item.id} style={{
             backgroundColor: rowColor(item.stockLevel, item.reorderThreshold),
             display: 'grid',
-            gridTemplateColumns: 'repeat(11, 1fr) 1fr auto',
+            gridTemplateColumns: 'repeat(12, minmax(100px, 1fr)) auto auto',
             gap: '0.5rem',
             padding: '1rem',
             borderRadius: 6,
