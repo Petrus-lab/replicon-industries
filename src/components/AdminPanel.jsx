@@ -133,6 +133,7 @@ const AdminPanel = () => {
         <Link to="/admin"><button>Dashboard Home</button></Link>
         <Link to="/admin/users"><button>User Profiles</button></Link>
         <Link to="/admin/pricing"><button>Pricing Manager</button></Link>
+	<Link to="/admin/inventory"><button>Inventory Manager</button></Link>
       </nav>
 
       {/* Markup Control */}
