@@ -1,5 +1,5 @@
 // ✅ FILE: src/components/InventoryManager.jsx
-// FINAL: rollSize dropdown + resupply sequencing + auto-delete batch restore
+// FINAL: Resupply deletes old batch if qty 0 + full row/column alignment
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
@@ -78,7 +78,6 @@ export default function InventoryManager() {
 
     await updateDoc(ref, { [field]: safeValue });
 
-    // ✅ If stock drops to zero, delete if newer batch exists
     if (field === 'stockLevel' && safeValue === 0) {
       const current = snap.data();
       const hasNewerBatch = items.some(i =>
@@ -103,8 +102,8 @@ export default function InventoryManager() {
   const handleResupply = async (item) => {
     const qty = parseInt(prompt('Enter Quantity:'), 10);
     const preRollPrice = parseFloat(prompt('Enter Pre-roll Price:'));
-    const rollSize = prompt(`Select Roll Size (${ROLL_SIZES.join(', ')}):`, '1kg');
-    const supplier = prompt('Enter Supplier:');
+    const rollSize = prompt(`Select Roll Size (${ROLL_SIZES.join(', ')}):`, item.rollSize || '1kg');
+    const supplier = prompt('Enter Supplier:', item.supplier);
     const orderNumber = prompt('Enter Order Number:');
     const arrivalDate = prompt(
       'Enter Arrival Date (YYYY-MM-DD):',
@@ -128,6 +127,12 @@ export default function InventoryManager() {
       rollSize,
       preRollPrice: Math.max(0, preRollPrice)
     });
+
+    // ✅ Delete the old batch if stockLevel was 0
+    if (item.stockLevel === 0) {
+      await deleteDoc(doc(db, 'inventory', item.id));
+      console.log(`Deleted zero-stock batch [${item.id}] after resupply.`);
+    }
   };
 
   const rowColor = (stock, threshold) =>
@@ -145,13 +150,13 @@ export default function InventoryManager() {
   });
 
   return (
-    <div style={{ maxWidth: 1200, margin: '2rem auto', fontFamily: 'sans-serif' }}>
+    <div style={{ maxWidth: 1220, margin: '2rem auto', fontFamily: 'sans-serif' }}>
       <h2>Inventory Manager</h2>
 
       {/* Add Form */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(11, 1fr) auto',
+        gridTemplateColumns: 'repeat(11, 1fr) 1fr auto',
         gap: '0.5rem',
         alignItems: 'end',
         marginBottom: '1rem'
@@ -196,18 +201,22 @@ export default function InventoryManager() {
             )}
           </div>
         ))}
-        <button onClick={handleAdd} style={{ height: '100%' }}>Add</button>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <label style={{ fontWeight: 'bold', fontSize: '0.85rem', visibility: 'hidden' }}>Add</label>
+          <button onClick={handleAdd} style={{ height: '100%' }}>Add</button>
+        </div>
+        <div /> {/* Empty column for delete button */}
       </div>
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {/* List View */}
+      {/* Inventory Items */}
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {sorted.map(item => (
           <li key={item.id} style={{
             backgroundColor: rowColor(item.stockLevel, item.reorderThreshold),
             display: 'grid',
-            gridTemplateColumns: 'repeat(11, 1fr) auto auto',
+            gridTemplateColumns: 'repeat(11, 1fr) 1fr auto',
             gap: '0.5rem',
             padding: '1rem',
             borderRadius: 6,
