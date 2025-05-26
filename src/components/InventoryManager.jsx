@@ -1,11 +1,13 @@
 // ✅ FILE: src/components/InventoryManager.jsx
-// FINAL PATCH — Validation + Cosmetic Polish Restored
+// FINAL: rollSize dropdown + resupply sequencing + auto-delete batch restore
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
 import {
   collection, doc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot
 } from 'firebase/firestore';
+
+const ROLL_SIZES = ['1kg', '3kg', '5kg', '10kg'];
 
 export default function InventoryManager() {
   const [items, setItems] = useState([]);
@@ -32,7 +34,7 @@ export default function InventoryManager() {
     setNewItem((prev) => ({
       ...prev,
       [name]: ['stockLevel', 'reorderThreshold', 'preRollPrice'].includes(name)
-        ? Math.max(0, Number(value)) // clamp to 0 minimum
+        ? Math.max(0, Number(value))
         : value
     }));
   };
@@ -76,9 +78,10 @@ export default function InventoryManager() {
 
     await updateDoc(ref, { [field]: safeValue });
 
+    // ✅ If stock drops to zero, delete if newer batch exists
     if (field === 'stockLevel' && safeValue === 0) {
       const current = snap.data();
-      const newer = items.find(i =>
+      const hasNewerBatch = items.some(i =>
         i.id !== id &&
         i.material === current.material &&
         i.color === current.color &&
@@ -86,7 +89,10 @@ export default function InventoryManager() {
         i.rollSize === current.rollSize &&
         new Date(i.arrivalDate) > new Date(current.arrivalDate)
       );
-      if (newer) await deleteDoc(ref);
+      if (hasNewerBatch) {
+        await deleteDoc(ref);
+        console.log(`Deleted [${id}] — replaced by newer batch.`);
+      }
     }
   };
 
@@ -95,13 +101,20 @@ export default function InventoryManager() {
   };
 
   const handleResupply = async (item) => {
-    const orderNumber = prompt('New Order Number:');
-    const supplier = prompt('Supplier:');
-    const qty = parseInt(prompt('Quantity:'), 10);
-    const arrivalDate = prompt('Arrival Date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-    const rollSize = prompt('Roll Size (1kg, 3kg, 5kg):');
-    const preRollPrice = parseFloat(prompt('Pre-roll Price:'));
-    if (!orderNumber || !supplier || isNaN(qty) || !arrivalDate || !rollSize || isNaN(preRollPrice)) return;
+    const qty = parseInt(prompt('Enter Quantity:'), 10);
+    const preRollPrice = parseFloat(prompt('Enter Pre-roll Price:'));
+    const rollSize = prompt(`Select Roll Size (${ROLL_SIZES.join(', ')}):`, '1kg');
+    const supplier = prompt('Enter Supplier:');
+    const orderNumber = prompt('Enter Order Number:');
+    const arrivalDate = prompt(
+      'Enter Arrival Date (YYYY-MM-DD):',
+      new Date().toISOString().split('T')[0]
+    );
+
+    if (
+      !orderNumber || !supplier || isNaN(qty) || isNaN(preRollPrice) ||
+      !arrivalDate || !rollSize || !ROLL_SIZES.includes(rollSize)
+    ) return;
 
     await addDoc(collection(db, 'inventory'), {
       material: item.material,
@@ -135,6 +148,7 @@ export default function InventoryManager() {
     <div style={{ maxWidth: 1200, margin: '2rem auto', fontFamily: 'sans-serif' }}>
       <h2>Inventory Manager</h2>
 
+      {/* Add Form */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(11, 1fr) auto',
@@ -156,19 +170,30 @@ export default function InventoryManager() {
         ].map(([key, label]) => (
           <div key={key} style={{ display: 'flex', flexDirection: 'column' }}>
             <label style={{ fontWeight: 'bold', fontSize: '0.85rem' }}>{label}</label>
-            <input
-              name={key}
-              type={
-                ['stockLevel', 'reorderThreshold', 'preRollPrice'].includes(key)
-                  ? 'number'
-                  : key === 'arrivalDate'
-                  ? 'date'
-                  : 'text'
-              }
-              value={newItem[key]}
-              onChange={handleChange}
-              style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
-            />
+            {key === 'rollSize' ? (
+              <select
+                name={key}
+                value={newItem[key]}
+                onChange={handleChange}
+                style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
+              >
+                <option value="">Select</option>
+                {ROLL_SIZES.map(size => (
+                  <option key={size} value={size}>{size}</option>
+                ))}
+              </select>
+            ) : (
+              <input
+                name={key}
+                type={
+                  ['stockLevel', 'reorderThreshold', 'preRollPrice'].includes(key)
+                    ? 'number' : key === 'arrivalDate' ? 'date' : 'text'
+                }
+                value={newItem[key]}
+                onChange={handleChange}
+                style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc' }}
+              />
+            )}
           </div>
         ))}
         <button onClick={handleAdd} style={{ height: '100%' }}>Add</button>
@@ -176,6 +201,7 @@ export default function InventoryManager() {
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
+      {/* List View */}
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {sorted.map(item => (
           <li key={item.id} style={{
@@ -193,8 +219,12 @@ export default function InventoryManager() {
             <div>{item.finish}</div>
             <input type="number" min="0" value={item.stockLevel}
               onChange={e => handleUpdate(item.id, 'stockLevel', Number(e.target.value))} />
-            <input type="text" value={item.rollSize}
-              onChange={e => handleUpdate(item.id, 'rollSize', e.target.value)} />
+            <select value={item.rollSize}
+              onChange={e => handleUpdate(item.id, 'rollSize', e.target.value)}>
+              {ROLL_SIZES.map(size => (
+                <option key={size} value={size}>{size}</option>
+              ))}
+            </select>
             <input type="number" min="0" value={item.preRollPrice}
               onChange={e => handleUpdate(item.id, 'preRollPrice', Number(e.target.value))} />
             <input type="number" min="0" value={item.reorderThreshold}
