@@ -1,5 +1,5 @@
 // ✅ FILE: src/components/UploadStatus.jsx
-// RESTORED: Original card‐style cosmetics + working “Pay” button
+// REFACTORED: Logical grid layout for Jobs & Orders, preserved “Pay” functionality
 
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
@@ -45,7 +45,7 @@ export default function UploadStatus() {
       const user = auth.currentUser;
       if (!user) throw new Error('Not authenticated');
 
-      // create order
+      // Create order
       await addDoc(collection(db, 'orders'), {
         userId: user.uid,
         jobId: job.id,
@@ -57,7 +57,7 @@ export default function UploadStatus() {
         createdAt: serverTimestamp()
       });
 
-      // update job status
+      // Update job status
       await updateDoc(doc(db, 'jobs', job.id), { status: 'Paid' });
     } catch (err) {
       console.error('Payment simulation failed:', err);
@@ -65,57 +65,80 @@ export default function UploadStatus() {
     }
   };
 
-  if (loading) return <p>Loading…</p>;
+  if (loading) return <p>Loading your jobs and orders…</p>;
 
-  const listStyle = {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0
+  // Styles
+  const sectionStyle = {
+    maxWidth: 700,
+    margin: '2rem auto',
+    padding: '1rem',
+    fontFamily: 'sans-serif'
   };
-
-  const itemStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
+  const gridStyle = {
+    display: 'grid',
+    gridTemplateColumns: '3fr 1fr 1fr',
+    gap: '1rem',
     alignItems: 'center',
-    padding: '0.75rem',
-    marginBottom: '0.5rem',
-    border: '1px solid #ccc',
-    borderRadius: '4px',
-    background: '#fafafa'
+    marginBottom: '2rem'
   };
-
-  const sectionStyle = { maxWidth: 600, margin: '2rem auto' };
+  const headerStyle = {
+    fontWeight: 'bold',
+    borderBottom: '2px solid #333',
+    padding: '0.5rem 0'
+  };
+  const rowStyle = {
+    padding: '0.75rem 0',
+    borderBottom: '1px solid #ccc'
+  };
+  const buttonStyle = {
+    padding: '6px 12px',
+    cursor: 'pointer',
+    border: '1px solid #007bff',
+    borderRadius: '4px',
+    background: '#007bff',
+    color: '#fff'
+  };
 
   return (
     <div style={sectionStyle}>
+      {/* Jobs Section */}
       <h2>Your Jobs</h2>
-      <ul style={listStyle}>
+      <div style={gridStyle}>
+        <div style={headerStyle}>File Name</div>
+        <div style={headerStyle}>Status</div>
+        <div style={headerStyle}>Action</div>
         {jobs.map(job => (
-          <li key={job.id} style={itemStyle}>
-            <div>
-              <strong>{job.fileName}</strong><br/>
-              Status: {job.status}
+          <React.Fragment key={job.id}>
+            <div style={rowStyle}>{job.fileName}</div>
+            <div style={rowStyle}>{job.status}</div>
+            <div style={rowStyle}>
+              {job.status === 'Uploaded' && (
+                <button
+                  style={buttonStyle}
+                  onClick={() => handlePay(job)}
+                >
+                  Pay
+                </button>
+              )}
             </div>
-            {job.status === 'Uploaded' && (
-              <button onClick={() => handlePay(job)}>
-                Pay
-              </button>
-            )}
-          </li>
+          </React.Fragment>
         ))}
-      </ul>
+      </div>
 
+      {/* Orders Section */}
       <h2>Your Orders</h2>
-      <ul style={listStyle}>
-        {orders.map(ord => (
-          <li key={ord.id} style={itemStyle}>
-            <div>
-              <strong>{ord.fileName}</strong><br/>
-              Status: {ord.status}
-            </div>
-          </li>
+      <div style={gridStyle}>
+        <div style={headerStyle}>File Name</div>
+        <div style={headerStyle}>Status</div>
+        <div style={headerStyle}></div>
+        {orders.map(order => (
+          <React.Fragment key={order.id}>
+            <div style={rowStyle}>{order.fileName}</div>
+            <div style={rowStyle}>{order.status}</div>
+            <div style={rowStyle}></div>
+          </React.Fragment>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
