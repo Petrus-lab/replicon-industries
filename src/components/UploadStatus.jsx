@@ -1,4 +1,5 @@
 // ✅ FILE: src/components/UploadStatus.jsx
+// RESTORED: Original card‐style cosmetics + working “Pay” button
 
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
@@ -22,20 +23,12 @@ export default function UploadStatus() {
     const user = auth.currentUser;
     if (!user) return;
 
-    // Subscribe to this user's jobs
-    const jobsQ = query(
-      collection(db, 'jobs'),
-      where('uid', '==', user.uid)
-    );
+    const jobsQ = query(collection(db, 'jobs'), where('uid', '==', user.uid));
     const unsubJobs = onSnapshot(jobsQ, snap => {
       setJobs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
 
-    // Subscribe to this user's orders
-    const ordersQ = query(
-      collection(db, 'orders'),
-      where('userId', '==', user.uid)
-    );
+    const ordersQ = query(collection(db, 'orders'), where('userId', '==', user.uid));
     const unsubOrders = onSnapshot(ordersQ, snap => {
       setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
@@ -52,7 +45,7 @@ export default function UploadStatus() {
       const user = auth.currentUser;
       if (!user) throw new Error('Not authenticated');
 
-      // 1) Create an order document (permits create via new rule)
+      // create order
       await addDoc(collection(db, 'orders'), {
         userId: user.uid,
         jobId: job.id,
@@ -64,30 +57,47 @@ export default function UploadStatus() {
         createdAt: serverTimestamp()
       });
 
-      // 2) Update the job status to "Paid"
-      await updateDoc(doc(db, 'jobs', job.id), {
-        status: 'Paid'
-      });
+      // update job status
+      await updateDoc(doc(db, 'jobs', job.id), { status: 'Paid' });
     } catch (err) {
       console.error('Payment simulation failed:', err);
-      alert('Payment simulation failed: ' + err.message);
+      alert('Payment failed: ' + err.message);
     }
   };
 
-  if (loading) return <p>Loading your jobs & orders…</p>;
+  if (loading) return <p>Loading…</p>;
+
+  const listStyle = {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0
+  };
+
+  const itemStyle = {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '0.75rem',
+    marginBottom: '0.5rem',
+    border: '1px solid #ccc',
+    borderRadius: '4px',
+    background: '#fafafa'
+  };
+
+  const sectionStyle = { maxWidth: 600, margin: '2rem auto' };
 
   return (
-    <div style={{ maxWidth: 600, margin: '2rem auto' }}>
+    <div style={sectionStyle}>
       <h2>Your Jobs</h2>
-      <ul>
+      <ul style={listStyle}>
         {jobs.map(job => (
-          <li key={job.id} style={{ marginBottom: '1rem' }}>
-            <strong>{job.fileName}</strong> — Status: {job.status}
+          <li key={job.id} style={itemStyle}>
+            <div>
+              <strong>{job.fileName}</strong><br/>
+              Status: {job.status}
+            </div>
             {job.status === 'Uploaded' && (
-              <button
-                onClick={() => handlePay(job)}
-                style={{ marginLeft: '1rem' }}
-              >
+              <button onClick={() => handlePay(job)}>
                 Pay
               </button>
             )}
@@ -96,10 +106,13 @@ export default function UploadStatus() {
       </ul>
 
       <h2>Your Orders</h2>
-      <ul>
+      <ul style={listStyle}>
         {orders.map(ord => (
-          <li key={ord.id} style={{ marginBottom: '1rem' }}>
-            <strong>{ord.fileName}</strong> — Status: {ord.status}
+          <li key={ord.id} style={itemStyle}>
+            <div>
+              <strong>{ord.fileName}</strong><br/>
+              Status: {ord.status}
+            </div>
           </li>
         ))}
       </ul>
