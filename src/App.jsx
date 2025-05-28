@@ -59,10 +59,10 @@ function App() {
         {!isAdmin && (
           <nav style={{ margin: '1rem 0' }}>
             <Link to="/client/profile">Profile</Link> |{' '}
-            <Link to="/client/upload">Upload</Link> |{' '}
-            <Link to="/client/orders">Orders</Link> |{' '}
             <Link to="/client/shipping">Shipping</Link> |{' '}
-            <Link to="/client/status">Status</Link>
+            <Link to="/client/upload">Upload</Link> |{' '}
+            <Link to="/client/status">Status</Link> |{' '} 
+            <Link to="/client/orders">Orders</Link>
           </nav>
         )}
 
