@@ -1,8 +1,22 @@
 // ✅ FILE: src/components/Profile.jsx
+// ENHANCED: add “Default Print Quality” dropdown before “Default Post–Processing Finish”
 
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+
+const PRINT_QUALITIES = [
+  'Draft Quality',
+  'Fit Check Quality',
+  'Prototype',
+  'Production Quality'
+];
+
+const POST_PROCESSES = [
+  { value: 'raw',             label: 'Raw (As Printed)' },
+  { value: 'supports_removed', label: 'Supports Removed' },
+  { value: 'ready_to_go',     label: 'Ready to Go' }
+];
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -14,7 +28,8 @@ export default function Profile() {
     city: '',
     zip: '',
     country: '',
-    defaultPostProcess: 'raw',  // renamed field
+    defaultPrintQuality: PRINT_QUALITIES[0],
+    defaultPostProcess: POST_PROCESSES[0].value,
   });
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +48,10 @@ export default function Profile() {
             city: d.defaultShipping?.city || '',
             zip: d.defaultShipping?.zip || '',
             country: d.defaultShipping?.country || '',
-            defaultPostProcess: d.printPreferences?.defaultFinish || 'raw',
+            defaultPrintQuality: d.printPreferences?.defaultPrintQuality
+              || PRINT_QUALITIES[0],
+            defaultPostProcess: d.printPreferences?.defaultFinish
+              || POST_PROCESSES[0].value,
           });
         }
       }
@@ -43,54 +61,112 @@ export default function Profile() {
   }, []);
 
   const handleChange = e => {
-    setProfileData(pd => ({ ...pd, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setProfileData(pd => ({ ...pd, [name]: value }));
   };
 
   const handleSave = async () => {
     if (!user) return;
-    await setDoc(doc(db, 'users', user.uid), {
-      email: user.email,
-      name: profileData.name,
-      contactNumber: profileData.contactNumber,
-      defaultShipping: {
-        address: profileData.address,
-        suburb: profileData.suburb,
-        city: profileData.city,
-        zip: profileData.zip,
-        country: profileData.country,
+    await setDoc(
+      doc(db, 'users', user.uid),
+      {
+        email: user.email,
+        name: profileData.name,
+        contactNumber: profileData.contactNumber,
+        defaultShipping: {
+          address: profileData.address,
+          suburb: profileData.suburb,
+          city: profileData.city,
+          zip: profileData.zip,
+          country: profileData.country,
+        },
+        printPreferences: {
+          defaultPrintQuality: profileData.defaultPrintQuality,
+          defaultFinish: profileData.defaultPostProcess,
+        },
       },
-      printPreferences: {
-        defaultFinish: profileData.defaultPostProcess,
-      },
-    }, { merge: true });
+      { merge: true }
+    );
     alert('Profile saved.');
   };
 
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div style={{ padding: '1rem', maxWidth: 600, margin: 'auto' }}>
+    <div style={{ padding: '1rem', maxWidth: 600, margin: 'auto', fontFamily: 'sans-serif' }}>
       <h2>User Profile</h2>
-      <input name="name"        value={profileData.name}        onChange={handleChange} placeholder="Name" />
-      <input name="contactNumber" value={profileData.contactNumber} onChange={handleChange} placeholder="Contact Number" />
-      <input name="address"     value={profileData.address}     onChange={handleChange} placeholder="Address" />
-      <input name="suburb"      value={profileData.suburb}      onChange={handleChange} placeholder="Suburb" />
-      <input name="city"        value={profileData.city}        onChange={handleChange} placeholder="City" />
-      <input name="zip"         value={profileData.zip}         onChange={handleChange} placeholder="Postal Code" />
-      <input name="country"     value={profileData.country}     onChange={handleChange} placeholder="Country" />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <input
+          name="name"
+          value={profileData.name}
+          onChange={handleChange}
+          placeholder="Name"
+        />
+        <input
+          name="contactNumber"
+          value={profileData.contactNumber}
+          onChange={handleChange}
+          placeholder="Contact Number"
+        />
+        <input
+          name="address"
+          value={profileData.address}
+          onChange={handleChange}
+          placeholder="Address"
+        />
+        <input
+          name="suburb"
+          value={profileData.suburb}
+          onChange={handleChange}
+          placeholder="Suburb"
+        />
+        <input
+          name="city"
+          value={profileData.city}
+          onChange={handleChange}
+          placeholder="City"
+        />
+        <input
+          name="zip"
+          value={profileData.zip}
+          onChange={handleChange}
+          placeholder="Postal Code"
+        />
+        <input
+          name="country"
+          value={profileData.country}
+          onChange={handleChange}
+          placeholder="Country"
+        />
 
-      <label>Default Post–Processing Finish:</label>
-      <select
-        name="defaultPostProcess"
-        value={profileData.defaultPostProcess}
-        onChange={handleChange}
-      >
-        <option value="raw">Raw (As Printed)</option>
-        <option value="supports_removed">Supports Removed</option>
-        <option value="ready_to_go">Ready to Go</option>
-      </select>
+        {/* New Default Print Quality */}
+        <label style={{ fontWeight: 'bold', marginTop: '1rem' }}>Default Print Quality:</label>
+        <select
+          name="defaultPrintQuality"
+          value={profileData.defaultPrintQuality}
+          onChange={handleChange}
+        >
+          {PRINT_QUALITIES.map((q, i) => (
+            <option key={i} value={q}>{q}</option>
+          ))}
+        </select>
 
-      <button onClick={handleSave}>Save Profile</button>
+        {/* Existing Default Post-Processing Finish */}
+        <label style={{ fontWeight: 'bold' }}>Default Post–Processing Finish:</label>
+        <select
+          name="defaultPostProcess"
+          value={profileData.defaultPostProcess}
+          onChange={handleChange}
+        >
+          {POST_PROCESSES.map(p => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
+
+        <button onClick={handleSave} style={{ marginTop: '1rem', padding: '0.5rem' }}>
+          Save Profile
+        </button>
+      </div>
     </div>
   );
 }
