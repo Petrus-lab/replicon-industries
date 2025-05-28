@@ -1,5 +1,5 @@
 // ✅ FILE: src/components/Profile.jsx
-// ENHANCED: add “Default Print Quality” dropdown before “Default Post–Processing Finish”
+// UPDATED: Match ShippingForm label styling (bold, 0.9rem, margin)
 
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
@@ -48,10 +48,8 @@ export default function Profile() {
             city: d.defaultShipping?.city || '',
             zip: d.defaultShipping?.zip || '',
             country: d.defaultShipping?.country || '',
-            defaultPrintQuality: d.printPreferences?.defaultPrintQuality
-              || PRINT_QUALITIES[0],
-            defaultPostProcess: d.printPreferences?.defaultFinish
-              || POST_PROCESSES[0].value,
+            defaultPrintQuality: d.printPreferences?.defaultPrintQuality || PRINT_QUALITIES[0],
+            defaultPostProcess:  d.printPreferences?.defaultFinish        || POST_PROCESSES[0].value,
           });
         }
       }
@@ -75,14 +73,14 @@ export default function Profile() {
         contactNumber: profileData.contactNumber,
         defaultShipping: {
           address: profileData.address,
-          suburb: profileData.suburb,
-          city: profileData.city,
-          zip: profileData.zip,
+          suburb:  profileData.suburb,
+          city:    profileData.city,
+          zip:     profileData.zip,
           country: profileData.country,
         },
         printPreferences: {
           defaultPrintQuality: profileData.defaultPrintQuality,
-          defaultFinish: profileData.defaultPostProcess,
+          defaultFinish:       profileData.defaultPostProcess,
         },
       },
       { merge: true }
@@ -92,80 +90,110 @@ export default function Profile() {
 
   if (loading) return <p>Loading...</p>;
 
+  const labelStyle = {
+    fontWeight: 'bold',
+    fontSize: '0.9rem',
+    margin: '0.4rem 0 0.2rem'
+  };
+
+  const inputStyle = {
+    padding: '6px',
+    borderRadius: '4px',
+    border: '1px solid #ccc'
+  };
+
   return (
     <div style={{ padding: '1rem', maxWidth: 600, margin: 'auto', fontFamily: 'sans-serif' }}>
       <h2>User Profile</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+        <label style={labelStyle}>Name</label>
         <input
           name="name"
           value={profileData.name}
           onChange={handleChange}
-          placeholder="Name"
+          style={inputStyle}
         />
+
+        <label style={labelStyle}>Contact Number</label>
         <input
           name="contactNumber"
           value={profileData.contactNumber}
           onChange={handleChange}
-          placeholder="Contact Number"
+          style={inputStyle}
         />
+
+        <label style={labelStyle}>Address</label>
         <input
           name="address"
           value={profileData.address}
           onChange={handleChange}
-          placeholder="Address"
+          style={inputStyle}
         />
+
+        <label style={labelStyle}>Suburb</label>
         <input
           name="suburb"
           value={profileData.suburb}
           onChange={handleChange}
-          placeholder="Suburb"
+          style={inputStyle}
         />
+
+        <label style={labelStyle}>City</label>
         <input
           name="city"
           value={profileData.city}
           onChange={handleChange}
-          placeholder="City"
+          style={inputStyle}
         />
+
+        <label style={labelStyle}>Postal Code</label>
         <input
           name="zip"
           value={profileData.zip}
           onChange={handleChange}
-          placeholder="Postal Code"
+          style={inputStyle}
         />
+
+        <label style={labelStyle}>Country</label>
         <input
           name="country"
           value={profileData.country}
           onChange={handleChange}
-          placeholder="Country"
+          style={inputStyle}
         />
 
-        {/* New Default Print Quality */}
-        <label style={{ fontWeight: 'bold', marginTop: '1rem' }}>Default Print Quality:</label>
+        <label style={labelStyle}>Default Print Quality</label>
         <select
           name="defaultPrintQuality"
           value={profileData.defaultPrintQuality}
           onChange={handleChange}
+          style={inputStyle}
         >
           {PRINT_QUALITIES.map((q, i) => (
             <option key={i} value={q}>{q}</option>
           ))}
         </select>
 
-        {/* Existing Default Post-Processing Finish */}
-        <label style={{ fontWeight: 'bold' }}>Default Post–Processing Finish:</label>
+        <label style={labelStyle}>Default Post–Processing Finish</label>
         <select
           name="defaultPostProcess"
           value={profileData.defaultPostProcess}
           onChange={handleChange}
+          style={inputStyle}
         >
           {POST_PROCESSES.map(p => (
             <option key={p.value} value={p.value}>{p.label}</option>
           ))}
         </select>
 
-        <button onClick={handleSave} style={{ marginTop: '1rem', padding: '0.5rem' }}>
+        <button
+          onClick={handleSave}
+          style={{ marginTop: '1rem', padding: '8px 12px' }}
+        >
           Save Profile
         </button>
+
       </div>
     </div>
   );
