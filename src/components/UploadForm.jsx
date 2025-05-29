@@ -1,6 +1,4 @@
 // ✅ FILE: src/components/UploadForm.jsx
-// UPDATED: all form fields now use the .half-width class for 50% width
-
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
 import {
@@ -10,206 +8,193 @@ import {
   getDocs,
   query,
   where,
-  getDoc,
-  doc
+  doc,
+  getDoc
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-const PRINT_QUALITIES = [
-  'Draft Quality',
-  'Fit Check Quality',
-  'Prototype',
-  'Production Quality'
-];
-
-const POST_PROCESSES = [
-  { value: 'raw',              label: 'Raw (As Printed)' },
-  { value: 'supports_removed', label: 'Supports Removed' },
-  { value: 'ready_to_go',      label: 'Ready to Go' }
-];
-
 export default function UploadForm() {
-  const [file, setFile] = useState(null);
-  const [material, setMaterial] = useState('');
-  const [color, setColor] = useState('');
-  const [inv, setInv] = useState([]);
-  const [finishes, setFinishes] = useState([]);
+  const [file, setFile]               = useState(null);
+  const [material, setMaterial]       = useState('');
+  const [color, setColor]             = useState('');
+  const [finish, setFinish]           = useState('');
+  const [printQuality, setPrintQuality]     = useState('');
+  const [postProcessing, setPostProcessing] = useState('');
+  const [inventory, setInventory]     = useState([]);
+  const [defaultQuality, setDefaultQuality]     = useState('');
+  const [defaultProcessing, setDefaultProcessing] = useState('');
+  const [status, setStatus]           = useState('');
 
-  const [defaultPrintQuality, setDefaultPrintQuality] = useState(PRINT_QUALITIES[0]);
-  const [printQuality, setPrintQuality] = useState(PRINT_QUALITIES[0]);
-
-  const [defaultPostProcess, setDefaultPostProcess] = useState('raw');
-  const [postProcess, setPostProcess] = useState('raw');
-
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState('');
-
-  // Load inventory once
+  // Fetch inventory (unchanged)
   useEffect(() => {
     (async () => {
       const snap = await getDocs(
         query(collection(db, 'inventory'), where('stockLevel', '>', 0))
       );
-      setInv(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setInventory(snap.docs.map(d => d.data()));
     })();
   }, []);
 
-  // Load user defaults once
+  // Fetch current user's defaults via getDoc (permission-safe)
   useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
+    const u = auth.currentUser;
+    if (!u) return;
     (async () => {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        const prefs = snap.data().printPreferences || {};
-        const dpq = prefs.defaultPrintQuality || PRINT_QUALITIES[0];
-        const dpp = prefs.defaultFinish      || 'raw';
-        setDefaultPrintQuality(dpq);
-        setPrintQuality(dpq);
-        setDefaultPostProcess(dpp);
-        setPostProcess(dpp);
+      const userRef = doc(db, 'users', u.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        const d = userSnap.data();
+        setDefaultQuality(d.defaultPrintQuality || '');
+        setDefaultProcessing(d.defaultFinish || '');
       }
     })();
   }, []);
 
-  // Derive material/color/finish lists
-  const materials = Array.from(new Set(inv.map(i => i.material)));
+  // Derive dropdown options
+  const materials = Array.from(new Set(inventory.map(i => i.material)));
   const colors    = material
-    ? Array.from(new Set(inv.filter(i => i.material === material).map(i => i.color)))
+    ? Array.from(new Set(inventory.filter(i => i.material === material).map(i => i.color)))
     : [];
-
-  useEffect(() => {
-    if (!material || !color) {
-      setFinishes([]);
-      return;
-    }
-    const list = inv
-      .filter(i => i.material === material && i.color === color)
-      .map(i => i.finish);
-    setFinishes(Array.from(new Set(list)));
-  }, [material, color, inv]);
+  const finishes  = material && color
+    ? Array.from(new Set(
+        inventory
+          .filter(i => i.material === material && i.color === color)
+          .map(i => i.finish)
+      ))
+    : [];
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError('');
+    setStatus('');
 
     const user = auth.currentUser;
-    if (!user) {
-      setError('Sign in to upload.');
-      return;
-    }
-    if (!file || !material || !color || !finishes.length) {
-      setError('Complete all fields and select a file.');
+    if (!user || !file || !material || !color || !finish) {
+      setStatus('Please complete all required fields.');
       return;
     }
 
-    setUploading(true);
     try {
+      // 1) upload file to Storage
       const storageRef = ref(storage, `uploads/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
-      const fileUrl = await getDownloadURL(storageRef);
+      const url = await getDownloadURL(storageRef);
 
+      // 2) create job in Firestore
       await addDoc(collection(db, 'jobs'), {
         uid:            user.uid,
         email:          user.email,
         fileName:       file.name,
         filamentType:   material,
         color,
-        finish:         finishes[0],
-        printQuality,
-        postProcess,
+        finish,
+        printQuality:   printQuality || defaultQuality,
+        postProcessing: postProcessing || defaultProcessing,
+        fileUrl:        url,
         cost:           0,
         status:         'Uploaded',
-        fileUrl,
         createdAt:      serverTimestamp()
       });
 
-      alert('Upload successful!');
+      setStatus('Upload successful.');
+      // reset fields
       setFile(null);
       setMaterial('');
       setColor('');
-      setPrintQuality(defaultPrintQuality);
-      setPostProcess(defaultPostProcess);
+      setFinish('');
+      setPrintQuality('');
+      setPostProcessing('');
     } catch (err) {
       console.error(err);
-      setError('Upload failed: ' + err.message);
-    } finally {
-      setUploading(false);
+      setStatus('Upload failed: ' + err.message);
     }
   };
 
   return (
-    <div className="form-container">
-      <h2 className="form-title">Upload Print Job</h2>
-      <form onSubmit={handleSubmit} className="form">
-        <label className="form-label">STL File:</label>
-        <input
-          type="file"
-          accept=".stl"
-          onChange={e => setFile(e.target.files[0] ?? null)}
-          className="form-input half-width"
-        />
+    <form className="form" onSubmit={handleSubmit}>
+      <h2 className="form-title">Upload 3D Print Job</h2>
 
-        <label className="form-label">Material:</label>
-        <select
-          value={material}
-          onChange={e => { setMaterial(e.target.value); setColor(''); }}
-          className="form-select half-width"
-        >
-          <option value="">Select Material</option>
-          {materials.map((m, i) => <option key={i} value={m}>{m}</option>)}
-        </select>
+      <label htmlFor="file"      className="form-label">3D File:</label>
+      <input
+        id="file"
+        type="file"
+        accept=".stl"
+        onChange={e => setFile(e.target.files[0])}
+        className="form-input half-width"
+        required
+      />
 
-        <label className="form-label">Color:</label>
-        <select
-          value={color}
-          onChange={e => setColor(e.target.value)}
-          disabled={!material}
-          className="form-select half-width"
-        >
-          <option value="">Select Color</option>
-          {colors.map((c, i) => <option key={i} value={c}>{c}</option>)}
-        </select>
+      <label htmlFor="material"  className="form-label">Material:</label>
+      <select
+        id="material"
+        value={material}
+        onChange={e => setMaterial(e.target.value)}
+        className="form-select half-width"
+        required
+      >
+        <option value="">Select material</option>
+        {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
+      </select>
 
-        <label className="form-label">Available Finish:</label>
-        <input
-          type="text"
-          value={finishes[0] || 'Select Material & Color'}
-          disabled
-          className="form-input half-width"
-        />
+      <label htmlFor="color"     className="form-label">Color:</label>
+      <select
+        id="color"
+        value={color}
+        onChange={e => setColor(e.target.value)}
+        className="form-select half-width"
+        required
+      >
+        <option value="">Select color</option>
+        {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
+      </select>
 
-        <label className="form-label">Print Quality:</label>
-        <select
-          value={printQuality}
-          onChange={e => setPrintQuality(e.target.value)}
-          className="form-select half-width"
-        >
-          {PRINT_QUALITIES.map((q, i) => <option key={i} value={q}>{q}</option>)}
-        </select>
+      <label htmlFor="finish"    className="form-label">Finish:</label>
+      <select
+        id="finish"
+        value={finish}
+        onChange={e => setFinish(e.target.value)}
+        className="form-select half-width"
+        required
+      >
+        <option value="">Select finish</option>
+        {finishes.map((f,i) => <option key={i} value={f}>{f}</option>)}
+      </select>
 
-        <label className="form-label">Post–Processing Finish:</label>
-        <select
-          value={postProcess}
-          onChange={e => setPostProcess(e.target.value)}
-          className="form-select half-width"
-          style={{ marginBottom: '1rem' }}
-        >
-          {POST_PROCESSES.map(p => (
-            <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
+      <label htmlFor="printQuality" className="form-label">
+        Print Quality:
+      </label>
+      <select
+        id="printQuality"
+        value={printQuality}
+        onChange={e => setPrintQuality(e.target.value)}
+        className="form-select half-width"
+      >
+        <option value="">Use default ({defaultQuality})</option>
+        <option value="Draft Quality">Draft Quality</option>
+        <option value="Fit Check Quality">Fit Check Quality</option>
+        <option value="Prototype">Prototype</option>
+        <option value="Production Quality">Production Quality</option>
+      </select>
 
-        {error && <p className="form-error">{error}</p>}
+      <label htmlFor="postProcessing" className="form-label">
+        Post-Processing:
+      </label>
+      <select
+        id="postProcessing"
+        value={postProcessing}
+        onChange={e => setPostProcessing(e.target.value)}
+        className="form-select half-width"
+      >
+        <option value="">Use default ({defaultProcessing})</option>
+        <option value="raw">Raw</option>
+        <option value="supports_removed">Supports Removed</option>
+        <option value="ready_to_go">Ready to Go</option>
+      </select>
 
-        <button
-          type="submit"
-          disabled={uploading}
-          className="form-button half-width"
-        >
-          {uploading ? 'Uploading…' : 'Submit'}
-        </button>
-      </form>
-    </div>
+      {status && <p className="form-error">{status}</p>}
+
+      <button type="submit" className="form-button">
+        Submit Job
+      </button>
+    </form>
   );
 }
