@@ -1,4 +1,5 @@
 // ✅ FILE: src/components/UploadForm.jsx
+
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
 import {
@@ -14,18 +15,18 @@ import {
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function UploadForm() {
-  const [file, setFile]               = useState(null);
-  const [material, setMaterial]       = useState('');
-  const [color, setColor]             = useState('');
-  const [finish, setFinish]           = useState('');
-  const [printQuality, setPrintQuality]     = useState('');
-  const [postProcessing, setPostProcessing] = useState('');
-  const [inventory, setInventory]     = useState([]);
-  const [defaultQuality, setDefaultQuality]     = useState('');
+  const [file, setFile]                     = useState(null);
+  const [material, setMaterial]             = useState('');
+  const [color, setColor]                   = useState('');
+  const [finish, setFinish]                 = useState('');
+  const [printQuality, setPrintQuality]     = useState('');        // ← start blank
+  const [postProcessing, setPostProcessing] = useState('');        // ← start blank
+  const [inventory, setInventory]           = useState([]);
+  const [defaultQuality, setDefaultQuality]       = useState('');
   const [defaultProcessing, setDefaultProcessing] = useState('');
-  const [status, setStatus]           = useState('');
+  const [status, setStatus]                 = useState('');
 
-  // Fetch inventory (unchanged)
+  // 1) Fetch inventory
   useEffect(() => {
     (async () => {
       const snap = await getDocs(
@@ -35,27 +36,28 @@ export default function UploadForm() {
     })();
   }, []);
 
-  // Fetch current user's defaults via getDoc (permission-safe)
+  // 2) Fetch user defaults via getDoc()
   useEffect(() => {
     const u = auth.currentUser;
     if (!u) return;
     (async () => {
-      const userRef = doc(db, 'users', u.uid);
-      const userSnap = await getDoc(userRef);
+      const userSnap = await getDoc(doc(db, 'users', u.uid));
       if (userSnap.exists()) {
         const d = userSnap.data();
-        setDefaultQuality(d.defaultPrintQuality || '');
-        setDefaultProcessing(d.defaultFinish || '');
+        setDefaultQuality(d.defaultPrintQuality || 'Draft Quality');
+        setDefaultProcessing(d.defaultFinish       || 'raw');
       }
     })();
   }, []);
 
-  // Derive dropdown options
+  // 3) Dropdown options
   const materials = Array.from(new Set(inventory.map(i => i.material)));
-  const colors    = material
-    ? Array.from(new Set(inventory.filter(i => i.material === material).map(i => i.color)))
+  const colors = material
+    ? Array.from(new Set(
+        inventory.filter(i => i.material === material).map(i => i.color)
+      ))
     : [];
-  const finishes  = material && color
+  const finishes = material && color
     ? Array.from(new Set(
         inventory
           .filter(i => i.material === material && i.color === color)
@@ -63,6 +65,7 @@ export default function UploadForm() {
       ))
     : [];
 
+  // 4) Submit handler
   const handleSubmit = async e => {
     e.preventDefault();
     setStatus('');
@@ -74,12 +77,12 @@ export default function UploadForm() {
     }
 
     try {
-      // 1) upload file to Storage
+      // upload to Storage
       const storageRef = ref(storage, `uploads/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
-      // 2) create job in Firestore
+      // write to Firestore
       await addDoc(collection(db, 'jobs'), {
         uid:            user.uid,
         email:          user.email,
@@ -96,7 +99,7 @@ export default function UploadForm() {
       });
 
       setStatus('Upload successful.');
-      // reset fields
+      // reset only the user‐chosen fields, keep defaults
       setFile(null);
       setMaterial('');
       setColor('');
@@ -113,7 +116,7 @@ export default function UploadForm() {
     <form className="form" onSubmit={handleSubmit}>
       <h2 className="form-title">Upload 3D Print Job</h2>
 
-      <label htmlFor="file"      className="form-label">3D File:</label>
+      <label htmlFor="file" className="form-label">3D File:</label>
       <input
         id="file"
         type="file"
@@ -123,7 +126,7 @@ export default function UploadForm() {
         required
       />
 
-      <label htmlFor="material"  className="form-label">Material:</label>
+      <label htmlFor="material" className="form-label">Material:</label>
       <select
         id="material"
         value={material}
@@ -135,7 +138,7 @@ export default function UploadForm() {
         {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
       </select>
 
-      <label htmlFor="color"     className="form-label">Color:</label>
+      <label htmlFor="color" className="form-label">Color:</label>
       <select
         id="color"
         value={color}
@@ -147,7 +150,7 @@ export default function UploadForm() {
         {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
       </select>
 
-      <label htmlFor="finish"    className="form-label">Finish:</label>
+      <label htmlFor="finish" className="form-label">Finish:</label>
       <select
         id="finish"
         value={finish}
@@ -159,32 +162,32 @@ export default function UploadForm() {
         {finishes.map((f,i) => <option key={i} value={f}>{f}</option>)}
       </select>
 
-      <label htmlFor="printQuality" className="form-label">
-        Print Quality:
-      </label>
+      <label htmlFor="printQuality" className="form-label">Print Quality:</label>
       <select
         id="printQuality"
         value={printQuality}
         onChange={e => setPrintQuality(e.target.value)}
         className="form-select half-width"
       >
-        <option value="">Use default ({defaultQuality})</option>
+        <option value="">
+          Use default ({defaultQuality})
+        </option>
         <option value="Draft Quality">Draft Quality</option>
         <option value="Fit Check Quality">Fit Check Quality</option>
         <option value="Prototype">Prototype</option>
         <option value="Production Quality">Production Quality</option>
       </select>
 
-      <label htmlFor="postProcessing" className="form-label">
-        Post-Processing:
-      </label>
+      <label htmlFor="postProcessing" className="form-label">Post-Processing:</label>
       <select
         id="postProcessing"
         value={postProcessing}
         onChange={e => setPostProcessing(e.target.value)}
         className="form-select half-width"
       >
-        <option value="">Use default ({defaultProcessing})</option>
+        <option value="">
+          Use default ({defaultProcessing})
+        </option>
         <option value="raw">Raw</option>
         <option value="supports_removed">Supports Removed</option>
         <option value="ready_to_go">Ready to Go</option>
@@ -192,9 +195,7 @@ export default function UploadForm() {
 
       {status && <p className="form-error">{status}</p>}
 
-      <button type="submit" className="form-button">
-        Submit Job
-      </button>
+      <button type="submit" className="form-button">Submit Job</button>
     </form>
   );
 }
