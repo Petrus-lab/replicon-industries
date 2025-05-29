@@ -1,4 +1,5 @@
 // ✅ FILE: src/components/UploadForm.jsx
+// UPDATED: button now uses .quarter-width to match field widths
 
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
@@ -207,7 +208,7 @@ export default function UploadForm() {
       {status && <p className="form-error">{status}</p>}
 
       <div className="form-group">
-        <button type="submit" className="form-button">Submit Job</button>
+        <button type="submit" className="form-button quarter-width">Submit Job</button>
       </div>
     </form>
   );
