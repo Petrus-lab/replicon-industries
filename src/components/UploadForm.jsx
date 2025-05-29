@@ -1,6 +1,3 @@
-// ✅ FILE: src/components/UploadForm.jsx
-// UPDATED: Match ShippingForm label styling (bold, 0.9rem, margin)
-
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
 import {
@@ -44,7 +41,6 @@ export default function UploadForm() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
-  // Load inventory once
   useEffect(() => {
     (async () => {
       const snap = await getDocs(
@@ -54,22 +50,19 @@ export default function UploadForm() {
     })();
   }, []);
 
-  // Load user defaults
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
     (async () => {
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        if (snap.exists()) {
-          const prefs = snap.data().printPreferences || {};
-          setDefaultPrintQuality(prefs.defaultPrintQuality || PRINT_QUALITIES[0]);
-          setPrintQuality(prefs.defaultPrintQuality || PRINT_QUALITIES[0]);
-          setDefaultPostProcess(prefs.defaultFinish || 'raw');
-          setPostProcess(prefs.defaultFinish || 'raw');
-        }
-      } catch (err) {
-        console.error(err);
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        const prefs = snap.data().printPreferences || {};
+        const dpq = prefs.defaultPrintQuality || PRINT_QUALITIES[0];
+        const dpp = prefs.defaultFinish || 'raw';
+        setDefaultPrintQuality(dpq);
+        setPrintQuality(dpq);
+        setDefaultPostProcess(dpp);
+        setPostProcess(dpp);
       }
     })();
   }, []);
@@ -111,18 +104,18 @@ export default function UploadForm() {
       const fileUrl = await getDownloadURL(storageRef);
 
       await addDoc(collection(db, 'jobs'), {
-        uid:           user.uid,
-        email:         user.email,
-        fileName:      file.name,
-        filamentType:  material,
+        uid:            user.uid,
+        email:          user.email,
+        fileName:       file.name,
+        filamentType:   material,
         color,
-        finish:        finishes[0],
+        finish:         finishes[0],
         printQuality,
         postProcess,
-        cost:          0,
-        status:        'Uploaded',
+        cost:           0,
+        status:         'Uploaded',
         fileUrl,
-        createdAt:     serverTimestamp()
+        createdAt:      serverTimestamp()
       });
 
       alert('Upload successful!');
@@ -139,88 +132,72 @@ export default function UploadForm() {
     }
   };
 
-  const labelStyle = {
-    fontWeight: 'bold',
-    fontSize: '0.9rem',
-    margin: '0.4rem 0 0.2rem'
-  };
-
-  const inputStyle = {
-    padding: '6px',
-    borderRadius: '4px',
-    border: '1px solid #ccc'
-  };
-
   return (
-    <div style={{ maxWidth: 600, margin: '2rem auto', fontFamily: 'sans-serif' }}>
+    <div style={{ maxWidth: 500, margin: '2rem auto' }}>
       <h2>Upload Print Job</h2>
-      <form onSubmit={handleSubmit}
-        style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-        <label style={labelStyle}>STL File</label>
-        <input
-          type="file"
-          accept=".stl"
-          onChange={e => setFile(e.target.files[0] ?? null)}
-        />
+      <label>STL File:</label>
+      <input
+        type="file"
+        accept=".stl"
+        onChange={e => setFile(e.target.files[0] ?? null)}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Material</label>
-        <select
-          value={material}
-          onChange={e => { setMaterial(e.target.value); setColor(''); }}
-          style={inputStyle}
-        >
-          <option value="">Select Material</option>
-          {materials.map((m, i) => <option key={i} value={m}>{m}</option>)}
-        </select>
+      <label>Material:</label>
+      <select
+        value={material}
+        onChange={e => { setMaterial(e.target.value); setColor(''); }}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      >
+        <option value="">Select Material</option>
+        {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
+      </select>
 
-        <label style={labelStyle}>Color</label>
-        <select
-          value={color}
-          onChange={e => setColor(e.target.value)}
-          disabled={!material}
-          style={inputStyle}
-        >
-          <option value="">Select Color</option>
-          {colors.map((c, i) => <option key={i} value={c}>{c}</option>)}
-        </select>
+      <label>Color:</label>
+      <select
+        value={color}
+        onChange={e => setColor(e.target.value)}
+        disabled={!material}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      >
+        <option value="">Select Color</option>
+        {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
+      </select>
 
-        <label style={labelStyle}>Available Finish</label>
-        <input
-          type="text"
-          value={finishes[0] ? finishes[0] : 'Select Material & Color'}
-          disabled
-          style={inputStyle}
-        />
+      <label>Available Finish:</label>
+      <input
+        type="text"
+        value={finishes[0] ? finishes[0] : 'Select Material & Color'}
+        disabled
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Print Quality</label>
-        <select
-          value={printQuality}
-          onChange={e => setPrintQuality(e.target.value)}
-          style={inputStyle}
-        >
-          {PRINT_QUALITIES.map((q, i) => (
-            <option key={i} value={q}>{q}</option>
-          ))}
-        </select>
+      <label>Print Quality:</label>
+      <select
+        value={printQuality}
+        onChange={e => setPrintQuality(e.target.value)}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      >
+        {PRINT_QUALITIES.map((q,i) => <option key={i} value={q}>{q}</option>)}
+      </select>
 
-        <label style={labelStyle}>Post–Processing Finish</label>
-        <select
-          value={postProcess}
-          onChange={e => setPostProcess(e.target.value)}
-          style={inputStyle}
-        >
-          {POST_PROCESSES.map(p => (
-            <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
+      <label>Post–Processing Finish:</label>
+      <select
+        value={postProcess}
+        onChange={e => setPostProcess(e.target.value)}
+        style={{ display: 'block', marginBottom: '1rem', width: '100%' }}
+      >
+        {POST_PROCESSES.map(p => (
+          <option key={p.value} value={p.value}>{p.label}</option>
+        ))}
+      </select>
 
-        <button type="submit" disabled={uploading}>
-          {uploading ? 'Uploading…' : 'Submit'}
-        </button>
+      <button type="submit" onClick={handleSubmit}>
+        {uploading ? 'Uploading…' : 'Submit'}
+      </button>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </form>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
     </div>
   );
 }

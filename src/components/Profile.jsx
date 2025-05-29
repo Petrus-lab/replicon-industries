@@ -1,6 +1,3 @@
-// ✅ FILE: src/components/Profile.jsx
-// UPDATED: Match ShippingForm label styling (bold, 0.9rem, margin)
-
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -49,7 +46,7 @@ export default function Profile() {
             zip: d.defaultShipping?.zip || '',
             country: d.defaultShipping?.country || '',
             defaultPrintQuality: d.printPreferences?.defaultPrintQuality || PRINT_QUALITIES[0],
-            defaultPostProcess:  d.printPreferences?.defaultFinish        || POST_PROCESSES[0].value,
+            defaultPostProcess: d.printPreferences?.defaultFinish        || POST_PROCESSES[0].value,
           });
         }
       }
@@ -59,8 +56,7 @@ export default function Profile() {
   }, []);
 
   const handleChange = e => {
-    const { name, value } = e.target;
-    setProfileData(pd => ({ ...pd, [name]: value }));
+    setProfileData(pd => ({ ...pd, [e.target.name]: e.target.value }));
   };
 
   const handleSave = async () => {
@@ -90,111 +86,91 @@ export default function Profile() {
 
   if (loading) return <p>Loading...</p>;
 
-  const labelStyle = {
-    fontWeight: 'bold',
-    fontSize: '0.9rem',
-    margin: '0.4rem 0 0.2rem'
-  };
-
-  const inputStyle = {
-    padding: '6px',
-    borderRadius: '4px',
-    border: '1px solid #ccc'
-  };
-
   return (
-    <div style={{ padding: '1rem', maxWidth: 600, margin: 'auto', fontFamily: 'sans-serif' }}>
+    <div style={{ maxWidth: 500, margin: '2rem auto' }}>
       <h2>User Profile</h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-        <label style={labelStyle}>Name</label>
-        <input
-          name="name"
-          value={profileData.name}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>Name:</label>
+      <input
+        name="name"
+        value={profileData.name}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Contact Number</label>
-        <input
-          name="contactNumber"
-          value={profileData.contactNumber}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>Contact Number:</label>
+      <input
+        name="contactNumber"
+        value={profileData.contactNumber}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Address</label>
-        <input
-          name="address"
-          value={profileData.address}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>Address:</label>
+      <input
+        name="address"
+        value={profileData.address}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Suburb</label>
-        <input
-          name="suburb"
-          value={profileData.suburb}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>Suburb:</label>
+      <input
+        name="suburb"
+        value={profileData.suburb}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>City</label>
-        <input
-          name="city"
-          value={profileData.city}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>City:</label>
+      <input
+        name="city"
+        value={profileData.city}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Postal Code</label>
-        <input
-          name="zip"
-          value={profileData.zip}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>Postal Code:</label>
+      <input
+        name="zip"
+        value={profileData.zip}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Country</label>
-        <input
-          name="country"
-          value={profileData.country}
-          onChange={handleChange}
-          style={inputStyle}
-        />
+      <label>Country:</label>
+      <input
+        name="country"
+        value={profileData.country}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      />
 
-        <label style={labelStyle}>Default Print Quality</label>
-        <select
-          name="defaultPrintQuality"
-          value={profileData.defaultPrintQuality}
-          onChange={handleChange}
-          style={inputStyle}
-        >
-          {PRINT_QUALITIES.map((q, i) => (
-            <option key={i} value={q}>{q}</option>
-          ))}
-        </select>
+      <label>Default Print Quality:</label>
+      <select
+        name="defaultPrintQuality"
+        value={profileData.defaultPrintQuality}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+      >
+        {PRINT_QUALITIES.map((q,i) => (
+          <option key={i} value={q}>{q}</option>
+        ))}
+      </select>
 
-        <label style={labelStyle}>Default Post–Processing Finish</label>
-        <select
-          name="defaultPostProcess"
-          value={profileData.defaultPostProcess}
-          onChange={handleChange}
-          style={inputStyle}
-        >
-          {POST_PROCESSES.map(p => (
-            <option key={p.value} value={p.value}>{p.label}</option>
-          ))}
-        </select>
+      <label>Default Post–Processing Finish:</label>
+      <select
+        name="defaultPostProcess"
+        value={profileData.defaultPostProcess}
+        onChange={handleChange}
+        style={{ display: 'block', marginBottom: '1rem', width: '100%' }}
+      >
+        {POST_PROCESSES.map(p => (
+          <option key={p.value} value={p.value}>{p.label}</option>
+        ))}
+      </select>
 
-        <button
-          onClick={handleSave}
-          style={{ marginTop: '1rem', padding: '8px 12px' }}
-        >
-          Save Profile
-        </button>
-
-      </div>
+      <button onClick={handleSave}>Save Profile</button>
     </div>
   );
 }
