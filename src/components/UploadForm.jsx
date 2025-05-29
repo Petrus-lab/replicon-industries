@@ -1,4 +1,5 @@
 // ✅ FILE: src/components/UploadForm.jsx
+// UPDATED: removed "Quality" suffix from the Print Quality dropdown options
 
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
@@ -19,8 +20,8 @@ export default function UploadForm() {
   const [material, setMaterial]             = useState('');
   const [color, setColor]                   = useState('');
   const [finish, setFinish]                 = useState('');
-  const [printQuality, setPrintQuality]     = useState('');        // ← start blank
-  const [postProcessing, setPostProcessing] = useState('');        // ← start blank
+  const [printQuality, setPrintQuality]     = useState('');
+  const [postProcessing, setPostProcessing] = useState('');
   const [inventory, setInventory]           = useState([]);
   const [defaultQuality, setDefaultQuality]       = useState('');
   const [defaultProcessing, setDefaultProcessing] = useState('');
@@ -44,8 +45,8 @@ export default function UploadForm() {
       const userSnap = await getDoc(doc(db, 'users', u.uid));
       if (userSnap.exists()) {
         const d = userSnap.data();
-        setDefaultQuality(d.defaultPrintQuality || 'Draft Quality');
-        setDefaultProcessing(d.defaultFinish       || 'raw');
+        setDefaultQuality(d.defaultPrintQuality || '');
+        setDefaultProcessing(d.defaultFinish || '');
       }
     })();
   }, []);
@@ -99,7 +100,7 @@ export default function UploadForm() {
       });
 
       setStatus('Upload successful.');
-      // reset only the user‐chosen fields, keep defaults
+      // reset fields
       setFile(null);
       setMaterial('');
       setColor('');
@@ -169,13 +170,11 @@ export default function UploadForm() {
         onChange={e => setPrintQuality(e.target.value)}
         className="form-select half-width"
       >
-        <option value="">
-          Use default ({defaultQuality})
-        </option>
-        <option value="Draft Quality">Draft Quality</option>
-        <option value="Fit Check Quality">Fit Check Quality</option>
+        <option value="">Use default ({defaultQuality})</option>
+        <option value="Draft Quality">Draft</option>
+        <option value="Fit Check Quality">Fit Check</option>
         <option value="Prototype">Prototype</option>
-        <option value="Production Quality">Production Quality</option>
+        <option value="Production Quality">Production</option>
       </select>
 
       <label htmlFor="postProcessing" className="form-label">Post-Processing:</label>
@@ -185,9 +184,7 @@ export default function UploadForm() {
         onChange={e => setPostProcessing(e.target.value)}
         className="form-select half-width"
       >
-        <option value="">
-          Use default ({defaultProcessing})
-        </option>
+        <option value="">Use default ({defaultProcessing})</option>
         <option value="raw">Raw</option>
         <option value="supports_removed">Supports Removed</option>
         <option value="ready_to_go">Ready to Go</option>
