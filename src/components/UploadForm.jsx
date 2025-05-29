@@ -1,5 +1,4 @@
-// ✅ FILE: src/components/UploadForm.jsx
-// UPDATED: removed "Quality" suffix from the Print Quality dropdown options
+// FILE: src/components/UploadForm.jsx
 
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
@@ -27,7 +26,7 @@ export default function UploadForm() {
   const [defaultProcessing, setDefaultProcessing] = useState('');
   const [status, setStatus]                 = useState('');
 
-  // 1) Fetch inventory
+  // Fetch inventory
   useEffect(() => {
     (async () => {
       const snap = await getDocs(
@@ -37,7 +36,7 @@ export default function UploadForm() {
     })();
   }, []);
 
-  // 2) Fetch user defaults via getDoc()
+  // Fetch user defaults
   useEffect(() => {
     const u = auth.currentUser;
     if (!u) return;
@@ -51,7 +50,7 @@ export default function UploadForm() {
     })();
   }, []);
 
-  // 3) Dropdown options
+  // Dropdown options
   const materials = Array.from(new Set(inventory.map(i => i.material)));
   const colors = material
     ? Array.from(new Set(
@@ -66,7 +65,7 @@ export default function UploadForm() {
       ))
     : [];
 
-  // 4) Submit handler
+  // Submission
   const handleSubmit = async e => {
     e.preventDefault();
     setStatus('');
@@ -78,12 +77,12 @@ export default function UploadForm() {
     }
 
     try {
-      // upload to Storage
+      // Upload file
       const storageRef = ref(storage, `uploads/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
-      // write to Firestore
+      // Create job
       await addDoc(collection(db, 'jobs'), {
         uid:            user.uid,
         email:          user.email,
@@ -100,7 +99,6 @@ export default function UploadForm() {
       });
 
       setStatus('Upload successful.');
-      // reset fields
       setFile(null);
       setMaterial('');
       setColor('');
@@ -123,7 +121,7 @@ export default function UploadForm() {
         type="file"
         accept=".stl"
         onChange={e => setFile(e.target.files[0])}
-        className="form-input half-width"
+        className="form-input quarter-width"
         required
       />
 
@@ -132,7 +130,7 @@ export default function UploadForm() {
         id="material"
         value={material}
         onChange={e => setMaterial(e.target.value)}
-        className="form-select half-width"
+        className="form-select quarter-width"
         required
       >
         <option value="">Select material</option>
@@ -144,7 +142,7 @@ export default function UploadForm() {
         id="color"
         value={color}
         onChange={e => setColor(e.target.value)}
-        className="form-select half-width"
+        className="form-select quarter-width"
         required
       >
         <option value="">Select color</option>
@@ -156,7 +154,7 @@ export default function UploadForm() {
         id="finish"
         value={finish}
         onChange={e => setFinish(e.target.value)}
-        className="form-select half-width"
+        className="form-select quarter-width"
         required
       >
         <option value="">Select finish</option>
@@ -168,13 +166,13 @@ export default function UploadForm() {
         id="printQuality"
         value={printQuality}
         onChange={e => setPrintQuality(e.target.value)}
-        className="form-select half-width"
+        className="form-select quarter-width"
       >
         <option value="">Use default ({defaultQuality})</option>
-        <option value="Draft Quality">Draft</option>
-        <option value="Fit Check Quality">Fit Check</option>
+        <option value="Draft">Draft</option>
+        <option value="Fit Check">Fit Check</option>
         <option value="Prototype">Prototype</option>
-        <option value="Production Quality">Production</option>
+        <option value="Production">Production</option>
       </select>
 
       <label htmlFor="postProcessing" className="form-label">Post-Processing:</label>
@@ -182,7 +180,7 @@ export default function UploadForm() {
         id="postProcessing"
         value={postProcessing}
         onChange={e => setPostProcessing(e.target.value)}
-        className="form-select half-width"
+        className="form-select quarter-width"
       >
         <option value="">Use default ({defaultProcessing})</option>
         <option value="raw">Raw</option>
