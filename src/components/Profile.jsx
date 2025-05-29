@@ -1,176 +1,119 @@
+// ✅ FILE: src/components/Profile.jsx
+// UPDATED: removed “Quality” suffix from Default Print Quality options
+
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-
-const PRINT_QUALITIES = [
-  'Draft Quality',
-  'Fit Check Quality',
-  'Prototype',
-  'Production Quality'
-];
-
-const POST_PROCESSES = [
-  { value: 'raw',             label: 'Raw (As Printed)' },
-  { value: 'supports_removed', label: 'Supports Removed' },
-  { value: 'ready_to_go',     label: 'Ready to Go' }
-];
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
-  const [user, setUser] = useState(null);
-  const [profileData, setProfileData] = useState({
+  const [userData, setUserData] = useState({
     name: '',
-    contactNumber: '',
-    address: '',
-    suburb: '',
-    city: '',
-    zip: '',
-    country: '',
-    defaultPrintQuality: PRINT_QUALITIES[0],
-    defaultPostProcess: POST_PROCESSES[0].value,
+    phoneNumber: '',
+    defaultFinish: '',
+    defaultPrintQuality: ''
   });
-  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged(async u => {
-      setUser(u);
-      if (u) {
-        const snap = await getDoc(doc(db, 'users', u.uid));
-        if (snap.exists()) {
-          const d = snap.data();
-          setProfileData({
-            name: d.name || '',
-            contactNumber: d.contactNumber || '',
-            address: d.defaultShipping?.address || '',
-            suburb: d.defaultShipping?.suburb || '',
-            city: d.defaultShipping?.city || '',
-            zip: d.defaultShipping?.zip || '',
-            country: d.defaultShipping?.country || '',
-            defaultPrintQuality: d.printPreferences?.defaultPrintQuality || PRINT_QUALITIES[0],
-            defaultPostProcess: d.printPreferences?.defaultFinish        || POST_PROCESSES[0].value,
-          });
-        }
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        navigate('/');
+        return;
       }
-      setLoading(false);
-    });
-    return unsub;
-  }, []);
+      const ref = doc(db, 'users', user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        setUserData(snap.data());
+      }
+    };
+    fetchProfile();
+  }, [navigate]);
 
   const handleChange = e => {
-    setProfileData(pd => ({ ...pd, [e.target.name]: e.target.value }));
+    setUserData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setStatus('');
   };
 
-  const handleSave = async () => {
+  const handleSubmit = async e => {
+    e.preventDefault();
+    const user = auth.currentUser;
     if (!user) return;
-    await setDoc(
-      doc(db, 'users', user.uid),
-      {
-        email: user.email,
-        name: profileData.name,
-        contactNumber: profileData.contactNumber,
-        defaultShipping: {
-          address: profileData.address,
-          suburb:  profileData.suburb,
-          city:    profileData.city,
-          zip:     profileData.zip,
-          country: profileData.country,
-        },
-        printPreferences: {
-          defaultPrintQuality: profileData.defaultPrintQuality,
-          defaultFinish:       profileData.defaultPostProcess,
-        },
-      },
-      { merge: true }
-    );
-    alert('Profile saved.');
+    try {
+      const ref = doc(db, 'users', user.uid);
+      await updateDoc(ref, {
+        name: userData.name,
+        phoneNumber: userData.phoneNumber,
+        defaultFinish: userData.defaultFinish,
+        defaultPrintQuality: userData.defaultPrintQuality
+      });
+      setStatus('Profile updated.');
+    } catch (err) {
+      console.error(err);
+      setStatus('Failed to update profile.');
+    }
   };
-
-  if (loading) return <p>Loading...</p>;
 
   return (
-    <div style={{ maxWidth: 500, margin: '2rem auto' }}>
-      <h2>User Profile</h2>
+    <form className="form" onSubmit={handleSubmit}>
+      <h2 className="form-title">Profile</h2>
 
-      <label>Name:</label>
+      <label htmlFor="name" className="form-label">Name:</label>
       <input
+        id="name"
         name="name"
-        value={profileData.name}
+        value={userData.name}
         onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+        className="form-input half-width"
+        required
       />
 
-      <label>Contact Number:</label>
+      <label htmlFor="phoneNumber" className="form-label">Phone Number:</label>
       <input
-        name="contactNumber"
-        value={profileData.contactNumber}
+        id="phoneNumber"
+        name="phoneNumber"
+        value={userData.phoneNumber}
         onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+        className="form-input half-width"
+        required
       />
 
-      <label>Address:</label>
-      <input
-        name="address"
-        value={profileData.address}
-        onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
-
-      <label>Suburb:</label>
-      <input
-        name="suburb"
-        value={profileData.suburb}
-        onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
-
-      <label>City:</label>
-      <input
-        name="city"
-        value={profileData.city}
-        onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
-
-      <label>Postal Code:</label>
-      <input
-        name="zip"
-        value={profileData.zip}
-        onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
-
-      <label>Country:</label>
-      <input
-        name="country"
-        value={profileData.country}
-        onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
-
-      <label>Default Print Quality:</label>
+      <label htmlFor="defaultPrintQuality" className="form-label">Default Print Quality:</label>
       <select
+        id="defaultPrintQuality"
         name="defaultPrintQuality"
-        value={profileData.defaultPrintQuality}
+        value={userData.defaultPrintQuality}
         onChange={handleChange}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
+        className="form-select half-width"
+        required
       >
-        {PRINT_QUALITIES.map((q,i) => (
-          <option key={i} value={q}>{q}</option>
-        ))}
+        <option value="">Select quality</option>
+        <option value="Draft Quality">Draft</option>
+        <option value="Fit Check Quality">Fit Check</option>
+        <option value="Prototype">Prototype</option>
+        <option value="Production Quality">Production</option>
       </select>
 
-      <label>Default Post–Processing Finish:</label>
+      <label htmlFor="defaultFinish" className="form-label">Default Post-Processing:</label>
       <select
-        name="defaultPostProcess"
-        value={profileData.defaultPostProcess}
+        id="defaultFinish"
+        name="defaultFinish"
+        value={userData.defaultFinish}
         onChange={handleChange}
-        style={{ display: 'block', marginBottom: '1rem', width: '100%' }}
+        className="form-select half-width"
+        required
       >
-        {POST_PROCESSES.map(p => (
-          <option key={p.value} value={p.value}>{p.label}</option>
-        ))}
+        <option value="">Select finish</option>
+        <option value="raw">Raw</option>
+        <option value="supports_removed">Supports Removed</option>
+        <option value="ready_to_go">Ready to Go</option>
       </select>
 
-      <button onClick={handleSave}>Save Profile</button>
-    </div>
+      {status && <p className="form-error">{status}</p>}
+
+      <button type="submit" className="form-button">Save Profile</button>
+    </form>
   );
 }
