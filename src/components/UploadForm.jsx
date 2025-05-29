@@ -1,3 +1,6 @@
+// ✅ FILE: src/components/UploadForm.jsx
+// REFACTORED: uses global.css classes only—no inline styles
+
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
 import {
@@ -20,9 +23,9 @@ const PRINT_QUALITIES = [
 ];
 
 const POST_PROCESSES = [
-  { value: 'raw',             label: 'Raw (As Printed)' },
+  { value: 'raw',              label: 'Raw (As Printed)' },
   { value: 'supports_removed', label: 'Supports Removed' },
-  { value: 'ready_to_go',     label: 'Ready to Go' }
+  { value: 'ready_to_go',      label: 'Ready to Go' }
 ];
 
 export default function UploadForm() {
@@ -41,6 +44,7 @@ export default function UploadForm() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
 
+  // Load inventory once
   useEffect(() => {
     (async () => {
       const snap = await getDocs(
@@ -50,6 +54,7 @@ export default function UploadForm() {
     })();
   }, []);
 
+  // Load user defaults once
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
@@ -58,7 +63,7 @@ export default function UploadForm() {
       if (snap.exists()) {
         const prefs = snap.data().printPreferences || {};
         const dpq = prefs.defaultPrintQuality || PRINT_QUALITIES[0];
-        const dpp = prefs.defaultFinish || 'raw';
+        const dpp = prefs.defaultFinish      || 'raw';
         setDefaultPrintQuality(dpq);
         setPrintQuality(dpq);
         setDefaultPostProcess(dpp);
@@ -67,8 +72,9 @@ export default function UploadForm() {
     })();
   }, []);
 
+  // Derive material/color/finish lists
   const materials = Array.from(new Set(inv.map(i => i.material)));
-  const colors = material
+  const colors    = material
     ? Array.from(new Set(inv.filter(i => i.material === material).map(i => i.color)))
     : [];
 
@@ -93,32 +99,35 @@ export default function UploadForm() {
       return;
     }
     if (!file || !material || !color || !finishes.length) {
-      setError('Please complete all dropdowns and select a file.');
+      setError('Complete all fields and select a file.');
       return;
     }
 
     setUploading(true);
     try {
+      // Storage upload
       const storageRef = ref(storage, `uploads/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const fileUrl = await getDownloadURL(storageRef);
 
+      // Firestore write
       await addDoc(collection(db, 'jobs'), {
-        uid:            user.uid,
-        email:          user.email,
-        fileName:       file.name,
-        filamentType:   material,
+        uid:           user.uid,
+        email:         user.email,
+        fileName:      file.name,
+        filamentType:  material,
         color,
-        finish:         finishes[0],
+        finish:        finishes[0],
         printQuality,
         postProcess,
-        cost:           0,
-        status:         'Uploaded',
+        cost:          0,
+        status:        'Uploaded',
         fileUrl,
-        createdAt:      serverTimestamp()
+        createdAt:     serverTimestamp()
       });
 
       alert('Upload successful!');
+      // reset
       setFile(null);
       setMaterial('');
       setColor('');
@@ -133,71 +142,72 @@ export default function UploadForm() {
   };
 
   return (
-    <div style={{ maxWidth: 500, margin: '2rem auto' }}>
-      <h2>Upload Print Job</h2>
+    <div className="form-container">
+      <h2 className="form-title">Upload Print Job</h2>
+      <form onSubmit={handleSubmit} className="form">
+        <label className="form-label">STL File:</label>
+        <input
+          type="file"
+          accept=".stl"
+          onChange={e => setFile(e.target.files[0] ?? null)}
+          className="form-input"
+        />
 
-      <label>STL File:</label>
-      <input
-        type="file"
-        accept=".stl"
-        onChange={e => setFile(e.target.files[0] ?? null)}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
+        <label className="form-label">Material:</label>
+        <select
+          value={material}
+          onChange={e => { setMaterial(e.target.value); setColor(''); }}
+          className="form-select"
+        >
+          <option value="">Select Material</option>
+          {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
+        </select>
 
-      <label>Material:</label>
-      <select
-        value={material}
-        onChange={e => { setMaterial(e.target.value); setColor(''); }}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      >
-        <option value="">Select Material</option>
-        {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
-      </select>
+        <label className="form-label">Color:</label>
+        <select
+          value={color}
+          onChange={e => setColor(e.target.value)}
+          disabled={!material}
+          className="form-select"
+        >
+          <option value="">Select Color</option>
+          {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
+        </select>
 
-      <label>Color:</label>
-      <select
-        value={color}
-        onChange={e => setColor(e.target.value)}
-        disabled={!material}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      >
-        <option value="">Select Color</option>
-        {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
-      </select>
+        <label className="form-label">Available Finish:</label>
+        <input
+          type="text"
+          value={finishes[0] || 'Select Material & Color'}
+          disabled
+          className="form-input"
+        />
 
-      <label>Available Finish:</label>
-      <input
-        type="text"
-        value={finishes[0] ? finishes[0] : 'Select Material & Color'}
-        disabled
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      />
+        <label className="form-label">Print Quality:</label>
+        <select
+          value={printQuality}
+          onChange={e => setPrintQuality(e.target.value)}
+          className="form-select"
+        >
+          {PRINT_QUALITIES.map((q,i) => <option key={i} value={q}>{q}</option>)}
+        </select>
 
-      <label>Print Quality:</label>
-      <select
-        value={printQuality}
-        onChange={e => setPrintQuality(e.target.value)}
-        style={{ display: 'block', marginBottom: '0.75rem', width: '100%' }}
-      >
-        {PRINT_QUALITIES.map((q,i) => <option key={i} value={q}>{q}</option>)}
-      </select>
+        <label className="form-label">Post–Processing Finish:</label>
+        <select
+          value={postProcess}
+          onChange={e => setPostProcess(e.target.value)}
+          className="form-select"
+        >
+          {POST_PROCESSES.map(p => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
 
-      <label>Post–Processing Finish:</label>
-      <select
-        value={postProcess}
-        onChange={e => setPostProcess(e.target.value)}
-        style={{ display: 'block', marginBottom: '1rem', width: '100%' }}
-      >
-        {POST_PROCESSES.map(p => (
-          <option key={p.value} value={p.value}>{p.label}</option>
-        ))}
-      </select>
+        {error && <p className="form-error">{error}</p>}
 
-      <button type="submit" onClick={handleSubmit}>
-        {uploading ? 'Uploading…' : 'Submit'}
-      </button>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        <button type="submit" disabled={uploading} className="form-button">
+          {uploading ? 'Uploading…' : 'Submit'}
+        </button>
+      </form>
     </div>
   );
 }
