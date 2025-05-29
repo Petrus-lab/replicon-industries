@@ -1,5 +1,5 @@
 // ✅ FILE: src/components/UploadForm.jsx
-// REFACTORED: uses global.css classes only—no inline styles
+// UPDATED: all form fields now use the .half-width class for 50% width
 
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
@@ -105,29 +105,26 @@ export default function UploadForm() {
 
     setUploading(true);
     try {
-      // Storage upload
       const storageRef = ref(storage, `uploads/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const fileUrl = await getDownloadURL(storageRef);
 
-      // Firestore write
       await addDoc(collection(db, 'jobs'), {
-        uid:           user.uid,
-        email:         user.email,
-        fileName:      file.name,
-        filamentType:  material,
+        uid:            user.uid,
+        email:          user.email,
+        fileName:       file.name,
+        filamentType:   material,
         color,
-        finish:        finishes[0],
+        finish:         finishes[0],
         printQuality,
         postProcess,
-        cost:          0,
-        status:        'Uploaded',
+        cost:           0,
+        status:         'Uploaded',
         fileUrl,
-        createdAt:     serverTimestamp()
+        createdAt:      serverTimestamp()
       });
 
       alert('Upload successful!');
-      // reset
       setFile(null);
       setMaterial('');
       setColor('');
@@ -150,17 +147,17 @@ export default function UploadForm() {
           type="file"
           accept=".stl"
           onChange={e => setFile(e.target.files[0] ?? null)}
-          className="form-input"
+          className="form-input half-width"
         />
 
         <label className="form-label">Material:</label>
         <select
           value={material}
           onChange={e => { setMaterial(e.target.value); setColor(''); }}
-          className="form-select"
+          className="form-select half-width"
         >
           <option value="">Select Material</option>
-          {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
+          {materials.map((m, i) => <option key={i} value={m}>{m}</option>)}
         </select>
 
         <label className="form-label">Color:</label>
@@ -168,10 +165,10 @@ export default function UploadForm() {
           value={color}
           onChange={e => setColor(e.target.value)}
           disabled={!material}
-          className="form-select"
+          className="form-select half-width"
         >
           <option value="">Select Color</option>
-          {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
+          {colors.map((c, i) => <option key={i} value={c}>{c}</option>)}
         </select>
 
         <label className="form-label">Available Finish:</label>
@@ -179,23 +176,24 @@ export default function UploadForm() {
           type="text"
           value={finishes[0] || 'Select Material & Color'}
           disabled
-          className="form-input"
+          className="form-input half-width"
         />
 
         <label className="form-label">Print Quality:</label>
         <select
           value={printQuality}
           onChange={e => setPrintQuality(e.target.value)}
-          className="form-select"
+          className="form-select half-width"
         >
-          {PRINT_QUALITIES.map((q,i) => <option key={i} value={q}>{q}</option>)}
+          {PRINT_QUALITIES.map((q, i) => <option key={i} value={q}>{q}</option>)}
         </select>
 
         <label className="form-label">Post–Processing Finish:</label>
         <select
           value={postProcess}
           onChange={e => setPostProcess(e.target.value)}
-          className="form-select"
+          className="form-select half-width"
+          style={{ marginBottom: '1rem' }}
         >
           {POST_PROCESSES.map(p => (
             <option key={p.value} value={p.value}>{p.label}</option>
@@ -204,7 +202,11 @@ export default function UploadForm() {
 
         {error && <p className="form-error">{error}</p>}
 
-        <button type="submit" disabled={uploading} className="form-button">
+        <button
+          type="submit"
+          disabled={uploading}
+          className="form-button half-width"
+        >
           {uploading ? 'Uploading…' : 'Submit'}
         </button>
       </form>
