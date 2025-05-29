@@ -95,3 +95,17 @@ h1, h2, h3, h4, h5, h6 {
   width: 25%;
   box-sizing: border-box;
 }
+
+/* Ensure forms stack their children vertically */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);  /* space between each form control */
+}
+
+/* Optional: if you want even more space between label+input groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}

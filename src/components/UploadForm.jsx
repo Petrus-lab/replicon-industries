@@ -1,4 +1,4 @@
-// FILE: src/components/UploadForm.jsx
+// ✅ FILE: src/components/UploadForm.jsx
 
 import React, { useState, useEffect } from 'react';
 import { db, storage, auth } from '../firebase';
@@ -26,7 +26,7 @@ export default function UploadForm() {
   const [defaultProcessing, setDefaultProcessing] = useState('');
   const [status, setStatus]                 = useState('');
 
-  // Fetch inventory
+  // 1) Fetch inventory
   useEffect(() => {
     (async () => {
       const snap = await getDocs(
@@ -36,7 +36,7 @@ export default function UploadForm() {
     })();
   }, []);
 
-  // Fetch user defaults
+  // 2) Fetch user defaults
   useEffect(() => {
     const u = auth.currentUser;
     if (!u) return;
@@ -50,7 +50,7 @@ export default function UploadForm() {
     })();
   }, []);
 
-  // Dropdown options
+  // 3) Build dropdown options
   const materials = Array.from(new Set(inventory.map(i => i.material)));
   const colors = material
     ? Array.from(new Set(
@@ -65,7 +65,7 @@ export default function UploadForm() {
       ))
     : [];
 
-  // Submission
+  // 4) Submission handler
   const handleSubmit = async e => {
     e.preventDefault();
     setStatus('');
@@ -77,12 +77,10 @@ export default function UploadForm() {
     }
 
     try {
-      // Upload file
       const storageRef = ref(storage, `uploads/${user.uid}/${file.name}`);
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
-      // Create job
       await addDoc(collection(db, 'jobs'), {
         uid:            user.uid,
         email:          user.email,
@@ -115,82 +113,102 @@ export default function UploadForm() {
     <form className="form" onSubmit={handleSubmit}>
       <h2 className="form-title">Upload 3D Print Job</h2>
 
-      <label htmlFor="file" className="form-label">3D File:</label>
-      <input
-        id="file"
-        type="file"
-        accept=".stl"
-        onChange={e => setFile(e.target.files[0])}
-        className="form-input quarter-width"
-        required
-      />
+      <div className="form-group">
+        <label htmlFor="file" className="form-label">3D File:</label>
+        <input
+          id="file"
+          type="file"
+          accept=".stl"
+          onChange={e => setFile(e.target.files[0])}
+          className="form-input quarter-width"
+          required
+        />
+      </div>
 
-      <label htmlFor="material" className="form-label">Material:</label>
-      <select
-        id="material"
-        value={material}
-        onChange={e => setMaterial(e.target.value)}
-        className="form-select quarter-width"
-        required
-      >
-        <option value="">Select material</option>
-        {materials.map((m,i) => <option key={i} value={m}>{m}</option>)}
-      </select>
+      <div className="form-group">
+        <label htmlFor="material" className="form-label">Material:</label>
+        <select
+          id="material"
+          value={material}
+          onChange={e => setMaterial(e.target.value)}
+          className="form-select quarter-width"
+          required
+        >
+          <option value="">Select material</option>
+          {materials.map((m, i) => (
+            <option key={i} value={m}>{m}</option>
+          ))}
+        </select>
+      </div>
 
-      <label htmlFor="color" className="form-label">Color:</label>
-      <select
-        id="color"
-        value={color}
-        onChange={e => setColor(e.target.value)}
-        className="form-select quarter-width"
-        required
-      >
-        <option value="">Select color</option>
-        {colors.map((c,i) => <option key={i} value={c}>{c}</option>)}
-      </select>
+      <div className="form-group">
+        <label htmlFor="color" className="form-label">Color:</label>
+        <select
+          id="color"
+          value={color}
+          onChange={e => setColor(e.target.value)}
+          className="form-select quarter-width"
+          required
+        >
+          <option value="">Select color</option>
+          {colors.map((c, i) => (
+            <option key={i} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
 
-      <label htmlFor="finish" className="form-label">Finish:</label>
-      <select
-        id="finish"
-        value={finish}
-        onChange={e => setFinish(e.target.value)}
-        className="form-select quarter-width"
-        required
-      >
-        <option value="">Select finish</option>
-        {finishes.map((f,i) => <option key={i} value={f}>{f}</option>)}
-      </select>
+      <div className="form-group">
+        <label htmlFor="finish" className="form-label">Finish:</label>
+        <select
+          id="finish"
+          value={finish}
+          onChange={e => setFinish(e.target.value)}
+          className="form-select quarter-width"
+          required
+        >
+          <option value="">Select finish</option>
+          {finishes.map((f, i) => (
+            <option key={i} value={f}>{f}</option>
+          ))}
+        </select>
+      </div>
 
-      <label htmlFor="printQuality" className="form-label">Print Quality:</label>
-      <select
-        id="printQuality"
-        value={printQuality}
-        onChange={e => setPrintQuality(e.target.value)}
-        className="form-select quarter-width"
-      >
-        <option value="">Use default ({defaultQuality})</option>
-        <option value="Draft">Draft</option>
-        <option value="Fit Check">Fit Check</option>
-        <option value="Prototype">Prototype</option>
-        <option value="Production">Production</option>
-      </select>
+      <div className="form-group">
+        <label htmlFor="printQuality" className="form-label">Print Quality:</label>
+        <select
+          id="printQuality"
+          value={printQuality}
+          onChange={e => setPrintQuality(e.target.value)}
+          className="form-select quarter-width"
+        >
+          <option value="">Use default ({defaultQuality})</option>
+          <option value="Draft">Draft</option>
+          <option value="Fit Check">Fit Check</option>
+          <option value="Prototype">Prototype</option>
+          <option value="Production">Production</option>
+        </select>
+      </div>
 
-      <label htmlFor="postProcessing" className="form-label">Post-Processing:</label>
-      <select
-        id="postProcessing"
-        value={postProcessing}
-        onChange={e => setPostProcessing(e.target.value)}
-        className="form-select quarter-width"
-      >
-        <option value="">Use default ({defaultProcessing})</option>
-        <option value="raw">Raw</option>
-        <option value="supports_removed">Supports Removed</option>
-        <option value="ready_to_go">Ready to Go</option>
-      </select>
+      <div className="form-group">
+        <label htmlFor="postProcessing" className="form-label">Post-Processing:</label>
+        <select
+          id="postProcessing"
+          value={postProcessing}
+          onChange={e => setPostProcessing(e.target.value)}
+          className="form-select quarter-width"
+        >
+          <option value="">Use default ({defaultProcessing})</option>
+          <option value="raw">Raw</option>
+          <option value="supports_removed">Supports Removed</option>
+          <option value="ready_to_go">Ready to Go</option>
+        </select>
+      </div>
 
       {status && <p className="form-error">{status}</p>}
 
-      <button type="submit" className="form-button">Submit Job</button>
+      <div className="form-group">
+        <button type="submit" className="form-button">Submit Job</button>
+      </div>
     </form>
   );
 }
