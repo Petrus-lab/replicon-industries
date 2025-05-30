@@ -1,69 +1,86 @@
-// src/components/AuthPage.jsx
+// ✅ FILE: src/components/AuthPage.jsx
+
 import React, { useState } from 'react';
 import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword
+} from 'firebase/auth';
 
 export default function AuthPage() {
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [email, setEmail]   = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError]   = useState(null);
+  const [isLogin, setIsLogin]     = useState(true);
+  const [email, setEmail]         = useState('');
+  const [password, setPassword]   = useState('');
+  const [errorMsg, setErrorMsg]   = useState('');
+
+  const toggleMode = () => {
+    setIsLogin(prev => !prev);
+    setErrorMsg('');
+  };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError(null);
+    setErrorMsg('');
     try {
-      if (isRegistering) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
+      if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
       }
     } catch (err) {
-      setError(err.message);
+      // show Firebase error code/message
+      setErrorMsg(err.message);
     }
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '2rem auto', textAlign: 'center' }}>
-      <h1>{isRegistering ? 'Sign Up' : 'Sign In'}</h1>
+    <div className="form" style={{ maxWidth: 400, margin: '2rem auto' }}>
+      <h2 className="form-title">{isLogin ? 'Sign In' : 'Sign Up'}</h2>
       <form onSubmit={handleSubmit}>
-        <div style={{ margin: '1rem 0' }}>
+        <div className="form-group">
+          <label htmlFor="email" className="form-label">Email:</label>
           <input
+            id="email"
             type="email"
-            placeholder="Email"
             value={email}
             onChange={e => setEmail(e.target.value)}
+            className="form-input"
             required
-            style={{ width: '100%', padding: '0.5rem' }}
           />
         </div>
-        <div style={{ margin: '1rem 0' }}>
+
+        <div className="form-group">
+          <label htmlFor="password" className="form-label">Password:</label>
           <input
+            id="password"
             type="password"
-            placeholder="Password"
             value={password}
             onChange={e => setPassword(e.target.value)}
+            className="form-input"
             required
-            style={{ width: '100%', padding: '0.5rem' }}
           />
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit" style={{ padding: '0.5rem 1rem' }}>
-          {isRegistering ? 'Create Account' : 'Sign In'}
-        </button>
+
+        {errorMsg && <p className="form-error">{errorMsg}</p>}
+
+        <div className="form-group">
+          <button type="submit" className="form-button">
+            {isLogin ? 'Sign In' : 'Create Account'}
+          </button>
+        </div>
       </form>
-      <p style={{ marginTop: '1rem' }}>
-        {isRegistering
-          ? 'Already have an account? '
-          : "Don't have an account? "}
+
+      <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+        {isLogin
+          ? "Don't have an account? "
+          : 'Already have an account? '}
         <button
-          onClick={() => {
-            setError(null);
-            setIsRegistering(!isRegistering);
-          }}
-          style={{ background: 'none', border: 'none', color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}
+          onClick={toggleMode}
+          type="button"
+          className="form-button"
+          style={{ display: 'inline-block', marginLeft: '0.5rem' }}
         >
-          {isRegistering ? 'Sign In' : 'Sign Up'}
+          {isLogin ? 'Sign Up' : 'Sign In'}
         </button>
       </p>
     </div>
