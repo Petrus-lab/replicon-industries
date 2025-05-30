@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function InventoryStatus() {
   const [redItems, setRedItems]       = useState([]);
@@ -10,22 +10,24 @@ export default function InventoryStatus() {
   const [allClear, setAllClear]       = useState(false);
 
   useEffect(() => {
-    const fetchInventory = async () => {
-      const snap = await getDocs(collection(db, 'inventory'));
-      const rawItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Subscribe to real-time updates on the inventory collection
+    const unsub = onSnapshot(collection(db, 'inventory'), snapshot => {
+      const rawItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
 
       if (rawItems.length === 0) {
+        setRedItems([]);
+        setOrangeItems([]);
         setAllClear(true);
         return;
       }
 
       // Dynamically detect field names
       const sample     = rawItems[0];
-      const qtyKey     = Object.keys(sample).find(k => /qty/i.test(k))            || 'qtyInStock';
-      const thrKey     = Object.keys(sample).find(k => /reorder/i.test(k))        || 'reorderThreshold';
-      const dateKey    = Object.keys(sample).find(k => /arrival|date/i.test(k))   || 'arrivalDate';
+      const qtyKey     = Object.keys(sample).find(k => /qty/i.test(k))          || 'qtyInStock';
+      const thrKey     = Object.keys(sample).find(k => /reorder/i.test(k))      || 'reorderThreshold';
+      const dateKey    = Object.keys(sample).find(k => /arrival|date/i.test(k)) || 'arrivalDate';
 
-      // Normalize items with numeric qty & threshold
+      // Normalize items
       const items = rawItems.map(item => ({
         ...item,
         qty:       Number(item[qtyKey]       ?? 0),
@@ -33,12 +35,12 @@ export default function InventoryStatus() {
         arrival:   item[dateKey]
       }));
 
-      // Out of stock (qty ≤ 0), sort by oldest arrival
+      // Out of stock (qty ≤ 0), oldest arrival first
       const reds = items
         .filter(i => i.qty <= 0)
         .sort((a, b) => new Date(a.arrival) - new Date(b.arrival));
 
-      // Below reorder threshold (0 < qty < threshold), sort by lowest qty
+      // Below threshold (0 < qty < threshold), lowest qty first
       const oranges = items
         .filter(i => i.qty > 0 && i.qty < i.threshold)
         .sort((a, b) => a.qty - b.qty);
@@ -46,9 +48,9 @@ export default function InventoryStatus() {
       setRedItems(reds);
       setOrangeItems(oranges);
       setAllClear(reds.length === 0 && oranges.length === 0);
-    };
+    });
 
-    fetchInventory();
+    return () => unsub();
   }, []);
 
   return (
