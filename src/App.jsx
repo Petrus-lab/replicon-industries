@@ -1,6 +1,8 @@
 // ✅ FILE: src/App.jsx
 
 import React, { useState, useEffect } from 'react';
+import { auth } from './firebase';
+import { onAuthStateChanged, getIdTokenResult, signOut } from 'firebase/auth';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,8 +10,6 @@ import {
   Link,
   Navigate
 } from 'react-router-dom';
-import { auth, db } from './firebase';
-import { onAuthStateChanged, getIdTokenResult, signOut } from 'firebase/auth';
 
 // Client components
 import AuthPage               from './components/AuthPage';
@@ -26,7 +26,7 @@ import PricingManager         from './components/PricingManager';
 import InventoryManager       from './components/InventoryManager';
 
 function App() {
-  const [user, setUser]     = useState(null);
+  const [user, setUser]       = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -76,21 +76,19 @@ function App() {
         )}
 
         <Routes>
-          {/* Admin Views */}
           {isAdmin && (
             <>
-              <Route path="/admin"            element={<AdminPanel />} />
-              <Route path="/admin/jobs"       element={<AdminPanel />} />
-              <Route path="/admin/orders"     element={<AdminPanel />} />
-              <Route path="/admin/users"      element={<AdminUserProfileViewer />} />
-              <Route path="/admin/shipping"   element={<AdminUserProfileViewer />} />
-              <Route path="/admin/pricing"    element={<PricingManager />} />
-              <Route path="/admin/inventory"  element={<InventoryManager />} />
-              <Route path="*"                  element={<Navigate to="/admin" />} />
+              <Route path="/admin"           element={<AdminPanel />} />
+              <Route path="/admin/jobs"      element={<AdminPanel />} />
+              <Route path="/admin/orders"    element={<AdminPanel />} />
+              <Route path="/admin/users"     element={<AdminUserProfileViewer />} />
+              <Route path="/admin/shipping"  element={<AdminUserProfileViewer />} />
+              <Route path="/admin/pricing"   element={<PricingManager />} />
+              <Route path="/admin/inventory" element={<InventoryManager />} />
+              <Route path="*"                 element={<Navigate to="/admin" />} />
             </>
           )}
 
-          {/* Client Views */}
           {!isAdmin && (
             <>
               <Route path="/client/profile" element={<Profile />} />

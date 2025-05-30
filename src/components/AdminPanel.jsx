@@ -18,7 +18,6 @@ export default function AdminPanel() {
   const [users, setUsers]                   = useState([]);
   const [shippingAddresses, setShippingAddresses] = useState({});
   const [markup, setMarkup]                 = useState(1.2);
-  const [isAdmin, setIsAdmin]               = useState(false);
   const [userEmail, setUserEmail]           = useState('');
 
   useEffect(() => {
@@ -50,11 +49,10 @@ export default function AdminPanel() {
       }
       setShippingAddresses(addrMap);
 
-      // current user token
+      // current user token/email
       const cu = auth.currentUser;
       if (cu) {
         const token = await cu.getIdTokenResult();
-        setIsAdmin(!!token.claims.admin);
         setUserEmail(cu.email || '');
       }
     };
@@ -70,7 +68,7 @@ export default function AdminPanel() {
     const data = jobs.map(j => ({
       fileName: j.fileName,
       status: j.status,
-      shippingAddress: shippingAddresses[j.uid] ? shippingAddresses[j.uid].addressLine1 : '',
+      shippingAddress: shippingAddresses[j.uid]?.addressLine1 || '',
       baseCost: j.cost,
       adjustedCost: (j.cost * markup).toFixed(2),
     }));
