@@ -14,17 +14,19 @@ export default function ShippingForm() {
     postalCode: '',
     country: '',
   });
-  const [error, setError]     = useState('');
+  const [error, setError]   = useState('');
   const [success, setSuccess] = useState('');
 
   const handleChange = e => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    setSuccess(''); setError('');
+    setSuccess(''); 
+    setError('');
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError(''); setSuccess('');
+    setError(''); 
+    setSuccess('');
     const user = auth.currentUser;
     if (!user) {
       setError('You must be logged in to save shipping info.');
@@ -45,38 +47,110 @@ export default function ShippingForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ maxWidth: 500, margin: '2rem auto' }}>
-      <h2>Shipping Details</h2>
+    <form className="form" onSubmit={handleSubmit}>
+      <h2 className="form-title">Shipping Details</h2>
 
-      {/* fields... */}
-      <label>Full Name:</label>
-      <input name="fullName" value={formData.fullName} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="fullName" className="form-label">Full Name:</label>
+        <input
+          id="fullName"
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      <label>Phone Number:</label>
-      <input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="phoneNumber" className="form-label">Phone Number:</label>
+        <input
+          id="phoneNumber"
+          name="phoneNumber"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      <label>Address Line 1:</label>
-      <input name="addressLine1" value={formData.addressLine1} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="addressLine1" className="form-label">Address Line 1:</label>
+        <input
+          id="addressLine1"
+          name="addressLine1"
+          value={formData.addressLine1}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      <label>Address Line 2:</label>
-      <input name="addressLine2" value={formData.addressLine2} onChange={handleChange} />
+      <div className="form-group">
+        <label htmlFor="addressLine2" className="form-label">Address Line 2:</label>
+        <input
+          id="addressLine2"
+          name="addressLine2"
+          value={formData.addressLine2}
+          onChange={handleChange}
+          className="form-input"
+        />
+      </div>
 
-      <label>Suburb:</label>
-      <input name="suburb" value={formData.suburb} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="suburb" className="form-label">Suburb:</label>
+        <input
+          id="suburb"
+          name="suburb"
+          value={formData.suburb}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      <label>City:</label>
-      <input name="city" value={formData.city} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="city" className="form-label">City:</label>
+        <input
+          id="city"
+          name="city"
+          value={formData.city}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      <label>Postal Code:</label>
-      <input name="postalCode" value={formData.postalCode} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="postalCode" className="form-label">Postal Code:</label>
+        <input
+          id="postalCode"
+          name="postalCode"
+          value={formData.postalCode}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      <label>Country:</label>
-      <input name="country" value={formData.country} onChange={handleChange} required />
+      <div className="form-group">
+        <label htmlFor="country" className="form-label">Country:</label>
+        <input
+          id="country"
+          name="country"
+          value={formData.country}
+          onChange={handleChange}
+          className="form-input"
+          required
+        />
+      </div>
 
-      {error   && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+      {error && <p className="form-error">{error}</p>}
+      {success && <p className="form-success">{success}</p>}
 
-      <button type="submit" style={{ marginTop: '1rem' }}>Save Shipping</button>
+      <div className="form-group">
+        <button type="submit" className="form-button">Save Shipping</button>
+      </div>
     </form>
   );
 }

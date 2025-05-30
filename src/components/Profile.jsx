@@ -1,5 +1,4 @@
 // ✅ FILE: src/components/Profile.jsx
-
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -9,18 +8,17 @@ export default function Profile() {
   const [profileData, setProfileData] = useState({
     name: '',
     phoneNumber: '',
-    defaultPrintQuality: '',
-    defaultFinish: '',
     billingAddressLine1: '',
     billingAddressLine2: '',
     billingSuburb: '',
     billingCity: '',
     billingPostalCode: '',
     billingCountry: '',
+    defaultPrintQuality: '',
+    defaultFinish: '',
   });
   const [status, setStatus] = useState('');
 
-  // Load user & profile
   useEffect(() => {
     return auth.onAuthStateChanged(async user => {
       if (!user) return;
@@ -33,14 +31,12 @@ export default function Profile() {
     });
   }, []);
 
-  // Handle changes
   const handleChange = e => {
     const { name, value } = e.target;
     setProfileData(prev => ({ ...prev, [name]: value }));
     if (status) setStatus('');
   };
 
-  // Save profile
   const handleSubmit = async e => {
     e.preventDefault();
     setStatus('');
