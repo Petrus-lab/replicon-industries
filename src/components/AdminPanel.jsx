@@ -49,10 +49,9 @@ export default function AdminPanel() {
       }
       setShippingAddresses(addrMap);
 
-      // current user token/email
+      // current user email only
       const cu = auth.currentUser;
       if (cu) {
-        const token = await cu.getIdTokenResult();
         setUserEmail(cu.email || '');
       }
     };
