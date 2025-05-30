@@ -11,7 +11,8 @@ import {
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import Papa from 'papaparse';
-import JobStatusReport from './JobStatusReport';
+import JobStatusReport   from './JobStatusReport';
+import InventoryStatus   from './InventoryStatus';
 
 export default function AdminPanel() {
   const [jobs, setJobs]                     = useState([]);
@@ -91,10 +92,13 @@ export default function AdminPanel() {
     <div className="form" style={{ padding: '2rem' }}>
       <h2 className="form-title">Admin Dashboard — {userEmail}</h2>
 
-      {/* 1) Job Status Panel */}
+      {/* 1) Inventory Status Panel */}
+      <InventoryStatus />
+
+      {/* 2) Job Status Panel */}
       <JobStatusReport />
 
-      {/* 2) Pricing Markup */}
+      {/* 3) Pricing Markup */}
       <section className="form-group">
         <label className="form-label">Markup (%):</label>
         <input
@@ -112,7 +116,7 @@ export default function AdminPanel() {
         </button>
       </section>
 
-      {/* 3) Logout & Export */}
+      {/* 4) Logout & Export */}
       <section className="form-group">
         <button
           onClick={handleLogout}
@@ -128,7 +132,7 @@ export default function AdminPanel() {
         </button>
       </section>
 
-      {/* 4) Jobs List */}
+      {/* 5) Jobs List */}
       <section className="form-group">
         <h3>Jobs</h3>
         <ul>
@@ -144,7 +148,7 @@ export default function AdminPanel() {
         </ul>
       </section>
 
-      {/* 5) Orders List */}
+      {/* 6) Orders List */}
       <section className="form-group">
         <h3>Orders</h3>
         <ul>
@@ -159,7 +163,7 @@ export default function AdminPanel() {
         </ul>
       </section>
 
-      {/* 6) Users List */}
+      {/* 7) Users List */}
       <section className="form-group">
         <h3>Users</h3>
         <ul>
