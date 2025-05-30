@@ -11,6 +11,7 @@ import {
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import Papa from 'papaparse';
+import JobStatusReport from './JobStatusReport';
 
 export default function AdminPanel() {
   const [jobs, setJobs]                     = useState([]);
@@ -22,26 +23,26 @@ export default function AdminPanel() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // jobs
+      // Jobs
       const jobSnap = await getDocs(collection(db, 'jobs'));
       setJobs(jobSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
-      // orders
+      // Orders
       const orderSnap = await getDocs(collection(db, 'orders'));
       setOrders(orderSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
-      // users
+      // Users
       const userSnap = await getDocs(collection(db, 'users'));
       const userList = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
       setUsers(userList);
 
-      // pricing (markup)
+      // Markup setting
       const markupSnap = await getDoc(doc(db, 'settings', 'markupSettings'));
       if (markupSnap.exists()) {
         setMarkup(markupSnap.data().markup || 1.2);
       }
 
-      // shipping addresses
+      // Shipping addresses
       const addrMap = {};
       for (const u of userList) {
         const s = await getDoc(doc(db, 'shipping', u.id));
@@ -49,7 +50,7 @@ export default function AdminPanel() {
       }
       setShippingAddresses(addrMap);
 
-      // current user email only
+      // Current user email
       const cu = auth.currentUser;
       if (cu) {
         setUserEmail(cu.email || '');
@@ -90,7 +91,10 @@ export default function AdminPanel() {
     <div className="form" style={{ padding: '2rem' }}>
       <h2 className="form-title">Admin Dashboard — {userEmail}</h2>
 
-      {/* Markup Section */}
+      {/* 1) Job Status Panel */}
+      <JobStatusReport />
+
+      {/* 2) Pricing Markup */}
       <section className="form-group">
         <label className="form-label">Markup (%):</label>
         <input
@@ -108,7 +112,7 @@ export default function AdminPanel() {
         </button>
       </section>
 
-      {/* Logout & Export */}
+      {/* 3) Logout & Export */}
       <section className="form-group">
         <button
           onClick={handleLogout}
@@ -124,7 +128,7 @@ export default function AdminPanel() {
         </button>
       </section>
 
-      {/* Jobs */}
+      {/* 4) Jobs List */}
       <section className="form-group">
         <h3>Jobs</h3>
         <ul>
@@ -140,7 +144,7 @@ export default function AdminPanel() {
         </ul>
       </section>
 
-      {/* Orders */}
+      {/* 5) Orders List */}
       <section className="form-group">
         <h3>Orders</h3>
         <ul>
@@ -155,7 +159,7 @@ export default function AdminPanel() {
         </ul>
       </section>
 
-      {/* Users */}
+      {/* 6) Users List */}
       <section className="form-group">
         <h3>Users</h3>
         <ul>
