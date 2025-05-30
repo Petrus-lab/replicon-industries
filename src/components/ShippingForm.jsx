@@ -14,7 +14,7 @@ export default function ShippingForm() {
     postalCode: '',
     country: '',
   });
-  const [error, setError]   = useState('');
+  const [error, setError]     = useState('');
   const [success, setSuccess] = useState('');
 
   const handleChange = e => {
@@ -57,7 +57,7 @@ export default function ShippingForm() {
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -69,7 +69,7 @@ export default function ShippingForm() {
           name="phoneNumber"
           value={formData.phoneNumber}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -81,7 +81,7 @@ export default function ShippingForm() {
           name="addressLine1"
           value={formData.addressLine1}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -93,7 +93,7 @@ export default function ShippingForm() {
           name="addressLine2"
           value={formData.addressLine2}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
         />
       </div>
 
@@ -104,7 +104,7 @@ export default function ShippingForm() {
           name="suburb"
           value={formData.suburb}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -116,7 +116,7 @@ export default function ShippingForm() {
           name="city"
           value={formData.city}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -128,7 +128,7 @@ export default function ShippingForm() {
           name="postalCode"
           value={formData.postalCode}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -140,16 +140,18 @@ export default function ShippingForm() {
           name="country"
           value={formData.country}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
 
-      {error && <p className="form-error">{error}</p>}
+      {error   && <p className="form-error">{error}</p>}
       {success && <p className="form-success">{success}</p>}
 
       <div className="form-group">
-        <button type="submit" className="form-button">Save Shipping</button>
+        <button type="submit" className="form-button quarter-width">
+          Save Shipping
+        </button>
       </div>
     </form>
   );

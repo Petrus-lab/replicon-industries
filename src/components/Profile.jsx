@@ -23,8 +23,7 @@ export default function Profile() {
     return auth.onAuthStateChanged(async user => {
       if (!user) return;
       setUserEmail(user.email || '');
-      const ref = doc(db, 'users', user.uid);
-      const snap = await getDoc(ref);
+      const snap = await getDoc(doc(db, 'users', user.uid));
       if (snap.exists()) {
         setProfileData(snap.data());
       }
@@ -67,7 +66,7 @@ export default function Profile() {
           type="text"
           value={profileData.name}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -80,7 +79,7 @@ export default function Profile() {
           type="tel"
           value={profileData.phoneNumber}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -93,7 +92,7 @@ export default function Profile() {
           type="text"
           value={profileData.billingAddressLine1}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -106,7 +105,7 @@ export default function Profile() {
           type="text"
           value={profileData.billingAddressLine2}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
         />
       </div>
 
@@ -118,7 +117,7 @@ export default function Profile() {
           type="text"
           value={profileData.billingSuburb}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -131,7 +130,7 @@ export default function Profile() {
           type="text"
           value={profileData.billingCity}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -144,7 +143,7 @@ export default function Profile() {
           type="text"
           value={profileData.billingPostalCode}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -157,7 +156,7 @@ export default function Profile() {
           type="text"
           value={profileData.billingCountry}
           onChange={handleChange}
-          className="form-input"
+          className="form-input quarter-width"
           required
         />
       </div>
@@ -169,7 +168,7 @@ export default function Profile() {
           name="defaultPrintQuality"
           value={profileData.defaultPrintQuality}
           onChange={handleChange}
-          className="form-select"
+          className="form-select quarter-width"
           required
         >
           <option value="">Select quality</option>
@@ -187,7 +186,7 @@ export default function Profile() {
           name="defaultFinish"
           value={profileData.defaultFinish}
           onChange={handleChange}
-          className="form-select"
+          className="form-select quarter-width"
           required
         >
           <option value="">Select finish</option>
@@ -200,7 +199,9 @@ export default function Profile() {
       {status && <p className="form-error">{status}</p>}
 
       <div className="form-group">
-        <button type="submit" className="form-button">Save Profile</button>
+        <button type="submit" className="form-button quarter-width">
+          Save Profile
+        </button>
       </div>
     </form>
   );
