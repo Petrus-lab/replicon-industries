@@ -22,36 +22,36 @@ export default function InventoryStatus() {
         return;
       }
 
-      // Filter out any documents missing the expected numeric fields
-      const sanitized = docs.filter((docItem) => {
-        return (
-          typeof docItem.stockLevel === 'number' &&
-          typeof docItem.reorderThreshold === 'number' &&
-          docItem.arrivalDate
-        );
+      // Collect reds and oranges without filtering out items lacking arrivalDate
+      const reds = [];
+      const oranges = [];
+
+      docs.forEach((docItem) => {
+        const qty = Number(docItem.stockLevel);
+        const thr = Number(docItem.reorderThreshold);
+
+        if (isNaN(qty) || isNaN(thr)) return;
+
+        if (qty <= 0) {
+          reds.push(docItem);
+        } else if (qty < thr) {
+          oranges.push(docItem);
+        }
       });
 
-      // 1) Out of Stock: stockLevel ≤ 0
-      const reds = sanitized
-        .filter((docItem) => docItem.stockLevel <= 0)
-        .sort((a, b) => {
-          // Sort by earliest arrivalDate first
-          const dateA = a.arrivalDate.toDate
-            ? a.arrivalDate.toDate()
-            : new Date(a.arrivalDate);
-          const dateB = b.arrivalDate.toDate
-            ? b.arrivalDate.toDate()
-            : new Date(b.arrivalDate);
-          return dateA - dateB;
-        });
+      // Sort reds by earliest arrivalDate first (if arrivalDate is missing, treat as far future)
+      reds.sort((a, b) => {
+        const dateA = a.arrivalDate?.toDate
+          ? a.arrivalDate.toDate()
+          : new Date(a.arrivalDate || Date.now() + 1e13);
+        const dateB = b.arrivalDate?.toDate
+          ? b.arrivalDate.toDate()
+          : new Date(b.arrivalDate || Date.now() + 1e13);
+        return dateA - dateB;
+      });
 
-      // 2) Below Reorder Threshold: 0 < stockLevel < reorderThreshold
-      const oranges = sanitized
-        .filter(
-          (docItem) =>
-            docItem.stockLevel > 0 && docItem.stockLevel < docItem.reorderThreshold
-        )
-        .sort((a, b) => a.stockLevel - b.stockLevel);
+      // Sort oranges by lowest stockLevel first
+      oranges.sort((a, b) => Number(a.stockLevel) - Number(b.stockLevel));
 
       setRedItems(reds);
       setOrangeItems(oranges);
@@ -76,9 +76,9 @@ export default function InventoryStatus() {
               <h4 className="status-title status-red">Out of Stock</h4>
               <ul className="status-list">
                 {redItems.map((docItem) => {
-                  const arrivedDate = docItem.arrivalDate.toDate
+                  const arrivedDate = docItem.arrivalDate?.toDate
                     ? docItem.arrivalDate.toDate().toLocaleDateString()
-                    : new Date(docItem.arrivalDate).toLocaleDateString();
+                    : new Date(docItem.arrivalDate || '').toLocaleDateString();
 
                   return (
                     <li key={docItem.id}>
