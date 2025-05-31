@@ -1,144 +1,110 @@
 // ✅ FILE: src/components/UploadStatus.jsx
-// REFACTORED: Logical grid layout for Jobs & Orders, preserved “Pay” functionality
 
 import React, { useState, useEffect } from 'react';
-import { db, auth } from '../firebase';
+import { auth, db } from '../firebase';
 import {
   collection,
   query,
   where,
   onSnapshot,
-  addDoc,
   updateDoc,
-  doc,
-  serverTimestamp
+  doc
 } from 'firebase/firestore';
 
 export default function UploadStatus() {
   const [jobs, setJobs] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const jobsQ = query(collection(db, 'jobs'), where('uid', '==', user.uid));
-    const unsubJobs = onSnapshot(jobsQ, snap => {
-      setJobs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    // Listen to this user's jobs
+    const jobsQuery = query(
+      collection(db, 'jobs'),
+      where('uid', '==', user.uid)
+    );
+    const unsubscribeJobs = onSnapshot(jobsQuery, snapshot => {
+      setJobs(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
     });
 
-    const ordersQ = query(collection(db, 'orders'), where('userId', '==', user.uid));
-    const unsubOrders = onSnapshot(ordersQ, snap => {
-      setOrders(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    // Listen to this user's orders
+    const ordersQuery = query(
+      collection(db, 'orders'),
+      where('userId', '==', user.uid)
+    );
+    const unsubscribeOrders = onSnapshot(ordersQuery, snapshot => {
+      setOrders(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
     });
 
-    setLoading(false);
     return () => {
-      unsubJobs();
-      unsubOrders();
+      unsubscribeJobs();
+      unsubscribeOrders();
     };
   }, []);
 
-  const handlePay = async (job) => {
+  const handlePay = async (orderId) => {
+    setError('');
     try {
-      const user = auth.currentUser;
-      if (!user) throw new Error('Not authenticated');
-
-      // Create order
-      await addDoc(collection(db, 'orders'), {
-        userId: user.uid,
-        jobId: job.id,
-        fileName: job.fileName,
-        filamentType: job.filamentType,
-        color: job.color,
-        cost: job.cost,
-        status: 'Paid',
-        createdAt: serverTimestamp()
-      });
-
-      // Update job status
-      await updateDoc(doc(db, 'jobs', job.id), { status: 'Paid' });
+      const orderRef = doc(db, 'orders', orderId);
+      await updateDoc(orderRef, { status: 'Paid' });
     } catch (err) {
       console.error('Payment simulation failed:', err);
-      alert('Payment failed: ' + err.message);
+      setError('Payment simulation failed: ' + err.message);
     }
   };
 
-  if (loading) return <p>Loading your jobs and orders…</p>;
-
-  // Styles
-  const sectionStyle = {
-    maxWidth: 700,
-    margin: '2rem auto',
-    padding: '1rem',
-    fontFamily: 'sans-serif'
-  };
-  const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: '3fr 1fr 1fr',
-    gap: '1rem',
-    alignItems: 'center',
-    marginBottom: '2rem'
-  };
-  const headerStyle = {
-    fontWeight: 'bold',
-    borderBottom: '2px solid #333',
-    padding: '0.5rem 0'
-  };
-  const rowStyle = {
-    padding: '0.75rem 0',
-    borderBottom: '1px solid #ccc'
-  };
-  const buttonStyle = {
-    padding: '6px 12px',
-    cursor: 'pointer',
-    border: '1px solid #007bff',
-    borderRadius: '4px',
-    background: '#007bff',
-    color: '#fff'
-  };
-
   return (
-    <div style={sectionStyle}>
-      {/* Jobs Section */}
-      <h2>Your Jobs</h2>
-      <div style={gridStyle}>
-        <div style={headerStyle}>File Name</div>
-        <div style={headerStyle}>Status</div>
-        <div style={headerStyle}>Action</div>
-        {jobs.map(job => (
-          <React.Fragment key={job.id}>
-            <div style={rowStyle}>{job.fileName}</div>
-            <div style={rowStyle}>{job.status}</div>
-            <div style={rowStyle}>
-              {job.status === 'Uploaded' && (
-                <button
-                  style={buttonStyle}
-                  onClick={() => handlePay(job)}
-                >
-                  Pay
-                </button>
-              )}
-            </div>
-          </React.Fragment>
-        ))}
-      </div>
+    <div className="form" style={{ maxWidth: 600, margin: '2rem auto' }}>
+      <h2 className="form-title">Your Status</h2>
 
-      {/* Orders Section */}
-      <h2>Your Orders</h2>
-      <div style={gridStyle}>
-        <div style={headerStyle}>File Name</div>
-        <div style={headerStyle}>Status</div>
-        <div style={headerStyle}></div>
-        {orders.map(order => (
-          <React.Fragment key={order.id}>
-            <div style={rowStyle}>{order.fileName}</div>
-            <div style={rowStyle}>{order.status}</div>
-            <div style={rowStyle}></div>
-          </React.Fragment>
-        ))}
-      </div>
+      {error && (
+        <p style={{ color: 'red' }}>{error}</p>
+      )}
+
+      <section className="form-group">
+        <h3 className="form-subtitle">Your Jobs</h3>
+        {jobs.length === 0 ? (
+          <p>You have no jobs yet.</p>
+        ) : (
+          <ul className="status-list">
+            {jobs.map(job => (
+              <li key={job.id} className="status-item">
+                <p><strong>File:</strong> {job.fileName}</p>
+                <p><strong>Status:</strong> {job.status}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="form-group">
+        <h3 className="form-subtitle">Your Orders</h3>
+        {orders.length === 0 ? (
+          <p>You have no orders yet.</p>
+        ) : (
+          <ul className="status-list">
+            {orders.map(order => (
+              <li key={order.id} className="status-item">
+                <p><strong>Material:</strong> {order.material}</p>
+                <p><strong>Color:</strong> {order.color}</p>
+                <p><strong>Cost:</strong> {order.cost}</p>
+                <p><strong>Status:</strong> {order.status}</p>
+                {order.status !== 'Paid' && (
+                  <button
+                    onClick={() => handlePay(order.id)}
+                    className="form-button"
+                    style={{ marginTop: '0.5rem' }}
+                  >
+                    Pay
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
