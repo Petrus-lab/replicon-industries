@@ -15,7 +15,6 @@ export default function InventoryStatus() {
       const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
       if (docs.length === 0) {
-        // No inventory items at all → show “up to date”
         setRedItems([]);
         setOrangeItems([]);
         setAllClear(true);
@@ -26,13 +25,9 @@ export default function InventoryStatus() {
       const oranges = [];
 
       docs.forEach((docItem) => {
-        // Ensure numeric values
         const qty = Number(docItem.stockLevel);
         const thr = Number(docItem.reorderThreshold);
-
-        if (isNaN(qty) || isNaN(thr)) {
-          return; // skip if missing data
-        }
+        if (isNaN(qty) || isNaN(thr)) return;
 
         if (qty <= 0) {
           reds.push(docItem);
@@ -68,14 +63,34 @@ export default function InventoryStatus() {
       <h3 className="form-title">Inventory Status</h3>
 
       {allClear ? (
-        <div className="status-panel status-green">
+        <div
+          className="status-panel status-green"
+          style={{
+            border: '2px solid #28a745',
+            backgroundColor: '#d4edda',
+            padding: '1rem',
+            borderRadius: '4px',
+            marginTop: '1rem'
+          }}
+        >
           ✅ Inventory is up to date
         </div>
       ) : (
         <>
           {redItems.length > 0 && (
-            <div className="status-section">
-              <h4 className="status-title status-red">Out of Stock</h4>
+            <div
+              className="status-panel status-red"
+              style={{
+                border: '2px solid #dc3545',
+                backgroundColor: '#f8d7da',
+                padding: '1rem',
+                borderRadius: '4px',
+                marginTop: '1rem'
+              }}
+            >
+              <h4 className="status-title" style={{ color: '#721c24' }}>
+                Out of Stock
+              </h4>
               <ul className="status-list">
                 {redItems.map((docItem) => {
                   const arrivedDate = docItem.arrivalDate?.toDate
@@ -83,21 +98,35 @@ export default function InventoryStatus() {
                     : new Date(docItem.arrivalDate).toLocaleDateString();
 
                   return (
-                    <li key={docItem.id}>
-                      {docItem.material} / {docItem.color} / {docItem.finish} — Arrived: {arrivedDate}
+                    <li key={docItem.id} style={{ marginBottom: '0.5rem' }}>
+                      {docItem.material} / {docItem.color} / {docItem.finish} — Arrived:{' '}
+                      {arrivedDate}
                     </li>
                   );
                 })}
               </ul>
             </div>
           )}
+
           {orangeItems.length > 0 && (
-            <div className="status-section">
-              <h4 className="status-title status-orange">Below Reorder Threshold</h4>
+            <div
+              className="status-panel status-orange"
+              style={{
+                border: '2px solid #fd7e14',
+                backgroundColor: '#fff3cd',
+                padding: '1rem',
+                borderRadius: '4px',
+                marginTop: '1rem'
+              }}
+            >
+              <h4 className="status-title" style={{ color: '#856404' }}>
+                Below Reorder Threshold
+              </h4>
               <ul className="status-list">
                 {orangeItems.map((docItem) => (
-                  <li key={docItem.id}>
-                    {docItem.material} / {docItem.color} / {docItem.finish} — Qty: {docItem.stockLevel} (Threshold: {docItem.reorderThreshold})
+                  <li key={docItem.id} style={{ marginBottom: '0.5rem' }}>
+                    {docItem.material} / {docItem.color} / {docItem.finish} — Qty:{' '}
+                    {docItem.stockLevel} (Threshold: {docItem.reorderThreshold})
                   </li>
                 ))}
               </ul>
@@ -108,4 +137,3 @@ export default function InventoryStatus() {
     </section>
   );
 }
-
