@@ -12,30 +12,28 @@ import {
 } from 'firebase/firestore';
 
 export default function UploadStatus() {
-  const [jobs, setJobs] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [error, setError] = useState('');
+  const [jobs, setJobs]       = useState([]);
+  const [orders, setOrders]   = useState([]);
+  const [error, setError]     = useState('');
 
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
 
-    // Listen to this user's jobs
-    const jobsQuery = query(
-      collection(db, 'jobs'),
-      where('uid', '==', user.uid)
-    );
-    const unsubscribeJobs = onSnapshot(jobsQuery, snapshot => {
-      setJobs(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    // Listen for this user's jobs
+    const jobsCol    = collection(db, 'jobs');
+    const jobsQ      = query(jobsCol, where('uid', '==', user.uid));
+    const unsubscribeJobs = onSnapshot(jobsQ, snapshot => {
+      const jobList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      setJobs(jobList);
     });
 
-    // Listen to this user's orders
-    const ordersQuery = query(
-      collection(db, 'orders'),
-      where('userId', '==', user.uid)
-    );
-    const unsubscribeOrders = onSnapshot(ordersQuery, snapshot => {
-      setOrders(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+    // Listen for this user's orders
+    const ordersCol = collection(db, 'orders');
+    const ordersQ   = query(ordersCol, where('userId', '==', user.uid));
+    const unsubscribeOrders = onSnapshot(ordersQ, snapshot => {
+      const orderList = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      setOrders(orderList);
     });
 
     return () => {
@@ -79,7 +77,7 @@ export default function UploadStatus() {
         )}
       </section>
 
-      <section className="form-group">
+      <section className="form-group" style={{ marginTop: '2rem' }}>
         <h3 className="form-subtitle">Your Orders</h3>
         {orders.length === 0 ? (
           <p>You have no orders yet.</p>
