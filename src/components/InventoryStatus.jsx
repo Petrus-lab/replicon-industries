@@ -5,51 +5,59 @@ import { db } from '../firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function InventoryStatus() {
-  const [redItems, setRedItems]       = useState([]);
-  const [orangeItems, setOrangeItems] = useState([]);
+  const [redItems, setRedItems]       = useState([]); // qtyInStock ≤ 0
+  const [orangeItems, setOrangeItems] = useState([]); // 0 < qtyInStock < reorderThreshold
   const [allClear, setAllClear]       = useState(false);
 
   useEffect(() => {
-    // Subscribe to real-time updates on the inventory collection
-    const unsub = onSnapshot(collection(db, 'inventory'), snapshot => {
-      const rawItems = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Subscribe to real-time updates on the "inventory" collection
+    const unsub = onSnapshot(collection(db, 'inventory'), (snapshot) => {
+      const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 
-      if (rawItems.length === 0) {
+      if (docs.length === 0) {
+        // No items at all → consider inventory "up to date"
         setRedItems([]);
         setOrangeItems([]);
         setAllClear(true);
         return;
       }
 
-      // Dynamically detect field names
-      const sample     = rawItems[0];
-      const qtyKey     = Object.keys(sample).find(k => /qty/i.test(k))          || 'qtyInStock';
-      const thrKey     = Object.keys(sample).find(k => /reorder/i.test(k))      || 'reorderThreshold';
-      const dateKey    = Object.keys(sample).find(k => /arrival|date/i.test(k)) || 'arrivalDate';
+      // 1. Filter out items that have no qtyInStock or reorderThreshold fields (optional guard)
+      const sanitized = docs.filter((item) => {
+        return (
+          typeof item.qtyInStock === 'number' &&
+          typeof item.reorderThreshold === 'number' &&
+          item.arrivalDate
+        );
+      });
 
-      // Normalize items
-      const items = rawItems.map(item => ({
-        ...item,
-        qty:       Number(item[qtyKey]       ?? 0),
-        threshold: Number(item[thrKey]       ?? 0),
-        arrival:   item[dateKey]
-      }));
+      // 2. Build arrays:
 
-      // Out of stock (qty ≤ 0), oldest arrival first
-      const reds = items
-        .filter(i => i.qty <= 0)
-        .sort((a, b) => new Date(a.arrival) - new Date(b.arrival));
+      // Out of Stock: qtyInStock ≤ 0
+      const reds = sanitized
+        .filter((item) => item.qtyInStock <= 0)
+        .sort((a, b) => {
+          // Sort by earliest arrivalDate first
+          // Ensure arrivalDate string is converted to Date
+          const dateA = new Date(a.arrivalDate);
+          const dateB = new Date(b.arrivalDate);
+          return dateA - dateB;
+        });
 
-      // Below threshold (0 < qty < threshold), lowest qty first
-      const oranges = items
-        .filter(i => i.qty > 0 && i.qty < i.threshold)
-        .sort((a, b) => a.qty - b.qty);
+      // Below Reorder Threshold: 0 < qtyInStock < reorderThreshold
+      const oranges = sanitized
+        .filter(
+          (item) =>
+            item.qtyInStock > 0 && item.qtyInStock < item.reorderThreshold
+        )
+        .sort((a, b) => a.qtyInStock - b.qtyInStock);
 
       setRedItems(reds);
       setOrangeItems(oranges);
       setAllClear(reds.length === 0 && oranges.length === 0);
     });
 
+    // Clean up listener on unmount
     return () => unsub();
   }, []);
 
@@ -67,21 +75,26 @@ export default function InventoryStatus() {
             <div className="status-section">
               <h4 className="status-title status-red">Out of Stock</h4>
               <ul className="status-list">
-                {redItems.map(item => (
+                {redItems.map((item) => (
                   <li key={item.id}>
-                    {item.material} / {item.color} / {item.finish} — Arrived: {new Date(item.arrival).toLocaleDateString()}
+                    {item.material} / {item.color} / {item.finish} — Arrived:{' '}
+                    {new Date(item.arrivalDate).toLocaleDateString()}
                   </li>
                 ))}
               </ul>
             </div>
           )}
+
           {orangeItems.length > 0 && (
             <div className="status-section">
-              <h4 className="status-title status-orange">Below Reorder Threshold</h4>
+              <h4 className="status-title status-orange">
+                Below Reorder Threshold
+              </h4>
               <ul className="status-list">
-                {orangeItems.map(item => (
+                {orangeItems.map((item) => (
                   <li key={item.id}>
-                    {item.material} / {item.color} / {item.finish} — Qty: {item.qty} (Threshold: {item.threshold})
+                    {item.material} / {item.color} / {item.finish} — Qty:{' '}
+                    {item.qtyInStock} (Threshold: {item.reorderThreshold})
                   </li>
                 ))}
               </ul>
