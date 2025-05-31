@@ -6,13 +6,13 @@ import { collection, onSnapshot } from 'firebase/firestore';
 
 export default function InventoryStatus() {
   const [redItems, setRedItems]       = useState([]); // stockLevel ≤ 0
-  const [orangeItems, setOrangeItems] = useState([]); // 0 < stockLevel < reorderThreshold
+  const [orangeItems, setOrangeItems] = useState([]); // 0 < stockLevel ≤ reorderThreshold
   const [allClear, setAllClear]       = useState(false);
 
   useEffect(() => {
     // Subscribe to real-time updates on the "inventory" collection
     const unsubscribe = onSnapshot(collection(db, 'inventory'), (snapshot) => {
-      const docs = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
       if (docs.length === 0) {
         // No inventory items at all → show “up to date”
@@ -22,31 +22,33 @@ export default function InventoryStatus() {
         return;
       }
 
-      // Collect reds and oranges without filtering out items lacking arrivalDate
       const reds = [];
       const oranges = [];
 
       docs.forEach((docItem) => {
+        // Ensure numeric values
         const qty = Number(docItem.stockLevel);
         const thr = Number(docItem.reorderThreshold);
 
-        if (isNaN(qty) || isNaN(thr)) return;
+        if (isNaN(qty) || isNaN(thr)) {
+          return; // skip if missing data
+        }
 
         if (qty <= 0) {
           reds.push(docItem);
-        } else if (qty < thr) {
+        } else if (qty > 0 && qty <= thr) {
           oranges.push(docItem);
         }
       });
 
-      // Sort reds by earliest arrivalDate first (if arrivalDate is missing, treat as far future)
+      // Sort reds by earliest arrivalDate first
       reds.sort((a, b) => {
         const dateA = a.arrivalDate?.toDate
           ? a.arrivalDate.toDate()
-          : new Date(a.arrivalDate || Date.now() + 1e13);
+          : new Date(a.arrivalDate);
         const dateB = b.arrivalDate?.toDate
           ? b.arrivalDate.toDate()
-          : new Date(b.arrivalDate || Date.now() + 1e13);
+          : new Date(b.arrivalDate);
         return dateA - dateB;
       });
 
@@ -78,7 +80,7 @@ export default function InventoryStatus() {
                 {redItems.map((docItem) => {
                   const arrivedDate = docItem.arrivalDate?.toDate
                     ? docItem.arrivalDate.toDate().toLocaleDateString()
-                    : new Date(docItem.arrivalDate || '').toLocaleDateString();
+                    : new Date(docItem.arrivalDate).toLocaleDateString();
 
                   return (
                     <li key={docItem.id}>
@@ -89,7 +91,6 @@ export default function InventoryStatus() {
               </ul>
             </div>
           )}
-
           {orangeItems.length > 0 && (
             <div className="status-section">
               <h4 className="status-title status-orange">Below Reorder Threshold</h4>
@@ -107,3 +108,4 @@ export default function InventoryStatus() {
     </section>
   );
 }
+
