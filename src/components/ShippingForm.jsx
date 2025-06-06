@@ -1,7 +1,8 @@
 // src/components/ShippingForm.jsx
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export default function ShippingForm() {
   const [formData, setFormData] = useState({
@@ -17,142 +18,147 @@ export default function ShippingForm() {
   const [error, setError]     = useState('');
   const [success, setSuccess] = useState('');
 
+  useEffect(() => {
+    const fetchShipping = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        const shipSnap = await getDoc(doc(db, 'shipping', user.uid));
+        if (shipSnap.exists()) {
+          const data = shipSnap.data();
+          setFormData({
+            fullName: data.fullName || '',
+            phoneNumber: data.phoneNumber || '',
+            addressLine1: data.contextAddress?.line1 || '',
+            addressLine2: data.contextAddress?.line2 || '',
+            suburb: data.contextAddress?.suburb || '',
+            city: data.contextAddress?.city || '',
+            postalCode: data.contextAddress?.postalCode || '',
+            country: data.contextAddress?.country || '',
+          });
+        }
+      } catch (err) {
+        console.error('Fetch shipping error:', err);
+        setError('Failed to fetch shipping info.');
+      }
+    };
+    fetchShipping();
+  }, []);
+
   const handleChange = e => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    setSuccess(''); 
+    setSuccess('');
     setError('');
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setError(''); 
+    setError('');
     setSuccess('');
     const user = auth.currentUser;
     if (!user) {
       setError('You must be logged in to save shipping info.');
       return;
     }
-
     try {
+      const { addressLine1, addressLine2, suburb, city, postalCode, country } = formData;
+      const fullAddress = `${addressLine1}, ${addressLine2 ? addressLine2 + ', ' : ''}${suburb}, ${city}, ${postalCode}, ${country}`;
+
       await setDoc(doc(db, 'shipping', user.uid), {
-        ...formData,
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        contextAddress: {
+          line1: addressLine1,
+          line2: addressLine2,
+          suburb,
+          city,
+          postalCode,
+          country,
+          fullAddress,
+        },
         uid: user.uid,
         email: user.email,
       });
       setSuccess('Shipping details saved.');
     } catch (err) {
-      console.error(err);
+      console.error('Failed to save shipping:', err);
       setError('Failed to save shipping details.');
     }
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
-      <h2 className="form-title">Shipping Details</h2>
+    <form onSubmit={handleSubmit}>
+      <h2>Shipping Details</h2>
 
-      <div className="form-group">
-        <label htmlFor="fullName" className="form-label">Full Name:</label>
-        <input
-          id="fullName"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Full Name:</label>
+      <input
+        name="fullName"
+        value={formData.fullName}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="phoneNumber" className="form-label">Phone Number:</label>
-        <input
-          id="phoneNumber"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Phone Number:</label>
+      <input
+        name="phoneNumber"
+        value={formData.phoneNumber}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="addressLine1" className="form-label">Address Line 1:</label>
-        <input
-          id="addressLine1"
-          name="addressLine1"
-          value={formData.addressLine1}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Address Line 1:</label>
+      <input
+        name="addressLine1"
+        value={formData.addressLine1}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="addressLine2" className="form-label">Address Line 2:</label>
-        <input
-          id="addressLine2"
-          name="addressLine2"
-          value={formData.addressLine2}
-          onChange={handleChange}
-          className="form-input quarter-width"
-        />
-      </div>
+      <label>Address Line 2:</label>
+      <input
+        name="addressLine2"
+        value={formData.addressLine2}
+        onChange={handleChange}
+      />
 
-      <div className="form-group">
-        <label htmlFor="suburb" className="form-label">Suburb:</label>
-        <input
-          id="suburb"
-          name="suburb"
-          value={formData.suburb}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Suburb:</label>
+      <input
+        name="suburb"
+        value={formData.suburb}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="city" className="form-label">City:</label>
-        <input
-          id="city"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>City:</label>
+      <input
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="postalCode" className="form-label">Postal Code:</label>
-        <input
-          id="postalCode"
-          name="postalCode"
-          value={formData.postalCode}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Postal Code:</label>
+      <input
+        name="postalCode"
+        value={formData.postalCode}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="country" className="form-label">Country:</label>
-        <input
-          id="country"
-          name="country"
-          value={formData.country}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Country:</label>
+      <input
+        name="country"
+        value={formData.country}
+        onChange={handleChange}
+        required
+      />
 
-      {error   && <p className="form-error">{error}</p>}
-      {success && <p className="form-success">{success}</p>}
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
 
-      <div className="form-group">
-        <button type="submit" className="form-button quarter-width">
-          Save Shipping
-        </button>
-      </div>
+      <button type="submit" style={{ marginTop: '1rem' }}>
+        Save Shipping
+      </button>
     </form>
   );
 }

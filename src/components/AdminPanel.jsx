@@ -1,4 +1,4 @@
-// ✅ FILE: src/components/AdminPanel.jsx
+// src/components/AdminPanel.jsx
 
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
@@ -7,71 +7,107 @@ import {
   getDocs,
   doc,
   getDoc,
-  updateDoc
+  updateDoc,
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import Papa from 'papaparse';
-import JobStatusReport   from './JobStatusReport';
-import InventoryStatus   from './InventoryStatus';
+import InventoryStatus from './InventoryStatus'; // original import
+import '../styles/global.css';
 
-export default function AdminPanel() {
-  const [jobs, setJobs]                     = useState([]);
-  const [orders, setOrders]                 = useState([]);
-  const [users, setUsers]                   = useState([]);
+const AdminPanel = () => {
+  const [jobs, setJobs] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [users, setUsers] = useState([]);
   const [shippingAddresses, setShippingAddresses] = useState({});
-  const [markup, setMarkup]                 = useState(1.2);
-  const [userEmail, setUserEmail]           = useState('');
+  const [markup, setMarkup] = useState(1.2);
+  const [userEmail, setUserEmail] = useState("");
+  const [materials, setMaterials] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      // Jobs
-      const jobSnap = await getDocs(collection(db, 'jobs'));
-      setJobs(jobSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+      try {
+        // Fetch Jobs
+        const jobSnap = await getDocs(collection(db, 'jobs'));
+        setJobs(jobSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
-      // Orders
-      const orderSnap = await getDocs(collection(db, 'orders'));
-      setOrders(orderSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        // Fetch Orders
+        const orderSnap = await getDocs(collection(db, 'orders'));
+        setOrders(orderSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
-      // Users
-      const userSnap = await getDocs(collection(db, 'users'));
-      const userList = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setUsers(userList);
+        // Fetch Users
+        const userSnap = await getDocs(collection(db, 'users'));
+        const userList = userSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setUsers(userList);
 
-      // Markup setting
-      const markupSnap = await getDoc(doc(db, 'settings', 'markupSettings'));
-      if (markupSnap.exists()) {
-        setMarkup(markupSnap.data().markup || 1.2);
-      }
+        // Fetch Pricing (materials/colors)
+        const pricingSnap = await getDoc(doc(db, 'settings', 'pricing'));
+        if (pricingSnap.exists()) {
+          setMaterials(pricingSnap.data().availableMaterials || []);
+          setColors(pricingSnap.data().availableColors || []);
+        }
 
-      // Shipping addresses
-      const addrMap = {};
-      for (const u of userList) {
-        const s = await getDoc(doc(db, 'shipping', u.id));
-        if (s.exists()) addrMap[u.id] = s.data();
-      }
-      setShippingAddresses(addrMap);
+        // Fetch Markup
+        const markupSnap = await getDoc(doc(db, 'settings', 'markupSettings'));
+        if (markupSnap.exists()) {
+          setMarkup(markupSnap.data().markup || 1.2);
+        }
 
-      // Current user email
-      const cu = auth.currentUser;
-      if (cu) {
-        setUserEmail(cu.email || '');
+        // Fetch Shipping Addresses for Jobs
+        const addresses = {};
+        for (const user of userList) {
+          const shippingSnap = await getDoc(doc(db, 'shipping', user.id));
+          if (shippingSnap.exists()) {
+            addresses[user.id] = shippingSnap.data();
+          }
+        }
+        setShippingAddresses(addresses);
+
+        // Check current user’s admin claim
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          const token = await currentUser.getIdTokenResult();
+          setIsAdmin(!!token.claims.admin);
+          setUserEmail(currentUser.email);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
+
     fetchData();
   }, []);
 
-  const updateMarkup = async () => {
-    await updateDoc(doc(db, 'settings', 'markupSettings'), { markup });
-    alert('Markup updated.');
+  const handleJobFieldChange = async (jobId, field, value) => {
+    try {
+      await updateDoc(doc(db, 'jobs', jobId), { [field]: value });
+      setJobs(jobs.map(j => (j.id === jobId ? { ...j, [field]: value } : j)));
+    } catch (error) {
+      console.error(`Error updating ${field} for job ${jobId}:`, error);
+    }
   };
 
-  const exportToCSV = () => {
-    const data = jobs.map(j => ({
-      fileName: j.fileName,
-      status: j.status,
-      shippingAddress: shippingAddresses[j.uid]?.addressLine1 || '',
-      baseCost: j.cost,
-      adjustedCost: (j.cost * markup).toFixed(2),
+  const updateJobStatus = (jobId, newStatus) => {
+    handleJobFieldChange(jobId, 'status', newStatus);
+  };
+
+  const updateMarkup = async () => {
+    try {
+      await updateDoc(doc(db, 'settings', 'markupSettings'), { markup });
+      alert('Markup updated successfully.');
+    } catch (error) {
+      console.error("Error updating markup:", error);
+    }
+  };
+
+  const exportJobsToCSV = () => {
+    const data = jobs.map(job => ({
+      fileName: job.fileName,
+      status: job.status,
+      shippingAddress: shippingAddresses[job.uid]?.fullAddress || 'N/A',
+      baseCost: job.cost,
+      adjustedCost: (job.cost * markup).toFixed(2),
     }));
     const csv = Papa.unparse(data);
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -83,99 +119,106 @@ export default function AdminPanel() {
   };
 
   const handleLogout = () => {
-    signOut(auth).then(() => {
-      window.location.href = '/';
-    });
+    signOut(auth)
+      .then(() => {
+        alert('Logged out successfully.');
+        window.location.href = '/';
+      })
+      .catch(error => console.error("Logout error:", error));
   };
 
   return (
-    <div className="form" style={{ padding: '2rem' }}>
-      <h2 className="form-title">Admin Dashboard — {userEmail}</h2>
+    <div style={{ padding: '2rem' }}>
+      <h2>Admin Panel - Logged in as {userEmail}</h2>
 
-      {/* 1) Inventory Status Panel */}
+      <div>
+        <label>
+          Markup (%):
+          <input
+            type="number"
+            value={markup * 100}
+            onChange={e => setMarkup(e.target.value / 100)}
+            step="0.1"
+            min="1.0"
+            max="100.0"
+          />
+        </label>
+        <button onClick={updateMarkup} className="form-button">Save Markup</button>
+      </div>
+
+      <button onClick={handleLogout} className="form-button">Logout</button>
+      <button onClick={exportJobsToCSV} className="form-button">Export Jobs to CSV</button>
+
+      {/* ====== Inventory Status Report ====== */}
       <InventoryStatus />
 
-      {/* 2) Job Status Panel */}
-      <JobStatusReport />
+      {/* ====== Jobs Report ====== */}
+      <h3>Jobs</h3>
+      <ul className="status-list">
+        {jobs.map(job => (
+          <li key={job.id} className="status-item">
+            <p><strong>File Name:</strong> {job.fileName}</p>
+            <p><strong>Status:</strong> {job.status}</p>
+            <p><strong>Shipping Address:</strong></p>
+            {shippingAddresses[job.uid] ? (
+              <div style={{ paddingLeft: '1rem' }}>
+                <div>{shippingAddresses[job.uid].addressLine1}</div>
+                <div>{shippingAddresses[job.uid].suburb}</div>
+                <div>{shippingAddresses[job.uid].city}</div>
+                <div>{shippingAddresses[job.uid].postalCode}</div>
+                <div>{shippingAddresses[job.uid].country}</div>
+              </div>
+            ) : (
+              <p>N/A</p>
+            )}
+            <p><strong>Cost:</strong> {job.cost}</p>
+            <p><strong>Adjusted Cost:</strong> {(job.cost * markup).toFixed(2)}</p>
+            <button onClick={() => updateJobStatus(job.id, 'Processing')} className="form-button">
+              Start Processing
+            </button>
+            <button onClick={() => updateJobStatus(job.id, 'Shipped')} className="form-button">
+              Mark as Shipped
+            </button>
+            <button
+              onClick={() =>
+                updateJobStatus(job.id, prompt('New Shipping Address:', job.shippingAddress))
+              }
+              className="form-button"
+            >
+              Update Shipping Address
+            </button>
+          </li>
+        ))}
+      </ul>
 
-      {/* 3) Pricing Markup */}
-      <section className="form-group">
-        <label className="form-label">Markup (%):</label>
-        <input
-          type="number"
-          value={markup * 100}
-          onChange={e => setMarkup(e.target.value / 100)}
-          step="0.1"
-          className="form-input quarter-width"
-        />
-        <button
-          onClick={updateMarkup}
-          className="form-button quarter-width"
-        >
-          Save Markup
-        </button>
-      </section>
+      {/* ====== Orders ====== */}
+      <h3>Orders</h3>
+      <ul>
+        {orders.map(order => (
+          <li key={order.id}>
+            <p><strong>Material:</strong> {order.material}</p>
+            <p><strong>Color:</strong> {order.color}</p>
+            <p><strong>Cost:</strong> {order.cost}</p>
+            <p><strong>File URL:</strong> <a href={order.fileUrl} target="_blank" rel="noopener noreferrer">View File</a></p>
+            <p><strong>Status:</strong> {order.status}</p>
+            <p><strong>User ID:</strong> {order.userId}</p>
+          </li>
+        ))}
+      </ul>
 
-      {/* 4) Logout & Export */}
-      <section className="form-group">
-        <button
-          onClick={handleLogout}
-          className="form-button quarter-width"
-        >
-          Logout
-        </button>
-        <button
-          onClick={exportToCSV}
-          className="form-button quarter-width"
-        >
-          Export Jobs CSV
-        </button>
-      </section>
-
-      {/* 5) Jobs List */}
-      <section className="form-group">
-        <h3>Jobs</h3>
-        <ul>
-          {jobs.map(job => (
-            <li key={job.id}>
-              <p><strong>File:</strong> {job.fileName}</p>
-              <p><strong>Status:</strong> {job.status}</p>
-              <p><strong>Shipping:</strong> {shippingAddresses[job.uid]?.addressLine1 || 'N/A'}</p>
-              <p><strong>Cost:</strong> {job.cost}</p>
-              <p><strong>Adjusted:</strong> {(job.cost * markup).toFixed(2)}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* 6) Orders List */}
-      <section className="form-group">
-        <h3>Orders</h3>
-        <ul>
-          {orders.map(o => (
-            <li key={o.id}>
-              <p><strong>Material:</strong> {o.material}</p>
-              <p><strong>Color:</strong> {o.color}</p>
-              <p><strong>Cost:</strong> {o.cost}</p>
-              <p><strong>Status:</strong> {o.status}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {/* 7) Users List */}
-      <section className="form-group">
-        <h3>Users</h3>
-        <ul>
-          {users.map(u => (
-            <li key={u.id}>
-              <p><strong>Email:</strong> {u.email}</p>
-              <p><strong>Name:</strong> {u.name}</p>
-              <p><strong>Admin:</strong> {u.isAdmin ? 'Yes' : 'No'}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
+      {/* ====== Users ====== */}
+      <h3>Users</h3>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>
+            <p><strong>Email:</strong> {user.email}</p>
+            <p><strong>Name:</strong> {user.name}</p>
+            <p><strong>Admin:</strong> {user.isAdmin ? 'Yes' : 'No'}</p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
-}
+};
+
+export default AdminPanel;

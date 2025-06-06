@@ -1,208 +1,182 @@
-// ✅ FILE: src/components/Profile.jsx
+// src/components/Profile.jsx
+
 import React, { useState, useEffect } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export default function Profile() {
-  const [userEmail, setUserEmail] = useState('');
-  const [profileData, setProfileData] = useState({
-    name: '',
-    phoneNumber: '',
-    billingAddressLine1: '',
-    billingAddressLine2: '',
-    billingSuburb: '',
-    billingCity: '',
-    billingPostalCode: '',
-    billingCountry: '',
-    defaultPrintQuality: '',
+  const [formData, setFormData] = useState({
+    fullName: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    province: '',
+    postalCode: '',
+    country: '',
     defaultFinish: '',
+    defaultPrintQuality: '',
   });
-  const [status, setStatus] = useState('');
+  const [error, setError]     = useState('');
+  const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    return auth.onAuthStateChanged(async user => {
+    const fetchProfile = async () => {
+      const user = auth.currentUser;
       if (!user) return;
-      setUserEmail(user.email || '');
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        setProfileData(snap.data());
+      try {
+        const profileSnap = await getDoc(doc(db, 'profiles', user.uid));
+        if (profileSnap.exists()) {
+          const data = profileSnap.data();
+          setFormData({
+            fullName: data.fullName || '',
+            addressLine1: data.billingAddress?.line1 || '',
+            addressLine2: data.billingAddress?.line2 || '',
+            city: data.billingAddress?.city || '',
+            province: data.billingAddress?.province || '',
+            postalCode: data.billingAddress?.postalCode || '',
+            country: data.billingAddress?.country || '',
+            defaultFinish: data.defaultPostProcessing || '',
+            defaultPrintQuality: data.defaultPrintQuality || '',
+          });
+        }
+      } catch (err) {
+        console.error('Fetch profile error:', err);
+        setError('Failed to fetch profile.');
       }
-    });
+    };
+    fetchProfile();
   }, []);
 
   const handleChange = e => {
-    const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
-    if (status) setStatus('');
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setSuccess('');
+    setError('');
   };
 
   const handleSubmit = async e => {
     e.preventDefault();
-    setStatus('');
+    setError('');
+    setSuccess('');
     const user = auth.currentUser;
     if (!user) {
-      setStatus('You must be logged in.');
+      setError('You must be logged in to save your profile.');
       return;
     }
     try {
-      await setDoc(doc(db, 'users', user.uid), profileData, { merge: true });
-      setStatus('Profile saved successfully.');
-    } catch {
-      setStatus('Error saving profile.');
+      const { addressLine1, addressLine2, city, province, postalCode, country } = formData;
+      const fullAddress = `${addressLine1}, ${addressLine2 ? addressLine2 + ', ' : ''}${city}, ${province}, ${postalCode}, ${country}`;
+
+      await setDoc(doc(db, 'profiles', user.uid), {
+        fullName: formData.fullName,
+        billingAddress: {
+          line1: addressLine1,
+          line2: addressLine2,
+          city,
+          province,
+          postalCode,
+          country,
+          fullAddress,
+        },
+        defaultPostProcessing: formData.defaultFinish,
+        defaultPrintQuality: formData.defaultPrintQuality,
+      });
+      setSuccess('Profile saved.');
+    } catch (err) {
+      console.error('Failed to save profile:', err);
+      setError('Failed to save profile.');
     }
   };
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
-      <h2 className="form-title">My Profile</h2>
+    <form onSubmit={handleSubmit}>
+      <h2>Profile</h2>
 
-      <p><strong>Email:</strong> {userEmail}</p>
+      <label>Full Name:</label>
+      <input
+        name="fullName"
+        value={formData.fullName}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="name" className="form-label">Name:</label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          value={profileData.name}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Address Line 1:</label>
+      <input
+        name="addressLine1"
+        value={formData.addressLine1}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="phoneNumber" className="form-label">Phone Number:</label>
-        <input
-          id="phoneNumber"
-          name="phoneNumber"
-          type="tel"
-          value={profileData.phoneNumber}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Address Line 2:</label>
+      <input
+        name="addressLine2"
+        value={formData.addressLine2}
+        onChange={handleChange}
+      />
 
-      <div className="form-group">
-        <label htmlFor="billingAddressLine1" className="form-label">Billing Address Line 1:</label>
-        <input
-          id="billingAddressLine1"
-          name="billingAddressLine1"
-          type="text"
-          value={profileData.billingAddressLine1}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>City:</label>
+      <input
+        name="city"
+        value={formData.city}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="billingAddressLine2" className="form-label">Billing Address Line 2:</label>
-        <input
-          id="billingAddressLine2"
-          name="billingAddressLine2"
-          type="text"
-          value={profileData.billingAddressLine2}
-          onChange={handleChange}
-          className="form-input quarter-width"
-        />
-      </div>
+      <label>Province:</label>
+      <input
+        name="province"
+        value={formData.province}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="billingSuburb" className="form-label">Suburb:</label>
-        <input
-          id="billingSuburb"
-          name="billingSuburb"
-          type="text"
-          value={profileData.billingSuburb}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Postal Code:</label>
+      <input
+        name="postalCode"
+        value={formData.postalCode}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="billingCity" className="form-label">City:</label>
-        <input
-          id="billingCity"
-          name="billingCity"
-          type="text"
-          value={profileData.billingCity}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Country:</label>
+      <input
+        name="country"
+        value={formData.country}
+        onChange={handleChange}
+        required
+      />
 
-      <div className="form-group">
-        <label htmlFor="billingPostalCode" className="form-label">Postal Code:</label>
-        <input
-          id="billingPostalCode"
-          name="billingPostalCode"
-          type="text"
-          value={profileData.billingPostalCode}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Default Finish:</label>
+      <select
+        name="defaultFinish"
+        value={formData.defaultFinish}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Select --</option>
+        <option value="raw">Raw</option>
+        <option value="supports_removed">Supports Removed</option>
+        <option value="ready_to_go">Ready to Go</option>
+      </select>
 
-      <div className="form-group">
-        <label htmlFor="billingCountry" className="form-label">Country:</label>
-        <input
-          id="billingCountry"
-          name="billingCountry"
-          type="text"
-          value={profileData.billingCountry}
-          onChange={handleChange}
-          className="form-input quarter-width"
-          required
-        />
-      </div>
+      <label>Default Print Quality:</label>
+      <select
+        name="defaultPrintQuality"
+        value={formData.defaultPrintQuality}
+        onChange={handleChange}
+        required
+      >
+        <option value="">-- Select --</option>
+        <option value="draft">Draft</option>
+        <option value="fit_check">Fit Check</option>
+        <option value="prototype">Prototype</option>
+        <option value="production">Production</option>
+      </select>
 
-      <div className="form-group">
-        <label htmlFor="defaultPrintQuality" className="form-label">Default Print Quality:</label>
-        <select
-          id="defaultPrintQuality"
-          name="defaultPrintQuality"
-          value={profileData.defaultPrintQuality}
-          onChange={handleChange}
-          className="form-select quarter-width"
-          required
-        >
-          <option value="">Select quality</option>
-          <option value="Draft">Draft</option>
-          <option value="Fit Check">Fit Check</option>
-          <option value="Prototype">Prototype</option>
-          <option value="Production">Production</option>
-        </select>
-      </div>
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {success && <p style={{ color: 'green' }}>{success}</p>}
 
-      <div className="form-group">
-        <label htmlFor="defaultFinish" className="form-label">Default Post-Processing:</label>
-        <select
-          id="defaultFinish"
-          name="defaultFinish"
-          value={profileData.defaultFinish}
-          onChange={handleChange}
-          className="form-select quarter-width"
-          required
-        >
-          <option value="">Select finish</option>
-          <option value="raw">Raw</option>
-          <option value="supports_removed">Supports Removed</option>
-          <option value="ready_to_go">Ready to Go</option>
-        </select>
-      </div>
-
-      {status && <p className="form-error">{status}</p>}
-
-      <div className="form-group">
-        <button type="submit" className="form-button quarter-width">
-          Save Profile
-        </button>
-      </div>
+      <button type="submit">Save Profile</button>
     </form>
   );
 }
