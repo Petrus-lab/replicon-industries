@@ -17,8 +17,10 @@ import UploadForm                 from './components/UploadForm';
 import ShippingForm               from './components/ShippingForm';
 import AdminPanel                 from './components/AdminPanel';
 import AdminUserProfileViewer     from './components/AdminUserProfileViewer';
+import InventoryManager           from './components/InventoryManager';
 import Profile                    from './components/Profile';
-import UploadStatus               from './components/UploadStatus'; // ensure this file exists
+import JobStatus                  from './components/JobStatus';
+import JobStatusReport            from './components/JobStatusReport';
 import NotFound                   from './components/NotFound';
 
 function App() {
@@ -48,43 +50,49 @@ function App() {
   return (
     <Router>
       <div className="App" style={{ padding: '1rem' }}>
-        <button onClick={handleSignOut} className="form-button">Sign Out</button>
+        <button onClick={handleSignOut} className="form-button">
+          Sign Out
+        </button>
 
-        {/* Admin Navigation */}
+        {/* ===== Admin Navigation ===== */}
         {isAdmin && (
           <nav style={{ margin: '1rem 0' }}>
             <Link to="/admin">Admin Dashboard</Link> |{' '}
-            <Link to="/admin/users">User Profiles</Link>
+            <Link to="/admin/users">User Profiles</Link> |{' '}
+            <Link to="/admin/inventory">Inventory Manager</Link> |{' '}
+            <Link to="/admin/jobs">Job Management</Link>
           </nav>
         )}
 
-        {/* Client Navigation */}
+        {/* ===== Client Navigation ===== */}
         {!isAdmin && (
           <nav style={{ margin: '1rem 0' }}>
             <Link to="/client/profile">Profile</Link> |{' '}
             <Link to="/client/upload">Upload</Link> |{' '}
             <Link to="/client/shipping">Shipping</Link> |{' '}
-            <Link to="/client/status">Status</Link>
+            <Link to="/client/status">Job Status</Link>
           </nav>
         )}
 
         <Routes>
-          {/* Admin Routes */}
+          {/* ===== Admin Routes ===== */}
           {isAdmin && (
             <>
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/admin/users" element={<AdminUserProfileViewer />} />
+              <Route path="/admin/inventory" element={<InventoryManager />} />
+              <Route path="/admin/jobs" element={<JobStatusReport />} />
               <Route path="*" element={<Navigate to="/admin" />} />
             </>
           )}
 
-          {/* Client Routes */}
+          {/* ===== Client Routes ===== */}
           {!isAdmin && (
             <>
               <Route path="/client/profile" element={<Profile />} />
               <Route path="/client/upload" element={<UploadForm />} />
               <Route path="/client/shipping" element={<ShippingForm />} />
-              <Route path="/client/status" element={<UploadStatus />} />
+              <Route path="/client/status" element={<JobStatus />} />
               <Route path="/" element={<Navigate to="/client/profile" />} />
               <Route path="*" element={<NotFound />} />
             </>
