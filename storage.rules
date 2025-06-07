@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Allow each user to read/write only their own uploads
+    match /uploads/{userId}/{allPaths=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+
+    // Admins get full access everywhere
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null
+                         && request.auth.token.admin == true;
+    }
+  }
+}
