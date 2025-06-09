@@ -7,7 +7,6 @@ const Profile = () => {
     name: '',
     contact: '',
     billingAddress: '',
-    shippingAddress: '',
     finish: '',
     quality: '',
   });
@@ -24,7 +23,14 @@ const Profile = () => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        setProfile({ ...profile, ...docSnap.data() });
+        const data = docSnap.data();
+        setProfile({
+          name: data.name || '',
+          contact: data.contact || '',
+          billingAddress: typeof data.billingAddress === 'string' ? data.billingAddress : '',
+          finish: data.finish || '',
+          quality: data.quality || '',
+        });
       }
     };
 
@@ -41,7 +47,15 @@ const Profile = () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    await setDoc(doc(db, 'profiles', user.uid), profile);
+    const sanitizedProfile = {
+      ...profile,
+      billingAddress:
+        typeof profile.billingAddress === 'string'
+          ? profile.billingAddress
+          : JSON.stringify(profile.billingAddress),
+    };
+
+    await setDoc(doc(db, 'profiles', user.uid), sanitizedProfile);
     alert('Profile updated.');
   };
 
@@ -49,35 +63,33 @@ const Profile = () => {
     <div className="section-container">
       <h2 className="section-heading">Your Profile</h2>
       <form onSubmit={handleSubmit} className="form-vertical">
+        <label className="form-label">Full Name:</label>
         <input
           type="text"
           name="name"
           value={profile.name}
           onChange={handleChange}
           placeholder="Full Name"
-          className="form-control"
+          className="form-control form-control-narrow"
         />
+
+        <label className="form-label">Contact Info:</label>
         <input
           type="text"
           name="contact"
           value={profile.contact}
           onChange={handleChange}
           placeholder="Contact Info"
-          className="form-control"
+          className="form-control form-control-narrow"
         />
+
+        <label className="form-label">Billing Address:</label>
         <textarea
           name="billingAddress"
           value={profile.billingAddress}
           onChange={handleChange}
           placeholder="Billing Address"
-          className="form-control"
-        />
-        <textarea
-          name="shippingAddress"
-          value={profile.shippingAddress}
-          onChange={handleChange}
-          placeholder="Shipping Address"
-          className="form-control"
+          className="form-control form-control-narrow"
         />
 
         <label className="form-label">Default Post Processing:</label>
@@ -85,7 +97,7 @@ const Profile = () => {
           name="finish"
           value={profile.finish}
           onChange={handleChange}
-          className="form-control"
+          className="form-control form-control-narrow"
         >
           {finishOptions.map((f) => (
             <option key={f} value={f}>
@@ -99,7 +111,7 @@ const Profile = () => {
           name="quality"
           value={profile.quality}
           onChange={handleChange}
-          className="form-control"
+          className="form-control form-control-narrow"
         >
           {qualityOptions.map((q) => (
             <option key={q} value={q}>
