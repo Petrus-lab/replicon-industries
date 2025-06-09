@@ -1,18 +1,18 @@
+// src/components/Profile.jsx
+
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const Profile = () => {
-  const [profile, setProfile] = useState({
+  const [profileData, setProfileData] = useState({
     name: '',
     contact: '',
     billingAddress: '',
     finish: '',
-    quality: '',
+    quality: ''
   });
-
-  const finishOptions = ['raw', 'supports_removed', 'ready_to_go'];
-  const qualityOptions = ['draft', 'fit_check', 'prototype', 'production'];
+  const [status, setStatus] = useState('');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -23,23 +23,15 @@ const Profile = () => {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        const data = docSnap.data();
-        setProfile({
-          name: data.name || '',
-          contact: data.contact || '',
-          billingAddress: typeof data.billingAddress === 'string' ? data.billingAddress : '',
-          finish: data.finish || '',
-          quality: data.quality || '',
-        });
+        setProfileData(docSnap.data());
       }
     };
 
     fetchProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {
-    setProfile({ ...profile, [e.target.name]: e.target.value });
+    setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -47,16 +39,14 @@ const Profile = () => {
     const user = auth.currentUser;
     if (!user) return;
 
-    const sanitizedProfile = {
-      ...profile,
-      billingAddress:
-        typeof profile.billingAddress === 'string'
-          ? profile.billingAddress
-          : JSON.stringify(profile.billingAddress),
-    };
-
-    await setDoc(doc(db, 'profiles', user.uid), sanitizedProfile);
-    alert('Profile updated.');
+    try {
+      setStatus('Saving...');
+      await setDoc(doc(db, 'profiles', user.uid), profileData);
+      setStatus('Profile updated successfully!');
+    } catch (err) {
+      console.error(err);
+      setStatus('Failed to update profile.');
+    }
   };
 
   return (
@@ -67,63 +57,57 @@ const Profile = () => {
         <input
           type="text"
           name="name"
-          value={profile.name}
+          value={profileData.name}
           onChange={handleChange}
-          placeholder="Full Name"
           className="form-control form-control-narrow"
         />
 
-        <label className="form-label">Contact Info:</label>
+        <label className="form-label">Contact Number:</label>
         <input
           type="text"
           name="contact"
-          value={profile.contact}
+          value={profileData.contact}
           onChange={handleChange}
-          placeholder="Contact Info"
           className="form-control form-control-narrow"
         />
 
         <label className="form-label">Billing Address:</label>
-        <textarea
+        <input
+          type="text"
           name="billingAddress"
-          value={profile.billingAddress}
+          value={profileData.billingAddress}
           onChange={handleChange}
-          placeholder="Billing Address"
           className="form-control form-control-narrow"
         />
 
         <label className="form-label">Default Post Processing:</label>
         <select
           name="finish"
-          value={profile.finish}
+          value={profileData.finish}
           onChange={handleChange}
           className="form-control form-control-narrow"
         >
-          {finishOptions.map((f) => (
-            <option key={f} value={f}>
-              {f}
-            </option>
-          ))}
+          <option value="raw">raw</option>
+          <option value="supports_removed">supports_removed</option>
+          <option value="ready_to_go">ready_to_go</option>
         </select>
 
         <label className="form-label">Default Print Quality:</label>
         <select
           name="quality"
-          value={profile.quality}
+          value={profileData.quality}
           onChange={handleChange}
           className="form-control form-control-narrow"
         >
-          {qualityOptions.map((q) => (
-            <option key={q} value={q}>
-              {q}
-            </option>
-          ))}
+          <option value="draft">draft</option>
+          <option value="fit_check">fit_check</option>
+          <option value="prototype">prototype</option>
+          <option value="production">production</option>
         </select>
 
-        <button type="submit" className="button-primary">
-          Save Profile
-        </button>
+        <button type="submit" className="button-primary">Save Changes</button>
       </form>
+      {status && <p>{status}</p>}
     </div>
   );
 };
