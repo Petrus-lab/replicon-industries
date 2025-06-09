@@ -1,3 +1,5 @@
+// UploadForm.jsx (final labeled version, logic preserved, visual labels standardized)
+
 import React, { useEffect, useState } from 'react';
 import { auth, db, storage } from '../firebase';
 import {
@@ -43,7 +45,6 @@ const UploadForm = () => {
       const profileSnap = await getDoc(doc(db, 'profiles', user.uid));
       const profile = profileSnap.exists() ? profileSnap.data() : {};
 
-      // Load inventory
       const snapshot = await getDocs(
         query(collection(db, 'inventory'), where('stockLevel', '>', 0))
       );
@@ -147,31 +148,35 @@ const UploadForm = () => {
     <div className="section-container">
       <h2 className="section-heading">Upload 3D Print Job</h2>
       <form onSubmit={handleSubmit} className="form-vertical">
+        <label className="form-label">STL File:</label>
         <input
           type="file"
           onChange={(e) => setSelectedFile(e.target.files[0])}
           className="form-control form-control-narrow"
         />
 
+        <label className="form-label">Material:</label>
         <select value={material} onChange={(e) => handleMaterialChange(e.target.value)} className="form-control form-control-narrow">
           {materialOptions.map((m) => (
             <option key={m} value={m}>{m}</option>
           ))}
         </select>
 
+        <label className="form-label">Color:</label>
         <select value={color} onChange={(e) => setColor(e.target.value)} className="form-control form-control-narrow">
           {colorOptions.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
 
+        <label className="form-label">Material Finish:</label>
         <select value={materialFinish} onChange={(e) => setMaterialFinish(e.target.value)} className="form-control form-control-narrow">
           {materialFinishOptions.map((f) => (
             <option key={f} value={f}>{f}</option>
           ))}
         </select>
 
-        <label className="form-label">Post-Processing:</label>
+        <label className="form-label">Default Post Processing:</label>
         <select value={postProcessing} onChange={(e) => setPostProcessing(e.target.value)} className="form-control form-control-narrow">
           {postProcessingOptions.map((f) => (
             <option key={f} value={f}>{f}</option>
