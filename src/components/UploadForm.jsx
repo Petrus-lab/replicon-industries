@@ -1,5 +1,3 @@
-// UploadForm.jsx (final labeled version, logic preserved, visual labels standardized)
-
 import React, { useEffect, useState } from 'react';
 import { auth, db, storage } from '../firebase';
 import {
@@ -52,11 +50,9 @@ const UploadForm = () => {
       const tempMap = {};
       snapshot.forEach((doc) => {
         const { material, color, finish } = doc.data();
-        if (!tempMap[material]) {
-          tempMap[material] = { colors: new Set(), finishes: new Set() };
-        }
-        tempMap[material].colors.add(color);
-        tempMap[material].finishes.add(finish);
+        if (!tempMap[material]) tempMap[material] = {};
+        if (!tempMap[material][color]) tempMap[material][color] = new Set();
+        tempMap[material][color].add(finish);
       });
 
       const materials = Object.keys(tempMap);
@@ -78,26 +74,34 @@ const UploadForm = () => {
       setPostProcessing(defaultPostProcessing);
       setQuality(defaultQuality);
       setMaterial(defaultMaterial);
-      updateDependentFields(defaultMaterial, profile.color, profile.materialFinish, tempMap);
+      updateColorsAndFinishes(defaultMaterial, profile.color, profile.materialFinish, tempMap);
     };
 
     fetchData();
   }, []);
 
-  const updateDependentFields = (selectedMaterial, profileColor, profileMaterialFinish, map) => {
-    const colors = [...(map[selectedMaterial]?.colors || [])];
-    const finishes = [...(map[selectedMaterial]?.finishes || [])];
+  const updateColorsAndFinishes = (mat, profileColor = '', profileFinish = '', map = inventoryMap) => {
+    const colorSet = Object.keys(map[mat] || {});
+    setColorOptions(colorSet);
 
-    setColorOptions(colors);
+    const color = colorSet.includes(profileColor) ? profileColor : colorSet[0] || '';
+    setColor(color);
+
+    const finishes = Array.from(map[mat]?.[color] || []);
     setMaterialFinishOptions(finishes);
-
-    setColor(colors.includes(profileColor) ? profileColor : colors[0] || '');
-    setMaterialFinish(finishes.includes(profileMaterialFinish) ? profileMaterialFinish : finishes[0] || '');
+    setMaterialFinish(finishes.includes(profileFinish) ? profileFinish : finishes[0] || '');
   };
 
   const handleMaterialChange = (value) => {
     setMaterial(value);
-    updateDependentFields(value, '', '', inventoryMap);
+    updateColorsAndFinishes(value);
+  };
+
+  const handleColorChange = (value) => {
+    setColor(value);
+    const finishes = Array.from(inventoryMap[material]?.[value] || []);
+    setMaterialFinishOptions(finishes);
+    setMaterialFinish(finishes[0] || '');
   };
 
   const handleSubmit = async (e) => {
@@ -148,7 +152,7 @@ const UploadForm = () => {
     <div className="section-container">
       <h2 className="section-heading">Upload 3D Print Job</h2>
       <form onSubmit={handleSubmit} className="form-vertical">
-        <label className="form-label">STL File:</label>
+        <label className="form-label">Select File:</label>
         <input
           type="file"
           onChange={(e) => setSelectedFile(e.target.files[0])}
@@ -163,20 +167,20 @@ const UploadForm = () => {
         </select>
 
         <label className="form-label">Color:</label>
-        <select value={color} onChange={(e) => setColor(e.target.value)} className="form-control form-control-narrow">
+        <select value={color} onChange={(e) => handleColorChange(e.target.value)} className="form-control form-control-narrow">
           {colorOptions.map((c) => (
             <option key={c} value={c}>{c}</option>
           ))}
         </select>
 
-        <label className="form-label">Material Finish:</label>
-        <select value={materialFinish} onChange={(e) => setMaterialFinish(e.target.value)} className="form-control form-control-narrow">
+        <label className="form-label">Finish:</label>
+        <select value={materialFinish} onChange={(e) => setMaterialFinish(e.target.value)} className="form-control form-control-narrow" disabled={materialFinishOptions.length === 1}>
           {materialFinishOptions.map((f) => (
             <option key={f} value={f}>{f}</option>
           ))}
         </select>
 
-        <label className="form-label">Default Post Processing:</label>
+        <label className="form-label">Post-Processing:</label>
         <select value={postProcessing} onChange={(e) => setPostProcessing(e.target.value)} className="form-control form-control-narrow">
           {postProcessingOptions.map((f) => (
             <option key={f} value={f}>{f}</option>
