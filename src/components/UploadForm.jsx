@@ -1,3 +1,5 @@
+// src/components/UploadForm.jsx
+
 import React, { useEffect, useState } from 'react';
 import { auth, db, storage } from '../firebase';
 import {
@@ -50,8 +52,12 @@ const UploadForm = () => {
       const tempMap = {};
       snapshot.forEach((doc) => {
         const { material, color, finish } = doc.data();
-        if (!tempMap[material]) tempMap[material] = {};
-        if (!tempMap[material][color]) tempMap[material][color] = new Set();
+        if (!tempMap[material]) {
+          tempMap[material] = {};
+        }
+        if (!tempMap[material][color]) {
+          tempMap[material][color] = new Set();
+        }
         tempMap[material][color].add(finish);
       });
 
@@ -74,34 +80,36 @@ const UploadForm = () => {
       setPostProcessing(defaultPostProcessing);
       setQuality(defaultQuality);
       setMaterial(defaultMaterial);
-      updateColorsAndFinishes(defaultMaterial, profile.color, profile.materialFinish, tempMap);
+      updateDependentFields(defaultMaterial, profile.color, profile.materialFinish, tempMap);
     };
 
     fetchData();
   }, []);
 
-  const updateColorsAndFinishes = (mat, profileColor = '', profileFinish = '', map = inventoryMap) => {
-    const colorSet = Object.keys(map[mat] || {});
-    setColorOptions(colorSet);
+  const updateDependentFields = (selectedMaterial, profileColor, profileMaterialFinish, map) => {
+    const colorKeys = map[selectedMaterial] ? Object.keys(map[selectedMaterial]) : [];
+    setColorOptions(colorKeys);
 
-    const color = colorSet.includes(profileColor) ? profileColor : colorSet[0] || '';
-    setColor(color);
+    const validColor = colorKeys.includes(profileColor) ? profileColor : colorKeys[0] || '';
+    setColor(validColor);
 
-    const finishes = Array.from(map[mat]?.[color] || []);
-    setMaterialFinishOptions(finishes);
-    setMaterialFinish(finishes.includes(profileFinish) ? profileFinish : finishes[0] || '');
+    const finishSet = map[selectedMaterial]?.[validColor] || new Set();
+    const finishList = [...finishSet];
+    setMaterialFinishOptions(finishList);
+    setMaterialFinish(finishList.includes(profileMaterialFinish) ? profileMaterialFinish : finishList[0] || '');
   };
 
   const handleMaterialChange = (value) => {
     setMaterial(value);
-    updateColorsAndFinishes(value);
+    updateDependentFields(value, '', '', inventoryMap);
   };
 
   const handleColorChange = (value) => {
     setColor(value);
-    const finishes = Array.from(inventoryMap[material]?.[value] || []);
-    setMaterialFinishOptions(finishes);
-    setMaterialFinish(finishes[0] || '');
+    const finishSet = inventoryMap[material]?.[value] || new Set();
+    const finishList = [...finishSet];
+    setMaterialFinishOptions(finishList);
+    setMaterialFinish(finishList[0] || '');
   };
 
   const handleSubmit = async (e) => {
@@ -173,7 +181,7 @@ const UploadForm = () => {
           ))}
         </select>
 
-        <label className="form-label">Finish:</label>
+        <label className="form-label">Material Finish:</label>
         <select value={materialFinish} onChange={(e) => setMaterialFinish(e.target.value)} className="form-control form-control-narrow" disabled={materialFinishOptions.length === 1}>
           {materialFinishOptions.map((f) => (
             <option key={f} value={f}>{f}</option>
@@ -187,7 +195,7 @@ const UploadForm = () => {
           ))}
         </select>
 
-        <label className="form-label">Default Print Quality:</label>
+        <label className="form-label">Print Quality:</label>
         <select value={quality} onChange={(e) => setQuality(e.target.value)} className="form-control form-control-narrow">
           {qualityOptions.map((q) => (
             <option key={q} value={q}>{q}</option>
