@@ -1,176 +1,195 @@
-// src/components/UploadForm.jsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { auth, db, storage } from '../firebase';
 import {
   collection,
   addDoc,
+  serverTimestamp,
+  getDocs,
+  doc,
+  getDoc,
   query,
   where,
-  getDocs,
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from 'firebase/storage';
 
-export default function UploadForm() {
+const UploadForm = () => {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState('');
+
   const [materialOptions, setMaterialOptions] = useState([]);
   const [colorOptions, setColorOptions] = useState([]);
-  const [finishOptions, setFinishOptions] = useState([]);
-  const [quantity, setQuantity] = useState(1);
-  const [selectedMaterial, setSelectedMaterial] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const [selectedFinish, setSelectedFinish] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [materialFinishOptions, setMaterialFinishOptions] = useState([]);
+
+  const [material, setMaterial] = useState('');
+  const [color, setColor] = useState('');
+  const [materialFinish, setMaterialFinish] = useState('');
+  const [postProcessing, setPostProcessing] = useState('');
+  const [quality, setQuality] = useState('');
+
+  const postProcessingOptions = ['raw', 'supports_removed', 'ready_to_go'];
+  const qualityOptions = ['draft', 'fit_check', 'prototype', 'production'];
+
+  const [inventoryMap, setInventoryMap] = useState({});
 
   useEffect(() => {
-    // fetch inventory to populate material/color lists
-    const fetchSettings = async () => {
-      const pricingSnap = await getDocs(collection(db, 'settings'));
-      pricingSnap.forEach(docSnap => {
-        if (docSnap.id === 'pricing') {
-          setMaterialOptions(docSnap.data().availableMaterials || []);
-          setColorOptions(docSnap.data().availableColors || []);
-          setFinishOptions(['raw', 'supports_removed', 'ready_to_go']);
+    const fetchData = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const profileSnap = await getDoc(doc(db, 'profiles', user.uid));
+      const profile = profileSnap.exists() ? profileSnap.data() : {};
+
+      // Load inventory
+      const snapshot = await getDocs(
+        query(collection(db, 'inventory'), where('stockLevel', '>', 0))
+      );
+
+      const tempMap = {};
+      snapshot.forEach((doc) => {
+        const { material, color, finish } = doc.data();
+        if (!tempMap[material]) {
+          tempMap[material] = { colors: new Set(), finishes: new Set() };
         }
+        tempMap[material].colors.add(color);
+        tempMap[material].finishes.add(finish);
       });
+
+      const materials = Object.keys(tempMap);
+      setInventoryMap(tempMap);
+      setMaterialOptions(materials);
+
+      const defaultMaterial = profile.material && materials.includes(profile.material)
+        ? profile.material
+        : materials[0] || '';
+
+      const defaultPostProcessing = profile.finish && postProcessingOptions.includes(profile.finish)
+        ? profile.finish
+        : postProcessingOptions[0];
+
+      const defaultQuality = profile.quality && qualityOptions.includes(profile.quality)
+        ? profile.quality
+        : qualityOptions[0];
+
+      setPostProcessing(defaultPostProcessing);
+      setQuality(defaultQuality);
+      setMaterial(defaultMaterial);
+      updateDependentFields(defaultMaterial, profile.color, profile.materialFinish, tempMap);
     };
-    fetchSettings();
+
+    fetchData();
   }, []);
 
-  const handleFileChange = e => {
-    setSelectedFile(e.target.files[0]);
-    setProgress(0);
-    setError('');
-    setSuccess('');
+  const updateDependentFields = (selectedMaterial, profileColor, profileMaterialFinish, map) => {
+    const colors = [...(map[selectedMaterial]?.colors || [])];
+    const finishes = [...(map[selectedMaterial]?.finishes || [])];
+
+    setColorOptions(colors);
+    setMaterialFinishOptions(finishes);
+
+    setColor(colors.includes(profileColor) ? profileColor : colors[0] || '');
+    setMaterialFinish(finishes.includes(profileMaterialFinish) ? profileMaterialFinish : finishes[0] || '');
   };
 
-  const handleSubmit = async e => {
+  const handleMaterialChange = (value) => {
+    setMaterial(value);
+    updateDependentFields(value, '', '', inventoryMap);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!selectedFile) {
-      setError('Please choose a file to upload.');
+    const user = auth.currentUser;
+    if (!user || !selectedFile) {
+      setStatus('Missing file or user session');
       return;
     }
-    if (!selectedMaterial || !selectedColor || !selectedFinish) {
-      setError('All fields are required.');
-      return;
-    }
-
-    setError('');
-    setSuccess('');
 
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        setError('You must be logged in to upload.');
-        return;
-      }
-
-      // 1) Upload file to Storage
-      const storageRef = ref(storage, `print_jobs/${user.uid}/${Date.now()}_${selectedFile.name}`);
+      setStatus('Uploading...');
+      const storageRef = ref(
+        storage,
+        `print_jobs/${user.uid}/${Date.now()}_${selectedFile.name}`
+      );
       const uploadTask = uploadBytesResumable(storageRef, selectedFile);
 
-      uploadTask.on('state_changed',
-        snapshot => {
-          const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setProgress(Math.floor(pct));
-        },
-        err => {
-          console.error('Upload error:', err);
-          setError('Failed to upload file.');
-        },
+      uploadTask.on(
+        'state_changed',
+        null,
+        (error) => setStatus('Upload failed: ' + error.message),
         async () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-          // 2) Create a new job document in Firestore
           await addDoc(collection(db, 'jobs'), {
             uid: user.uid,
-            email: user.email,
-            material: selectedMaterial,
-            color: selectedColor,
-            finish: selectedFinish,
-            quantity,
-            fileName: selectedFile.name,
             fileUrl: downloadURL,
-            cost: 0,
+            fileName: selectedFile.name,
+            material,
+            color,
+            materialFinish,
+            finish: postProcessing,
+            quality,
             status: 'Uploaded',
-            createdAt: new Date(),
+            createdAt: serverTimestamp(),
           });
-
-          setSuccess('Upload successful!');
+          setStatus('Upload successful!');
           setSelectedFile(null);
-          setProgress(0);
-          setSelectedMaterial('');
-          setSelectedColor('');
-          setSelectedFinish('');
-          setQuantity(1);
         }
       );
     } catch (err) {
-      console.error('UploadForm submit error:', err);
-      setError('Something went wrong.');
+      console.error(err);
+      setStatus('Upload failed: ' + err.message);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Upload Print Job</h2>
+    <div className="section-container">
+      <h2 className="section-heading">Upload 3D Print Job</h2>
+      <form onSubmit={handleSubmit} className="form-vertical">
+        <input
+          type="file"
+          onChange={(e) => setSelectedFile(e.target.files[0])}
+          className="form-control form-control-narrow"
+        />
 
-      <label>Material:</label>
-      <select
-        value={selectedMaterial}
-        onChange={e => setSelectedMaterial(e.target.value)}
-        required
-      >
-        <option value="">-- Select Material --</option>
-        {materialOptions.map(mat => (
-          <option key={mat} value={mat}>{mat}</option>
-        ))}
-      </select>
+        <select value={material} onChange={(e) => handleMaterialChange(e.target.value)} className="form-control form-control-narrow">
+          {materialOptions.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
+        </select>
 
-      <label>Color:</label>
-      <select
-        value={selectedColor}
-        onChange={e => setSelectedColor(e.target.value)}
-        required
-      >
-        <option value="">-- Select Color --</option>
-        {colorOptions.map(col => (
-          <option key={col} value={col}>{col}</option>
-        ))}
-      </select>
+        <select value={color} onChange={(e) => setColor(e.target.value)} className="form-control form-control-narrow">
+          {colorOptions.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
 
-      <label>Finish:</label>
-      <select
-        value={selectedFinish}
-        onChange={e => setSelectedFinish(e.target.value)}
-        required
-      >
-        <option value="">-- Select Finish --</option>
-        {finishOptions.map(fin => (
-          <option key={fin} value={fin}>{fin}</option>
-        ))}
-      </select>
+        <select value={materialFinish} onChange={(e) => setMaterialFinish(e.target.value)} className="form-control form-control-narrow">
+          {materialFinishOptions.map((f) => (
+            <option key={f} value={f}>{f}</option>
+          ))}
+        </select>
 
-      <label>Quantity:</label>
-      <input
-        type="number"
-        value={quantity}
-        min="1"
-        onChange={e => setQuantity(Number(e.target.value))}
-        required
-      />
+        <label className="form-label">Post-Processing:</label>
+        <select value={postProcessing} onChange={(e) => setPostProcessing(e.target.value)} className="form-control form-control-narrow">
+          {postProcessingOptions.map((f) => (
+            <option key={f} value={f}>{f}</option>
+          ))}
+        </select>
 
-      <label>File:</label>
-      <input type="file" onChange={handleFileChange} required />
+        <label className="form-label">Default Print Quality:</label>
+        <select value={quality} onChange={(e) => setQuality(e.target.value)} className="form-control form-control-narrow">
+          {qualityOptions.map((q) => (
+            <option key={q} value={q}>{q}</option>
+          ))}
+        </select>
 
-      {progress > 0 && <p>Upload Progress: {progress}%</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
-
-      <button type="submit">Upload</button>
-    </form>
+        <button type="submit" className="button-primary">Upload</button>
+      </form>
+      {status && <p>{status}</p>}
+    </div>
   );
-}
+};
+
+export default UploadForm;

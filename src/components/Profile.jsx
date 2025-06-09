@@ -1,182 +1,119 @@
-// src/components/Profile.jsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 
-export default function Profile() {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    province: '',
-    postalCode: '',
-    country: '',
-    defaultFinish: '',
-    defaultPrintQuality: '',
+const Profile = () => {
+  const [profile, setProfile] = useState({
+    name: '',
+    contact: '',
+    billingAddress: '',
+    shippingAddress: '',
+    finish: '',
+    quality: '',
   });
-  const [error, setError]     = useState('');
-  const [success, setSuccess] = useState('');
+
+  const finishOptions = ['raw', 'supports_removed', 'ready_to_go'];
+  const qualityOptions = ['draft', 'fit_check', 'prototype', 'production'];
 
   useEffect(() => {
     const fetchProfile = async () => {
       const user = auth.currentUser;
       if (!user) return;
-      try {
-        const profileSnap = await getDoc(doc(db, 'profiles', user.uid));
-        if (profileSnap.exists()) {
-          const data = profileSnap.data();
-          setFormData({
-            fullName: data.fullName || '',
-            addressLine1: data.billingAddress?.line1 || '',
-            addressLine2: data.billingAddress?.line2 || '',
-            city: data.billingAddress?.city || '',
-            province: data.billingAddress?.province || '',
-            postalCode: data.billingAddress?.postalCode || '',
-            country: data.billingAddress?.country || '',
-            defaultFinish: data.defaultPostProcessing || '',
-            defaultPrintQuality: data.defaultPrintQuality || '',
-          });
-        }
-      } catch (err) {
-        console.error('Fetch profile error:', err);
-        setError('Failed to fetch profile.');
+
+      const docRef = doc(db, 'profiles', user.uid);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        setProfile({ ...profile, ...docSnap.data() });
       }
     };
+
     fetchProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleChange = e => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    setSuccess('');
-    setError('');
+  const handleChange = (e) => {
+    setProfile({ ...profile, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
     const user = auth.currentUser;
-    if (!user) {
-      setError('You must be logged in to save your profile.');
-      return;
-    }
-    try {
-      const { addressLine1, addressLine2, city, province, postalCode, country } = formData;
-      const fullAddress = `${addressLine1}, ${addressLine2 ? addressLine2 + ', ' : ''}${city}, ${province}, ${postalCode}, ${country}`;
+    if (!user) return;
 
-      await setDoc(doc(db, 'profiles', user.uid), {
-        fullName: formData.fullName,
-        billingAddress: {
-          line1: addressLine1,
-          line2: addressLine2,
-          city,
-          province,
-          postalCode,
-          country,
-          fullAddress,
-        },
-        defaultPostProcessing: formData.defaultFinish,
-        defaultPrintQuality: formData.defaultPrintQuality,
-      });
-      setSuccess('Profile saved.');
-    } catch (err) {
-      console.error('Failed to save profile:', err);
-      setError('Failed to save profile.');
-    }
+    await setDoc(doc(db, 'profiles', user.uid), profile);
+    alert('Profile updated.');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Profile</h2>
+    <div className="section-container">
+      <h2 className="section-heading">Your Profile</h2>
+      <form onSubmit={handleSubmit} className="form-vertical">
+        <input
+          type="text"
+          name="name"
+          value={profile.name}
+          onChange={handleChange}
+          placeholder="Full Name"
+          className="form-control"
+        />
+        <input
+          type="text"
+          name="contact"
+          value={profile.contact}
+          onChange={handleChange}
+          placeholder="Contact Info"
+          className="form-control"
+        />
+        <textarea
+          name="billingAddress"
+          value={profile.billingAddress}
+          onChange={handleChange}
+          placeholder="Billing Address"
+          className="form-control"
+        />
+        <textarea
+          name="shippingAddress"
+          value={profile.shippingAddress}
+          onChange={handleChange}
+          placeholder="Shipping Address"
+          className="form-control"
+        />
 
-      <label>Full Name:</label>
-      <input
-        name="fullName"
-        value={formData.fullName}
-        onChange={handleChange}
-        required
-      />
+        <label className="form-label">Default Post Processing:</label>
+        <select
+          name="finish"
+          value={profile.finish}
+          onChange={handleChange}
+          className="form-control"
+        >
+          {finishOptions.map((f) => (
+            <option key={f} value={f}>
+              {f}
+            </option>
+          ))}
+        </select>
 
-      <label>Address Line 1:</label>
-      <input
-        name="addressLine1"
-        value={formData.addressLine1}
-        onChange={handleChange}
-        required
-      />
+        <label className="form-label">Default Print Quality:</label>
+        <select
+          name="quality"
+          value={profile.quality}
+          onChange={handleChange}
+          className="form-control"
+        >
+          {qualityOptions.map((q) => (
+            <option key={q} value={q}>
+              {q}
+            </option>
+          ))}
+        </select>
 
-      <label>Address Line 2:</label>
-      <input
-        name="addressLine2"
-        value={formData.addressLine2}
-        onChange={handleChange}
-      />
-
-      <label>City:</label>
-      <input
-        name="city"
-        value={formData.city}
-        onChange={handleChange}
-        required
-      />
-
-      <label>Province:</label>
-      <input
-        name="province"
-        value={formData.province}
-        onChange={handleChange}
-        required
-      />
-
-      <label>Postal Code:</label>
-      <input
-        name="postalCode"
-        value={formData.postalCode}
-        onChange={handleChange}
-        required
-      />
-
-      <label>Country:</label>
-      <input
-        name="country"
-        value={formData.country}
-        onChange={handleChange}
-        required
-      />
-
-      <label>Default Finish:</label>
-      <select
-        name="defaultFinish"
-        value={formData.defaultFinish}
-        onChange={handleChange}
-        required
-      >
-        <option value="">-- Select --</option>
-        <option value="raw">Raw</option>
-        <option value="supports_removed">Supports Removed</option>
-        <option value="ready_to_go">Ready to Go</option>
-      </select>
-
-      <label>Default Print Quality:</label>
-      <select
-        name="defaultPrintQuality"
-        value={formData.defaultPrintQuality}
-        onChange={handleChange}
-        required
-      >
-        <option value="">-- Select --</option>
-        <option value="draft">Draft</option>
-        <option value="fit_check">Fit Check</option>
-        <option value="prototype">Prototype</option>
-        <option value="production">Production</option>
-      </select>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
-
-      <button type="submit">Save Profile</button>
-    </form>
+        <button type="submit" className="button-primary">
+          Save Profile
+        </button>
+      </form>
+    </div>
   );
-}
+};
+
+export default Profile;
