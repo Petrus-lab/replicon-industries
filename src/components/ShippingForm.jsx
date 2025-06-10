@@ -1,5 +1,3 @@
-// src/components/ShippingForm.jsx
-
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import { doc, getDoc, setDoc, updateDoc, deleteField } from 'firebase/firestore';
@@ -86,15 +84,37 @@ const ShippingForm = () => {
   const renderAddressBlock = (title, data) => (
     <div className="section-subblock">
       <h3 className="section-heading">{title}</h3>
-      {data ? (
-        <>
-          <div>{data.fullName}</div>
-          <div>{data.phoneNumber}</div>
-          <div>{data.fullAddress}</div>
-        </>
-      ) : (
-        <div className="text-faint">No address saved</div>
-      )}
+      <div className="address-frame">
+        {data ? (
+          <>
+            <label className="form-label">Full Name:</label>
+            <div>{data.fullName}</div>
+
+            <label className="form-label">Phone Number:</label>
+            <div>{data.phoneNumber}</div>
+
+            <label className="form-label">Line 1:</label>
+            <div>{data.line1}</div>
+
+            <label className="form-label">Line 2:</label>
+            <div>{data.line2}</div>
+
+            <label className="form-label">Suburb:</label>
+            <div>{data.suburb}</div>
+
+            <label className="form-label">City:</label>
+            <div>{data.city}</div>
+
+            <label className="form-label">Postal Code:</label>
+            <div>{data.postalCode}</div>
+
+            <label className="form-label">Country:</label>
+            <div>{data.country}</div>
+          </>
+        ) : (
+          <div className="text-faint">No address saved</div>
+        )}
+      </div>
     </div>
   );
 
@@ -102,8 +122,9 @@ const ShippingForm = () => {
     <div className="section-container">
       <h2 className="section-heading">Shipping Address Manager</h2>
       <div className="grid-3-cols">
-        {/* Column 1: Input Form */}
         <div className="column-block">
+          <h3 className="section-heading">Input Shipping Address</h3>
+
           <label className="form-label">Full Name:</label>
           <input name="fullName" value={inputAddress.fullName} onChange={handleChange} className="form-control form-control-narrow" />
 
@@ -129,22 +150,21 @@ const ShippingForm = () => {
           <input name="country" value={inputAddress.country} onChange={handleChange} className="form-control form-control-narrow" />
 
           <div className="button-row">
-            <button type="button" className="button-primary" onClick={() => handleSave('defaultShipping')}>
+            <button type="button" className="button-secondary" onClick={() => handleSave('defaultShipping')}>
               Save as Default Address
             </button>
             <button type="button" className="button-secondary" onClick={() => handleSave('oneOffShipping')}>
               Save as One-Off Address
             </button>
           </div>
+
           {status && <p>{status}</p>}
         </div>
 
-        {/* Column 2: Default Display */}
         <div className="column-block">
           {renderAddressBlock('Default Shipping Address', defaultShipping)}
         </div>
 
-        {/* Column 3: One-Off Display */}
         <div className="column-block">
           {renderAddressBlock('One-Off Shipping Address', oneOffShipping)}
         </div>
