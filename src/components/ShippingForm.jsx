@@ -1,164 +1,156 @@
 // src/components/ShippingForm.jsx
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteField } from 'firebase/firestore';
 
-export default function ShippingForm() {
-  const [formData, setFormData] = useState({
+const ShippingForm = () => {
+  const [inputAddress, setInputAddress] = useState({
     fullName: '',
     phoneNumber: '',
-    addressLine1: '',
-    addressLine2: '',
+    line1: '',
+    line2: '',
     suburb: '',
     city: '',
     postalCode: '',
-    country: '',
+    country: ''
   });
-  const [error, setError]     = useState('');
-  const [success, setSuccess] = useState('');
+
+  const [defaultShipping, setDefaultShipping] = useState(null);
+  const [oneOffShipping, setOneOffShipping] = useState(null);
+  const [status, setStatus] = useState('');
+
+  const handleChange = (e) => {
+    setInputAddress({ ...inputAddress, [e.target.name]: e.target.value });
+  };
+
+  const getFullAddress = (address) => {
+    return [address.line1, address.line2, address.suburb, address.city, address.postalCode, address.country]
+      .filter(Boolean)
+      .join(', ');
+  };
+
+  const fetchShippingData = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const docRef = doc(db, 'shipping', user.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      setDefaultShipping(data.defaultShipping || null);
+      setOneOffShipping(data.oneOffShipping || null);
+    }
+  };
+
+  const handleSave = async (target) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const docRef = doc(db, 'shipping', user.uid);
+    const isEmpty = Object.values(inputAddress).every(v => v.trim() === '');
+
+    try {
+      setStatus('Saving...');
+      if (isEmpty) {
+        await updateDoc(docRef, { [target]: deleteField() });
+        if (target === 'defaultShipping') setDefaultShipping(null);
+        if (target === 'oneOffShipping') setOneOffShipping(null);
+      } else {
+        const shippingBlock = {
+          fullName: inputAddress.fullName,
+          phoneNumber: inputAddress.phoneNumber,
+          line1: inputAddress.line1,
+          line2: inputAddress.line2,
+          suburb: inputAddress.suburb,
+          city: inputAddress.city,
+          postalCode: inputAddress.postalCode,
+          country: inputAddress.country,
+          fullAddress: getFullAddress(inputAddress)
+        };
+        await setDoc(docRef, { [target]: shippingBlock }, { merge: true });
+        if (target === 'defaultShipping') setDefaultShipping(shippingBlock);
+        if (target === 'oneOffShipping') setOneOffShipping(shippingBlock);
+      }
+      setStatus('Saved successfully.');
+    } catch (err) {
+      console.error(err);
+      setStatus('Failed to save.');
+    }
+  };
 
   useEffect(() => {
-    const fetchShipping = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-      try {
-        const shipSnap = await getDoc(doc(db, 'shipping', user.uid));
-        if (shipSnap.exists()) {
-          const data = shipSnap.data();
-          setFormData({
-            fullName: data.fullName || '',
-            phoneNumber: data.phoneNumber || '',
-            addressLine1: data.contextAddress?.line1 || '',
-            addressLine2: data.contextAddress?.line2 || '',
-            suburb: data.contextAddress?.suburb || '',
-            city: data.contextAddress?.city || '',
-            postalCode: data.contextAddress?.postalCode || '',
-            country: data.contextAddress?.country || '',
-          });
-        }
-      } catch (err) {
-        console.error('Fetch shipping error:', err);
-        setError('Failed to fetch shipping info.');
-      }
-    };
-    fetchShipping();
+    fetchShippingData();
   }, []);
 
-  const handleChange = e => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    setSuccess('');
-    setError('');
-  };
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    const user = auth.currentUser;
-    if (!user) {
-      setError('You must be logged in to save shipping info.');
-      return;
-    }
-    try {
-      const { addressLine1, addressLine2, suburb, city, postalCode, country } = formData;
-      const fullAddress = `${addressLine1}, ${addressLine2 ? addressLine2 + ', ' : ''}${suburb}, ${city}, ${postalCode}, ${country}`;
-
-      await setDoc(doc(db, 'shipping', user.uid), {
-        fullName: formData.fullName,
-        phoneNumber: formData.phoneNumber,
-        contextAddress: {
-          line1: addressLine1,
-          line2: addressLine2,
-          suburb,
-          city,
-          postalCode,
-          country,
-          fullAddress,
-        },
-        uid: user.uid,
-        email: user.email,
-      });
-      setSuccess('Shipping details saved.');
-    } catch (err) {
-      console.error('Failed to save shipping:', err);
-      setError('Failed to save shipping details.');
-    }
-  };
+  const renderAddressBlock = (title, data) => (
+    <div className="section-subblock">
+      <h3 className="section-heading">{title}</h3>
+      {data ? (
+        <>
+          <div>{data.fullName}</div>
+          <div>{data.phoneNumber}</div>
+          <div>{data.fullAddress}</div>
+        </>
+      ) : (
+        <div className="text-faint">No address saved</div>
+      )}
+    </div>
+  );
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Shipping Details</h2>
+    <div className="section-container">
+      <h2 className="section-heading">Shipping Address Manager</h2>
+      <div className="grid-3-cols">
+        {/* Column 1: Input Form */}
+        <div className="column-block">
+          <label className="form-label">Full Name:</label>
+          <input name="fullName" value={inputAddress.fullName} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Full Name:</label>
-      <input
-        name="fullName"
-        value={formData.fullName}
-        onChange={handleChange}
-        required
-      />
+          <label className="form-label">Phone Number:</label>
+          <input name="phoneNumber" value={inputAddress.phoneNumber} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Phone Number:</label>
-      <input
-        name="phoneNumber"
-        value={formData.phoneNumber}
-        onChange={handleChange}
-        required
-      />
+          <label className="form-label">Line 1:</label>
+          <input name="line1" value={inputAddress.line1} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Address Line 1:</label>
-      <input
-        name="addressLine1"
-        value={formData.addressLine1}
-        onChange={handleChange}
-        required
-      />
+          <label className="form-label">Line 2:</label>
+          <input name="line2" value={inputAddress.line2} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Address Line 2:</label>
-      <input
-        name="addressLine2"
-        value={formData.addressLine2}
-        onChange={handleChange}
-      />
+          <label className="form-label">Suburb:</label>
+          <input name="suburb" value={inputAddress.suburb} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Suburb:</label>
-      <input
-        name="suburb"
-        value={formData.suburb}
-        onChange={handleChange}
-        required
-      />
+          <label className="form-label">City:</label>
+          <input name="city" value={inputAddress.city} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>City:</label>
-      <input
-        name="city"
-        value={formData.city}
-        onChange={handleChange}
-        required
-      />
+          <label className="form-label">Postal Code:</label>
+          <input name="postalCode" value={inputAddress.postalCode} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Postal Code:</label>
-      <input
-        name="postalCode"
-        value={formData.postalCode}
-        onChange={handleChange}
-        required
-      />
+          <label className="form-label">Country:</label>
+          <input name="country" value={inputAddress.country} onChange={handleChange} className="form-control form-control-narrow" />
 
-      <label>Country:</label>
-      <input
-        name="country"
-        value={formData.country}
-        onChange={handleChange}
-        required
-      />
+          <div className="button-row">
+            <button type="button" className="button-primary" onClick={() => handleSave('defaultShipping')}>
+              Save as Default Address
+            </button>
+            <button type="button" className="button-secondary" onClick={() => handleSave('oneOffShipping')}>
+              Save as One-Off Address
+            </button>
+          </div>
+          {status && <p>{status}</p>}
+        </div>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+        {/* Column 2: Default Display */}
+        <div className="column-block">
+          {renderAddressBlock('Default Shipping Address', defaultShipping)}
+        </div>
 
-      <button type="submit" style={{ marginTop: '1rem' }}>
-        Save Shipping
-      </button>
-    </form>
+        {/* Column 3: One-Off Display */}
+        <div className="column-block">
+          {renderAddressBlock('One-Off Shipping Address', oneOffShipping)}
+        </div>
+      </div>
+    </div>
   );
-}
+};
+
+export default ShippingForm;
