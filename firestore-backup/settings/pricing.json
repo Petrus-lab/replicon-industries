@@ -1,0 +1,26 @@
+{
+  "markupPercentage": 40,
+  "availableColors": [],
+  "availableMaterials": [
+    "\"PLA\"",
+    "\"ABS\"",
+    "\"PETG\"",
+    "\"Nylon\"",
+    "\"TPU\""
+  ],
+  "colors": [
+    "\"Black\"",
+    "\"White\"",
+    "\"Blue\"",
+    "\"Red\"",
+    "\"Green\"",
+    "\"Gray\""
+  ],
+  "baseCostPerGram": {
+    "\"PLA\"": 0.1,
+    "\"ABS\"": 0.12,
+    "\"PETG\"": 0.15,
+    "\"Nylon\"": 0.2,
+    "\"TPU\"": 0.25
+  }
+}

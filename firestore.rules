@@ -2,31 +2,33 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Shipping Collection – users may only read/write their own
+    // Shipping Collection – users may only read/write their own shipping data
     match /shipping/{userId} {
       allow read, write, delete: if request.auth != null
                                  && request.auth.uid == userId;
     }
 
-    // Orders Collection – users may only read/write their own
+    // Orders Collection – users may only read/write their own orders
     match /orders/{orderId} {
       allow read, write, delete: if request.auth != null
                                  && request.auth.uid == resource.data.uid;
     }
 
-    // Jobs Collection – anyone authenticated can create;
-    // each user can read/update/delete their own jobs;
-    // admins have full access
+    // Jobs Collection – allow any authenticated user to create,
+    // allow each user to read/update/delete only their own jobs,
+    // and allow admins full access
     match /jobs/{jobId} {
       allow create: if request.auth != null;
       allow read, update, delete: if request.auth != null
-        && (request.auth.uid == resource.data.uid || request.auth.token.admin == true);
+                                  && (request.auth.uid == resource.data.uid
+                                      || request.auth.token.admin == true);
     }
 
-    // Inventory Collection – only admins may read/write/delete
+    // ✅ Inventory Collection – allow read for all users; only admins may write/delete
     match /inventory/{itemId} {
-      allow read, write, delete: if request.auth != null
-                                 && request.auth.token.admin == true;
+      allow read: if request.auth != null;
+      allow write, delete: if request.auth != null
+                           && request.auth.token.admin == true;
     }
 
     // User Profiles – owner can read/write; admins can read any
@@ -37,19 +39,19 @@ service cloud.firestore {
                    && request.auth.token.admin == true;
     }
 
-    // Settings (pricing, markupSettings) – only admins
+    // Settings (e.g. pricing, markupSettings) – only admins
     match /settings/{docId} {
       allow read, write: if request.auth != null
                          && request.auth.token.admin == true;
     }
 
-    // Users Collection – only admins
+    // Users Collection – only admins may read/write/delete
     match /users/{userId} {
       allow read, write, delete: if request.auth != null
                                  && request.auth.token.admin == true;
     }
 
-    // Catch-all – any other collection is admin-only
+    // Catch-all for any other collections – only admins
     match /{collection}/{docId} {
       allow read, write, delete: if request.auth != null
                                  && request.auth.token.admin == true;

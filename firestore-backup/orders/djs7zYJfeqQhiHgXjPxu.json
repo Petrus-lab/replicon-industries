@@ -1,0 +1,13 @@
+{
+  "userId": "smfo6oFc9fZNOA31YOYs5tNqojK2",
+  "jobId": "HhsRpq2jodmp7Irpxls1",
+  "fileName": "LMSTest.stl",
+  "filamentType": "PTG",
+  "color": "Black",
+  "cost": 0,
+  "status": "Paid",
+  "createdAt": {
+    "_seconds": 1748443399,
+    "_nanoseconds": 528000000
+  }
+}

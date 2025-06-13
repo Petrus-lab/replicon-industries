@@ -1,0 +1,12 @@
+{
+  "material": "PTG",
+  "color": "RED",
+  "finish": "Gloss",
+  "stockLevel": 1,
+  "reorderThreshold": 1,
+  "supplier": "3dp shop",
+  "orderNumber": "WW",
+  "arrivalDate": "2025-06-03",
+  "rollSize": "1kg",
+  "preRollPrice": 299
+}

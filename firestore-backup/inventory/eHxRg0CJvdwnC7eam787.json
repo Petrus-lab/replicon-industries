@@ -1,0 +1,12 @@
+{
+  "material": "PTG",
+  "color": "Black",
+  "finish": "MATT",
+  "reorderThreshold": 1,
+  "supplier": "www",
+  "orderNumber": "4566",
+  "arrivalDate": "2025-05-26",
+  "rollSize": "1kg",
+  "preRollPrice": 299,
+  "stockLevel": 2
+}

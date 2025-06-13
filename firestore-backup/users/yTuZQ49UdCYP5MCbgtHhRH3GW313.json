@@ -1,0 +1,24 @@
+{
+  "email": "p.a.abbott.tech@gmail.com",
+  "phoneNumber": "0825353884",
+  "defaultShipping": {
+    "country": "South Africa",
+    "zip": "",
+    "address": "",
+    "city": "",
+    "suburb": ""
+  },
+  "contactNumber": "",
+  "printPreferences": {
+    "defaultPrintQuality": "Draft Quality",
+    "defaultFinish": "raw"
+  },
+  "name": "Andre",
+  "billingSuburb": "doornpoort ",
+  "billingAddressLine1": "806a wilger roud ",
+  "billingPostalCode": "0017",
+  "billingCountry": "South Africa",
+  "billingCity": "pretoria ",
+  "defaultPrintQuality": "Draft",
+  "defaultFinish": "raw"
+}

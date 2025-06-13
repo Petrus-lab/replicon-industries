@@ -1,0 +1,26 @@
+{
+  "uid": "yTuZQ49UdCYP5MCbgtHhRH3GW313",
+  "email": "p.a.abbott.tech@gmail.com",
+  "defaultShipping": {
+    "fullName": "P.A(Andre) Abbott",
+    "phoneNumber": "0825353884",
+    "country": "South Africa",
+    "city": "pretoria ",
+    "postalCode": "0017",
+    "fullAddress": "test a, testb, doornpoort , pretoria , 0017, South Africa",
+    "suburb": "doornpoort ",
+    "line2": "testb",
+    "line1": "test a"
+  },
+  "oneOffShipping": {
+    "country": "South Africa",
+    "phoneNumber": "0825353884",
+    "city": "pretoria ",
+    "postalCode": "0017",
+    "fullAddress": "test a, testb, doornpoort , pretoria , 0017, South Africa",
+    "fullName": "P.A(Andre) Abbott",
+    "suburb": "doornpoort ",
+    "line2": "testb",
+    "line1": "test a"
+  }
+}

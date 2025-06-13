@@ -1,0 +1,94 @@
+🧭 Single-click backup script ready, Captain.
+
+📜 Script: backupFirestoreAndStorage.js
+🔗 Download backupFirestoreAndStorage.js
+
+✅ What This Script Does
+📦 Dumps all Firestore collections and documents into:
+
+bash
+Copy
+Edit
+firestore-backup/
+├── users/
+├── shipping/
+├── jobs/
+└── ...
+🗂 Generates storage-index.json listing all file paths in your Firebase Cloud Storage bucket.
+
+🚀 How to Run (in PowerShell)
+Ensure environment is set:
+
+powershell
+Copy
+Edit
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\\replicon-industries-secrets\\your-service-account.json"
+Run the script:
+
+powershell
+Copy
+Edit
+node backupFirestoreAndStorage.js
+🔐 Optional rules backup (manual):
+
+bash
+Copy
+Edit
+firebase login
+firebase firestore:rules:get > firestore.rules
+firebase storage:rules:get > storage.rules
+All done. Shall I generate the matching restore script next? 
+
+
+
+
+
+
+
+You said:
+yes please
+
+
+ChatGPT said:
+🧬 Restore script operational, Captain.
+
+📜 Script: restoreFirestoreFromBackup.js
+🔗 Download restoreFirestoreFromBackup.js
+
+✅ What This Script Does
+It will:
+
+Traverse firestore-backup/{collection}/{docId}.json
+
+Re-upload each document into Firestore using .set(..., { merge: true })
+
+This restores all user/job/shipping/settings data back into its original collections.
+
+🚀 How to Use (PowerShell)
+Confirm Firestore Admin auth:
+
+powershell
+Copy
+Edit
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\\replicon-industries-secrets\\your-service-account.json"
+Place your firestore-backup/ folder in the same directory as the script.
+
+Run the script:
+
+powershell
+Copy
+Edit
+node restoreFirestoreFromBackup.js
+When ready, I can also prepare a matching script to restore files to Cloud Storage if needed. Shall we preserve this mission package as your official recovery kit? 
+
+
+
+
+
+
+
+
+
+Tools
+
+
