@@ -400,4 +400,22 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: underline;
   white-space: nowrap;
 }
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.job-table th,
+.job-table td {
+  padding: 0.5rem;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+  word-wrap: break-word;
+}
 
