@@ -1,93 +1,93 @@
-// src/components/JobStatus.jsx
-
 import React, { useEffect, useState } from 'react';
 import { auth, db } from '../firebase';
 import {
   collection,
   getDocs,
   query,
-  where
+  where,
+  doc,
+  getDoc,
+  updateDoc,
+  deleteDoc,
 } from 'firebase/firestore';
-import '../styles/global.css';
 
 const JobStatus = () => {
   const [jobs, setJobs] = useState([]);
-  const [hoveredBilling, setHoveredBilling] = useState(null);
-  const [hoveredShipping, setHoveredShipping] = useState(null);
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const u = auth.currentUser;
+      setUser(u);
+      if (u) {
+        const token = await u.getIdTokenResult();
+        setIsAdmin(!!token.claims.admin);
+      }
+    };
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchJobs = async () => {
-      const user = auth.currentUser;
       if (!user) return;
-
-      const snapshot = await getDocs(
-        query(collection(db, 'jobs'), where('uid', '==', user.uid))
-      );
-      const jobList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      jobList.sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+      const q = isAdmin
+        ? query(collection(db, 'jobs'))
+        : query(collection(db, 'jobs'), where('uid', '==', user.uid));
+      const snapshot = await getDocs(q);
+      const jobList = [];
+      snapshot.forEach((doc) => {
+        jobList.push({ id: doc.id, ...doc.data() });
+      });
       setJobs(jobList);
     };
-
     fetchJobs();
-  }, []);
+  }, [user, isAdmin]);
 
-  const renderHover = (data, key) => {
-    const isActive = key === 'billing' ? hoveredBilling === data : hoveredShipping === data;
-    const setHover = key === 'billing' ? setHoveredBilling : setHoveredShipping;
-
-    return (
-      <div
-        className="hover-trigger"
-        onMouseEnter={() => setHover(data)}
-        onMouseLeave={() => setHover(null)}
-      >
-        <span className="text-link">
-          {key === 'billing' ? 'As per Profile' : (data === 'Default' ? 'Default' : 'One-Off')}
-        </span>
-        {isActive && data && typeof data === 'object' && (
-          <div className="hover-popup">
-            {data.fullName && <div>{data.fullName}</div>}
-            {data.phoneNumber && <div>{data.phoneNumber}</div>}
-            {data.line1 && <div>{data.line1}</div>}
-            {data.line2 && <div>{data.line2}</div>}
-            {data.suburb && <div>{data.suburb}</div>}
-            {data.city && <div>{data.city}</div>}
-            {data.postalCode && <div>{data.postalCode}</div>}
-            {data.country && <div>{data.country}</div>}
-          </div>
-        )}
-      </div>
+  const handlePay = async (jobId) => {
+    await updateDoc(doc(db, 'jobs', jobId), {
+      status: 'Paid',
+    });
+    setJobs((prev) =>
+      prev.map((job) =>
+        job.id === jobId ? { ...job, status: 'Paid' } : job
+      )
     );
   };
 
-  const handleDelete = (jobId) => {
-    console.log('Request to delete job:', jobId);
-    // deletion logic goes here
+  const handleDelete = async (jobId) => {
+    await deleteDoc(doc(db, 'jobs', jobId));
+    setJobs((prev) => prev.filter((job) => job.id !== jobId));
+  };
+
+  const renderAddressHover = (data) => {
+    if (!data || typeof data !== 'object') return 'Invalid address';
+    return `${data.fullName || ''}\n${data.line1 || ''}\n${data.line2 || ''}\n${data.city || ''}\n${data.suburb || ''}\n${data.postalCode || ''}\n${data.country || ''}`;
   };
 
   return (
     <div className="section-container">
       <h2 className="section-heading">Job Status</h2>
-      <div className="table-scroll">
-        <table className="table-fixed">
+      <div className="job-table-wrapper">
+        <table className="job-table">
           <thead>
             <tr>
               <th>Job ID</th>
               <th>Material</th>
               <th>Color</th>
               <th>Material Finish</th>
-              <th>Post Processing</th>
+              <th>Post-Processing</th>
               <th>Print Quality</th>
               <th>Billing Address</th>
-              <th>Shipping Address Type</th>
-              <th>File Uploaded</th>
+              <th>Shipping Address</th>
+              <th>File</th>
               <th>Status</th>
               <th>Print Time</th>
-              <th>Print Cost</th>
+              <th>Print Quote</th>
               <th>Post Time</th>
-              <th>Post Cost</th>
-              <th>Ship Time</th>
-              <th>Ship Cost</th>
+              <th>Post Quote</th>
+              <th>Shipping Time</th>
+              <th>Shipping Quote</th>
               <th>Total Price</th>
               <th>Total Time</th>
               <th>Pay</th>
@@ -95,64 +95,107 @@ const JobStatus = () => {
             </tr>
           </thead>
           <tbody>
-            {jobs.map((job) => {
-              const canPay =
-                job.status === 'Quoted' &&
-                ['printCost', 'postProcessCost', 'shippingCost'].every(k => typeof job[k] === 'number');
+            {jobs.length === 0 ? (
+              <tr>
+                <td colSpan="20">No jobs found.</td>
+              </tr>
+            ) : (
+              jobs.map((job) => {
+                const {
+                  visualRef,
+                  material,
+                  color,
+                  materialFinish,
+                  finish,
+                  quality,
+                  billingAddress,
+                  shippingAddress,
+                  fileName,
+                  fileUrl,
+                  status,
+                  printTime,
+                  printQuote,
+                  postProcessingTime,
+                  postProcessingQuote,
+                  shippingTime,
+                  shippingQuote,
+                } = job;
 
-              const totalCost = ['printCost', 'postProcessCost', 'shippingCost']
-                .filter(k => typeof job[k] === 'number')
-                .reduce((sum, k) => sum + job[k], 0);
+                const totalPrice =
+                  (printQuote || 0) +
+                  (postProcessingQuote || 0) +
+                  (shippingQuote || 0);
 
-              const totalTime = ['printTime', 'postProcessTime']
-                .filter(k => typeof job[k] === 'number')
-                .reduce((sum, k) => sum + job[k], 0);
+                const totalTime =
+                  (printTime || 0) + (postProcessingTime || 0);
 
-              return (
-                <tr key={job.id}>
-                  <td>{job.visualRef || job.id}</td>
-                  <td>{job.material}</td>
-                  <td>{job.color}</td>
-                  <td>{job.materialFinish}</td>
-                  <td>{job.finish}</td>
-                  <td>{job.quality}</td>
-                  <td>{renderHover(job.billingAddress, 'billing')}</td>
-                  <td>{renderHover(job.shippingAddress, 'shipping')}</td>
-                  <td>
-                    <a href={job.fileUrl} target="_blank" rel="noopener noreferrer">
-                      {job.fileName}
-                    </a>
-                  </td>
-                  <td>{job.status}</td>
-                  <td>{job.printTime || 'Pending'}</td>
-                  <td>{job.printCost != null ? `R${job.printCost.toFixed(2)}` : 'Pending'}</td>
-                  <td>{job.postProcessTime || 'Pending'}</td>
-                  <td>{job.postProcessCost != null ? `R${job.postProcessCost.toFixed(2)}` : 'Pending'}</td>
-                  <td>{job.shippingTime || 'Pending'}</td>
-                  <td>{job.shippingCost != null ? `R${job.shippingCost.toFixed(2)}` : 'Pending'}</td>
-                  <td>{totalCost ? `R${totalCost.toFixed(2)}` : 'Pending'}</td>
-                  <td>{totalTime || 'Pending'}</td>
-                  <td>
-                    {canPay ? (
-                      <button className="button-primary" onClick={() => console.log('Process payment')}>
-                        Pay
-                      </button>
-                    ) : (
-                      <button className="button-disabled" disabled>
-                        Pay
-                      </button>
-                    )}
-                  </td>
-                  <td>
-                    {job.status !== 'Paid' && (
-                      <button className="button-secondary" onClick={() => handleDelete(job.id)}>
-                        Delete
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                const quotesAreValid =
+                  typeof printQuote === 'number' &&
+                  typeof postProcessingQuote === 'number' &&
+                  typeof shippingQuote === 'number';
+
+                return (
+                  <tr key={job.id}>
+                    <td>{visualRef || job.id}</td>
+                    <td>{material}</td>
+                    <td>{color}</td>
+                    <td>{materialFinish}</td>
+                    <td>{finish}</td>
+                    <td>{quality}</td>
+                    <td>
+                      <div
+                        className="hover-popup"
+                        title={renderAddressHover(billingAddress)}
+                      >
+                        View
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        className="hover-popup"
+                        title={renderAddressHover(shippingAddress)}
+                      >
+                        View
+                      </div>
+                    </td>
+                    <td>
+                      <a href={fileUrl} target="_blank" rel="noreferrer">
+                        {fileName}
+                      </a>
+                    </td>
+                    <td>{status}</td>
+                    <td>{printTime || 'Pending'}</td>
+                    <td>{printQuote != null ? `R${printQuote}` : 'Pending'}</td>
+                    <td>{postProcessingTime || 'Pending'}</td>
+                    <td>{postProcessingQuote != null ? `R${postProcessingQuote}` : 'Pending'}</td>
+                    <td>{shippingTime || 'Pending'}</td>
+                    <td>{shippingQuote != null ? `R${shippingQuote}` : 'Pending'}</td>
+                    <td>{quotesAreValid ? `R${totalPrice}` : 'Pending'}</td>
+                    <td>{totalTime ? `${totalTime} hrs` : 'Pending'}</td>
+                    <td>
+                      {status === 'Quoted' && quotesAreValid ? (
+                        <button className="button-pay" onClick={() => handlePay(job.id)}>
+                          Pay
+                        </button>
+                      ) : status === 'Paid' ? (
+                        'Paid'
+                      ) : (
+                        <button className="button-disabled" disabled>
+                          Pay
+                        </button>
+                      )}
+                    </td>
+                    <td>
+                      {status !== 'Paid' && (
+                        <button className="button-delete" onClick={() => handleDelete(job.id)}>
+                          Delete
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
           </tbody>
         </table>
       </div>
