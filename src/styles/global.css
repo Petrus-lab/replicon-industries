@@ -344,4 +344,60 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 0.5rem;
   background-color: #fff;
 }
+.job-table {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+}
+
+.job-header-row,
+.job-data-row {
+  display: contents;
+}
+
+.job-header-row span,
+.job-data-row span {
+  padding: 0.5rem;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #ddd;
+}
+/* === TABLE COLUMN FIX === */
+.job-table-wrapper {
+  overflow-x: auto;
+  margin-top: 2rem;
+}
+
+.job-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.job-table th,
+.job-table td {
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+  font-size: 0.9rem;
+  word-wrap: break-word;
+}
+
+.job-table th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+/* Optional: add hover-popup style if needed */
+.hover-popup {
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
+  white-space: nowrap;
+}
 
