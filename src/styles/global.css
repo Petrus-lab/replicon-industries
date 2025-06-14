@@ -418,4 +418,39 @@ h1, h2, h3, h4, h5, h6 {
   border-bottom: 1px solid #ccc;
   word-wrap: break-word;
 }
+.job-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 0.5rem;
+}
+
+.job-table-header,
+.job-table-row {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(80px, 1fr));
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.section-subblock {
+  background-color: #f1f1f1;
+  border-radius: 6px;
+  padding: 1rem;
+}
+.job-table-row {
+  display: grid;
+  grid-template-columns: repeat(20, minmax(80px, 1fr));
+  gap: 0.5rem;
+  align-items: start;
+}
+
+.header-row {
+  font-weight: bold;
+  background-color: #e0e0e0;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
 
