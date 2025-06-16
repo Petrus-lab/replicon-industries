@@ -1,187 +1,152 @@
 // src/components/UploadForm.jsx
 
-// UploadForm.jsx — fully restored and patched
-import React, { useEffect, useState } from 'react';
-import { auth, db, storage } from '../firebase';
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-  doc,
-  getDoc,
-  query,
-  where,
-  runTransaction
-} from 'firebase/firestore';
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from 'firebase/storage';
-import { generateStardate } from '../utils/stardate';
+import React, { useState, useEffect } from 'react';
+import { auth, db, storage, functions } from '../firebase';
+import { collection, addDoc, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { httpsCallable } from 'firebase/functions';
 
 const UploadForm = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [status, setStatus] = useState('');
-  const [materialOptions, setMaterialOptions] = useState([]);
-  const [colorOptions, setColorOptions] = useState([]);
-  const [materialFinishOptions, setMaterialFinishOptions] = useState([]);
+  const [file, setFile] = useState(null);
   const [material, setMaterial] = useState('');
   const [color, setColor] = useState('');
-  const [materialFinish, setMaterialFinish] = useState('');
+  const [finish, setFinish] = useState('');
   const [postProcessing, setPostProcessing] = useState('');
   const [quality, setQuality] = useState('');
+  const [status, setStatus] = useState('');
+  const [materials, setMaterials] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [availableFinishes, setAvailableFinishes] = useState([]);
+  const [qualityOptions, setQualityOptions] = useState(['draft', 'fit_check', 'prototype', 'production']);
+  const [postProcessingOptions, setPostProcessingOptions] = useState(['raw', 'supports_removed', 'ready_to_go']);
+  const generateStardate = httpsCallable(functions, "generateStardateJobId");
 
-  const postProcessingOptions = ['raw', 'supports_removed', 'ready_to_go'];
-  const qualityOptions = ['draft', 'fit_check', 'prototype', 'production'];
-  const [inventoryMap, setInventoryMap] = useState({});
 
   useEffect(() => {
-    const fetchData = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-
-      const profileSnap = await getDoc(doc(db, 'profiles', user.uid));
-      const profile = profileSnap.exists() ? profileSnap.data() : {};
-
-      const snapshot = await getDocs(
-        query(collection(db, 'inventory'), where('stockLevel', '>', 0))
-      );
-
-      const tempMap = {};
-      snapshot.forEach((doc) => {
-        const { material, color, finish } = doc.data();
-        if (!tempMap[material]) {
-          tempMap[material] = {};
-        }
-        if (!tempMap[material][color]) {
-          tempMap[material][color] = new Set();
-        }
-        tempMap[material][color].add(finish);
-      });
-
-      const materials = Object.keys(tempMap);
-      setInventoryMap(tempMap);
-      setMaterialOptions(materials);
-
-      const defaultMaterial = profile.material && materials.includes(profile.material) ? profile.material : materials[0] || '';
-      const defaultColor = profile.color || '';
-      const defaultFinish = profile.materialFinish || '';
-      const defaultPostProcessing = profile.finish && postProcessingOptions.includes(profile.finish) ? profile.finish : postProcessingOptions[0];
-      const defaultQuality = profile.quality && qualityOptions.includes(profile.quality) ? profile.quality : qualityOptions[0];
-
-      setPostProcessing(defaultPostProcessing);
-      setQuality(defaultQuality);
-      setMaterial(defaultMaterial);
-      updateDependentFields(defaultMaterial, defaultColor, defaultFinish, tempMap);
+    const fetchPricingData = async () => {
+      const settingsRef = doc(db, 'settings', 'pricing');
+      const snapshot = await getDoc(settingsRef);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setMaterials(data.availableMaterials || []);
+        setColors(data.availableColors || []);
+        setAvailableFinishes(data.availableFinishes || []);
+      }
     };
 
-    fetchData();
+    fetchPricingData();
   }, []);
-
-  const updateDependentFields = (material, profileColor, profileFinish, map) => {
-    const availableColors = Object.keys(map[material] || {});
-    setColorOptions(availableColors);
-
-    const selectedColor = availableColors.includes(profileColor) ? profileColor : availableColors[0] || '';
-    setColor(selectedColor);
-
-    const finishes = [...(map[material]?.[selectedColor] || [])];
-    setMaterialFinishOptions(finishes);
-    setMaterialFinish(finishes.includes(profileFinish) ? profileFinish : finishes[0] || '');
-  };
-
-  const handleMaterialChange = (value) => {
-    setMaterial(value);
-    updateDependentFields(value, '', '', inventoryMap);
-  };
-
-  const handleColorChange = (value) => {
-    setColor(value);
-    const finishes = [...(inventoryMap[material]?.[value] || [])];
-    setMaterialFinishOptions(finishes);
-    setMaterialFinish(finishes[0] || '');
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = auth.currentUser;
-    if (!user || !selectedFile) {
-      setStatus('Missing file or user session');
+
+    if (!auth.currentUser) {
+      setStatus('Upload failed: You must be logged in to upload.');
+      return;
+    }
+
+    if (!file || !material || !color || !finish || !quality || !postProcessing) {
+      setStatus('All fields are required.');
       return;
     }
 
     try {
       setStatus('Uploading...');
-      const storageRef = ref(storage, `print_jobs/${user.uid}/${Date.now()}_${selectedFile.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+      const user = auth.currentUser;
+      const uid = user.uid;
+      const email = user.email;
 
-      uploadTask.on(
-        'state_changed',
-        null,
-        (error) => setStatus('Upload failed: ' + error.message),
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          const { visualRef, stardate } = await generateStardate();
+      // 🔒 Generate Stardate and VisualRef via Firebase Callable Function
+      const generateStardateJobId = httpsCallable(functions, 'generateStardateJobId');
+      const stardateResult = await generateStardateJobId();
+      const { stardate, visualRef } = stardateResult.data;
 
-          await addDoc(collection(db, 'jobs'), {
-            uid: user.uid,
-            fileUrl: downloadURL,
-            fileName: selectedFile.name,
-            material,
-            color,
-            materialFinish,
-            finish: postProcessing,
-            quality,
-            visualRef,
-            stardate,
-            createdAt: serverTimestamp(),
-            status: 'Uploaded',
-          });
+      // Upload file to Firebase Storage
+      const timestamp = Date.now();
+      const storageRef = ref(storage, `uploads/${uid}/${timestamp}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
 
-          setStatus('Upload successful!');
-          setSelectedFile(null);
-        }
-      );
-    } catch (err) {
-      console.error(err);
-      setStatus('Upload failed: ' + err.message);
+      // Save job document
+      const jobData = {
+        uid,
+        email,
+        fileName: file.name,
+        fileUrl: downloadURL,
+        material,
+        color,
+        finish,
+        postProcessing,
+        quality,
+        stardate,
+        visualRef,
+        createdAt: new Date(),
+      };
+
+      await addDoc(collection(db, 'jobs'), jobData);
+
+      setStatus('Upload successful!');
+      // Reset form
+      setFile(null);
+      setMaterial('');
+      setColor('');
+      setFinish('');
+      setPostProcessing('');
+      setQuality('');
+    } catch (error) {
+      console.error(error);
+      setStatus(`Upload failed: ${error.message}`);
     }
   };
 
   return (
     <div className="section-container">
-      <h2 className="section-heading">Upload 3D Print Job</h2>
-      <form onSubmit={handleSubmit} className="form-vertical">
-        <input type="file" onChange={(e) => setSelectedFile(e.target.files[0])} className="form-control form-control-narrow" />
+      <h2 className="section-heading">Upload a 3D Print Job</h2>
+      <form onSubmit={handleSubmit}>
+        <label className="form-label">Select File:</label>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} className="form-control form-control-narrow" />
 
         <label className="form-label">Material:</label>
-        <select value={material} onChange={(e) => handleMaterialChange(e.target.value)} className="form-control form-control-narrow">
-          {materialOptions.map((m) => <option key={m} value={m}>{m}</option>)}
+        <select value={material} onChange={(e) => setMaterial(e.target.value)} className="form-control form-control-narrow">
+          <option value="">Select</option>
+          {materials.map((m) => (
+            <option key={m} value={m}>{m}</option>
+          ))}
         </select>
 
         <label className="form-label">Color:</label>
-        <select value={color} onChange={(e) => handleColorChange(e.target.value)} className="form-control form-control-narrow">
-          {colorOptions.map((c) => <option key={c} value={c}>{c}</option>)}
+        <select value={color} onChange={(e) => setColor(e.target.value)} className="form-control form-control-narrow">
+          <option value="">Select</option>
+          {colors.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
         </select>
 
-        <label className="form-label">Material Finish:</label>
-        <select value={materialFinish} onChange={(e) => setMaterialFinish(e.target.value)} className="form-control form-control-narrow">
-          {materialFinishOptions.map((f) => <option key={f} value={f}>{f}</option>)}
+        <label className="form-label">Finish:</label>
+        <select value={finish} onChange={(e) => setFinish(e.target.value)} className="form-control form-control-narrow">
+          <option value="">Select</option>
+          {availableFinishes.map((f) => (
+            <option key={f} value={f}>{f}</option>
+          ))}
         </select>
 
-        <label className="form-label">Post-Processing:</label>
+        <label className="form-label">Post Processing:</label>
         <select value={postProcessing} onChange={(e) => setPostProcessing(e.target.value)} className="form-control form-control-narrow">
-          {postProcessingOptions.map((f) => <option key={f} value={f}>{f}</option>)}
+          <option value="">Select</option>
+          {postProcessingOptions.map((option) => (
+            <option key={option} value={option}>{option.replace(/_/g, ' ')}</option>
+          ))}
         </select>
 
         <label className="form-label">Print Quality:</label>
         <select value={quality} onChange={(e) => setQuality(e.target.value)} className="form-control form-control-narrow">
-          {qualityOptions.map((q) => <option key={q} value={q}>{q}</option>)}
+          <option value="">Select</option>
+          {qualityOptions.map((option) => (
+            <option key={option} value={option}>{option.replace(/_/g, ' ')}</option>
+          ))}
         </select>
 
-        <button type="submit" className="button-primary">Upload</button>
+        <button type="submit" className="button-primary">Submit</button>
       </form>
       {status && <p>{status}</p>}
     </div>

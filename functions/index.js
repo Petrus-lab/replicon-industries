@@ -1,80 +1,35 @@
 // functions/index.js
-const functions = require('firebase-functions');
-const express   = require('express');
-const fetch     = require('node-fetch');
-const cors      = require('cors');
 
-const app = express();
-app.use(cors({ origin: true }));
-app.use(express.json());
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 
-// Safely pull PayPal creds from runtime config
-const { client_id: clientId, client_secret: secret } = functions.config().paypal || {};
-if (!clientId || !secret) {
-  console.error(
-    '⚠️  PayPal credentials missing! ' +
-    'Run: firebase functions:config:set ' +
-    'paypal.client_id="YOUR_CLIENT_ID" ' +
-    'paypal.client_secret="YOUR_SECRET"'
-  );
-}
+admin.initializeApp();
+const db = admin.firestore();
 
-async function getAccessToken() {
-  if (!clientId || !secret) {
-    throw new Error('Missing PayPal credentials in functions.config().paypal');
-  }
-
-  const resp = await fetch(
-    'https://api.sandbox.paypal.com/v1/oauth2/token',
-    {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Basic ' +
-          Buffer.from(`${clientId}:${secret}`).toString('base64'),
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: 'grant_type=client_credentials',
-    }
-  );
-
-  if (!resp.ok) {
-    const text = await resp.text();
-    throw new Error(`Token fetch failed (${resp.status}): ${text}`);
-  }
-  return (await resp.json()).access_token;
-}
-
-app.post('/create-order', async (req, res) => {
-  try {
-    const token = await getAccessToken();
-    const orderRes = await fetch(
-      'https://api.sandbox.paypal.com/v2/checkout/orders',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          intent: 'CAPTURE',
-          purchase_units: [{
-            amount: { currency_code: 'USD', value: req.body.amount },
-          }],
-        }),
-      }
+exports.generateStardateJobId = functions.https.onCall(async (data, context) => {
+  // 🔐 Enforce authentication
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "User must be authenticated"
     );
-
-    if (!orderRes.ok) {
-      const text = await orderRes.text();
-      throw new Error(`Order create failed (${orderRes.status}): ${text}`);
-    }
-
-    const order = await orderRes.json();
-    res.status(200).json({ id: order.id });
-  } catch (err) {
-    console.error('PayPal create-order error:', err);
-    res.status(500).json({ error: err.message || 'Unable to create order' });
   }
-});
 
-exports.paypal = functions.https.onRequest(app);
+  const now = new Date();
+  const stardate = `${now.getUTCFullYear() - 2000}.${now.getUTCMonth() + 1}.${now.getUTCDate()}`;
+  const stardateDocRef = db.collection("stardate_sequences").doc(stardate);
+
+  let sequence = 1;
+  const doc = await stardateDocRef.get();
+
+  if (doc.exists) {
+    sequence = (doc.data().sequence || 0) + 1;
+    await stardateDocRef.update({ sequence });
+  } else {
+    await stardateDocRef.set({ sequence });
+  }
+
+  const visualRef = `Stardate ${stardate}-${String(sequence).padStart(3, '0')}`;
+
+  return { stardate, visualRef };
+});

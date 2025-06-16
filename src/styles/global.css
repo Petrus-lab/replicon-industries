@@ -453,4 +453,17 @@ h1, h2, h3, h4, h5, h6 {
   padding: 0.5rem;
   border-radius: 4px;
 }
+.job-table-row {
+  display: grid;
+  grid-template-columns:
+    120px 90px 90px 120px 150px 120px 120px 120px 160px 100px
+    100px 120px 100px 120px 100px 120px 120px 120px 80px 80px;
+  gap: 0.5rem;
+}
+.job-table-row span {
+  padding: 6px 8px;
+  background-color: #fff;
+  border-radius: 4px;
+  word-break: break-word;
+}
 

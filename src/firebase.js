@@ -4,6 +4,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, getIdTokenResult } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import { getFirestore, doc, getDoc, collection, getDocs, updateDoc } from 'firebase/firestore';
+import { getFunctions } from 'firebase/functions'; // ✅ NEW
 
 // Firebase config
 const firebaseConfig = {
@@ -23,6 +24,7 @@ export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 export const storage = getStorage(app);
 export const db = getFirestore(app);
+export const functions = getFunctions(app); // ✅ NEW
 
 // Check admin claim
 export const isAdminUser = async (user) => {
