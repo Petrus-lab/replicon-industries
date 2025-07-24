@@ -1,5 +1,0 @@
-1. curl -H "Authorization: Bearer <MQUBvu77Je5mg4vtxRkWzCJP>" "https://api.vercel.com/v2/projects?limit=1"
-
-2. curl -H "Authorization: Bearer <MQUBvu77Je5mg4vtxRkWzCJP>" "https://api.vercel.com/v2/projects?limit=1&teamId=<ORG_ID>"
-
-MQUBvu77Je5mg4vtxRkWzCJP

@@ -1,2 +1,0 @@
-## Example Markdown
-Hello world!
