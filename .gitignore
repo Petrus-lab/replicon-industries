@@ -29,3 +29,5 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+
+replicon-local-runner/firebase-service-account.json

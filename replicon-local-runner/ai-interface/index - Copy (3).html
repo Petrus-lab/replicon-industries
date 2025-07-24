@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Replicon Local AI Runner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="container">
+    <span class="logo">Replicon AI Runner</span>
+    <button class="dark-toggle" id="darkToggle" type="button">🌗 Dark Mode</button>
+    <div class="statusbar" id="statusbar">Checking integrations...</div>
+
+    <label for="actionType">Select Action Type:</label>
+    <select id="actionType">
+      <option value="shell">Run Shell Command</option>
+      <option value="python">Run Python</option>
+      <option value="read">Read File</option>
+      <option value="write">Write File</option>
+      <option value="json">Run JSON</option>
+    </select>
+    <div class="action-templates" id="templates"></div>
+
+    <label for="inputBox">Input:</label>
+    <textarea id="inputBox" placeholder="Enter command, file path, or JSON payload here..."></textarea>
+
+    <div class="button-row">
+      <button id="submitBtn" type="button">🚀 Submit to Runner</button>
+      <button id="clearInputBtn" type="button">🧹 Clear Input</button>
+      <button id="clearOutputBtn" type="button">🧹 Clear Output</button>
+      <button id="helpBtn" type="button">📖 Help</button>
+    </div>
+    <div class="test-buttons">
+      <button id="testFirebaseBtn" type="button">✅ Test Firebase</button>
+      <button id="testGitHubBtn" type="button">✅ Test GitHub</button>
+      <button id="testVercelBtn" type="button">✅ Test Vercel</button>
+    </div>
+    <div class="output-controls">
+      <button id="copyOutputBtn" type="button">📋 Copy Output</button>
+      <button id="saveOutputBtn" type="button">💾 Save Output to File</button>
+      <button id="sendOutputToChatGPTBtn" type="button">➡️ Send Output to ChatGPT</button>
+    </div>
+
+    <!-- Start ChatGPT Integration Section -->
+    <div class="chatgpt-section">
+      <h3>Ask ChatGPT (cloud LLM)</h3>
+      <textarea id="chatgptPrompt" placeholder="Ask a question (e.g. 'Generate a Node.js script for...')"></textarea>
+      <div class="button-row">
+        <button id="askChatGPTBtn" type="button">🤖 Ask ChatGPT</button>
+      </div>
+      <textarea id="chatgptResponse" readonly placeholder="ChatGPT's answer will appear here"></textarea>
+    </div>
+    <!-- End ChatGPT Integration Section -->
+
+    <label for="outputBox">Output:</label>
+    <textarea id="outputBox" readonly></textarea>
+    <div class="output-render" id="outputRender"></div>
+
+    <div>
+      <h3>History <small>(last 5)</small></h3>
+      <ol class="history-list" id="historyList"></ol>
+    </div>
+    <div id="spinner" style="display:none;"><span class="spinner"></span> Working...</div>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="runner-ui.js"></script>
+</body>
+</html>

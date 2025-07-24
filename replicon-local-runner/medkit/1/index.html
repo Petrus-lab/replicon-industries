@@ -1,0 +1,41 @@
+<!-- FILE: index.html   GENERATED: 2025-07-19T19:58:00+02:00 -->
+<!-- AI PRIME DIRECTIVES: NO INLINE STYLING, ALL COSMETICS VIA style.css ONLY -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Replicon Local AI Runner</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="runner-ui.js"></script>
+</head>
+<body>
+<div class="container">
+    <div id="offline" style="display:none;color:#f66;font-weight:bold;">❌ Unable to reach backend.</div>
+    <h1>Replicon AI Runner</h1>
+    <div class="subtitle">Local Automated Dev Runner</div>
+    <label for="action-type">Select Action Type:</label>
+    <select id="action-type">
+        <option value="shell">Run Shell Command</option>
+        <option value="python">Run Python</option>
+        <option value="read">Read File</option>
+        <option value="write">Write File</option>
+        <option value="json">Run JSON</option>
+    </select>
+    <div id="example-row" class="example-row"></div>
+    <label for="input">Input:</label>
+    <textarea id="input" rows="5"></textarea>
+    <div class="button-row">
+        <button id="submit">Submit to Runner</button>
+        <button id="clear-input">Clear Input</button>
+        <button id="clear-output">Clear Output</button>
+    </div>
+    <label for="output">Output:</label>
+    <textarea id="output" rows="6" readonly></textarea>
+    <div>
+        <strong>History</strong>
+        <div id="history"></div>
+    </div>
+</div>
+</body>
+</html>

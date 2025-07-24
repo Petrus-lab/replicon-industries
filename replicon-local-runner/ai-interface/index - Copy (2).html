@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Replicon Local AI Runner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="dark-mode">
+  <div id="container">
+    <span class="logo">Replicon AI Runner</span>
+    <button class="dark-toggle" id="darkToggle" type="button">🌗 Dark Mode</button>
+    <div class="statusbar" id="statusbar">Checking integrations...</div>
+
+    <label for="actionType">Select Action Type:</label>
+    <select id="actionType">
+      <option value="shell">Run Shell Command</option>
+      <option value="python">Run Python</option>
+      <option value="read">Read File</option>
+      <option value="write">Write File</option>
+      <option value="upload">Upload File</option>
+      <option value="json">Run JSON</option>
+    </select>
+    <div id="templates" class="action-templates"></div>
+
+    <label for="inputBox">Input:</label>
+    <div style="display: flex; align-items: center; gap: 0.5em;">
+      <textarea id="inputBox" placeholder="Enter command, file path, or JSON payload here..." style="flex: 1"></textarea>
+      <button id="browseFileBtn" type="button" style="display: none;">📂 Browse…</button>
+      <span id="fileExistsIndicator" style="display: none;"></span>
+      <input id="fileInput" type="file" style="display:none;">
+    </div>
+    <div id="pathWarning" style="color:orange; font-size:0.97em; display:none;"></div>
+
+    <div id="uploadSection" style="display:none; margin-bottom: 8px;">
+      <label for="uploadFileInput">Select file to upload:</label>
+      <input id="uploadFileInput" type="file" />
+      <label for="uploadDestPath">Destination path (on backend):</label>
+      <input id="uploadDestPath" type="text" placeholder="e.g. file outputs/myfile.txt" style="width:260px;"/>
+      <button id="uploadBtn" type="button">⬆️ Upload File</button>
+      <span id="uploadStatus" style="margin-left:1em;"></span>
+    </div>
+
+    <div class="button-row">
+      <button id="submitBtn" type="button">🚀 Submit to Runner</button>
+      <button id="clearInputBtn" type="button">🧹 Clear Input</button>
+      <button id="clearOutputBtn" type="button">🧹 Clear Output</button>
+      <button id="helpBtn" type="button">📖 Help</button>
+    </div>
+    <div class="test-buttons">
+      <button id="testFirebaseBtn" type="button">✅ Test Firebase</button>
+      <button id="testGitHubBtn" type="button">✅ Test GitHub</button>
+      <button id="testVercelBtn" type="button">✅ Test Vercel</button>
+    </div>
+    <div class="output-controls">
+      <button id="copyOutputBtn" type="button">📋 Copy Output</button>
+      <button id="saveOutputBtn" type="button">💾 Save Output to File</button>
+      <button id="sendOutputToChatGPTBtn" type="button">➡️ Send Output to ChatGPT</button>
+    </div>
+
+    <label for="outputBox"><b>Local AI Output:</b></label>
+    <textarea id="outputBox" readonly></textarea>
+
+    <div>
+      <h3>History <small>(last 5)</small></h3>
+      <ol class="history-list" id="historyList"></ol>
+    </div>
+    <div id="spinner" style="display:none;"><span class="spinner"></span> Working...</div>
+
+    <!-- Ask ChatGPT (cloud LLM) block at the bottom -->
+    <div class="chatgpt-section" style="margin-top: 30px;">
+      <h3>Ask ChatGPT (cloud LLM)</h3>
+      <textarea id="chatgptPrompt" placeholder="Ask a question (e.g. 'Generate a Node.js script for...')"></textarea>
+      <div style="margin: 8px 0;">
+        <label for="chatgptModel">Model:</label>
+        <select id="chatgptModel"></select>
+        <span id="chatgptModelNickname" style="margin-left: 8px; color: #58aaff;"></span>
+      </div>
+      <div class="button-row">
+        <button id="askChatGPTBtn" type="button">🤖 Ask ChatGPT</button>
+        <button id="clearChatGPTInputBtn" type="button">🧹 Clear Input</button>
+        <button id="clearChatGPTOutputBtn" type="button">🧹 Clear Output</button>
+        <button id="sendChatGPTToRunnerBtn" type="button">⬅️ Send GPT Output to Runner</button>
+        <button id="testChatGPTBtn" type="button">🔎 Test ChatGPT</button>
+      </div>
+      <label for="chatgptResponse"><b>ChatGPT (cloud) Output:</b></label>
+      <textarea id="chatgptResponse" readonly placeholder="ChatGPT's answer will appear here"></textarea>
+    </div>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script src="runner-ui.js"></script>
+</body>
+</html>

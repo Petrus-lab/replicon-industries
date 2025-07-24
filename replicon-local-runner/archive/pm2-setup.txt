@@ -1,0 +1,15 @@
+# PM2 Setup for Replicon Backend Auto-Restart
+# -------------------------------------------
+# 1. Install PM2 globally (if not already installed)
+npm install -g pm2
+
+# 2. Start your backend with PM2 (run from your runner folder)
+pm2 start interface-server.js --name replicon-backend
+
+# 3. To restart/stop/list logs, use:
+pm2 restart replicon-backend
+pm2 stop replicon-backend
+pm2 list
+pm2 logs replicon-backend
+
+# PM2 will now auto-restart your backend when the Restart button is pressed in the UI.

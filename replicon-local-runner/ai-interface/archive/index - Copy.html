@@ -1,0 +1,59 @@
+<!-- ✅ FILE: replicon-local-runner/ai-interface/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Replicon AI Runner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="container">
+    <span class="logo">Replicon AI Runner</span>
+    <button class="dark-toggle" onclick="toggleDarkMode()">🌗 Dark Mode</button>
+    <div class="statusbar" id="statusbar">Checking integrations...</div>
+
+    <div class="button-row">
+      <label for="actionType">Select Action Type:</label>
+      <select id="actionType"></select>
+    </div>
+
+    <div class="action-templates test-buttons" id="templates"></div>
+
+    <label for="inputBox">Input:</label>
+    <textarea id="inputBox" placeholder="Enter command, file path, or JSON payload here..." rows="10"></textarea>
+
+    <div class="button-row bottom-system-buttons">
+      <button id="submitBtn">🚀 Submit to Runner</button>
+      <button id="clearInputBtn">🧹 Clear Input</button>
+      <button id="clearOutputBtn">🧹 Clear Output</button>
+      <button id="helpBtn">📖 Help</button>
+    </div>
+
+    <div class="test-buttons">
+      <button id="testFirebaseBtn">✅ Test Firebase</button>
+      <button id="testGitHubBtn">✅ Test GitHub</button>
+      <button id="testVercelBtn">✅ Test Vercel</button>
+    </div>
+
+    <div class="output-controls button-row">
+      <button id="copyOutputBtn">📋 Copy Output</button>
+      <button id="saveOutputBtn">💾 Save Output to File</button>
+    </div>
+
+    <label for="outputBox">Output:</label>
+    <textarea id="outputBox" readonly></textarea>
+    <div class="output-render" id="outputRender"></div>
+
+    <div>
+      <h3>History <small>(last 5)</small></h3>
+      <ol class="history-list" id="historyList"></ol>
+    </div>
+
+    <div id="spinner" style="display:none;"><span class="spinner"></span> Working...</div>
+  </div>
+  <div id="toast" class="toast"></div>
+
+  <script src="runner-ui.js"></script>
+</body>
+</html>

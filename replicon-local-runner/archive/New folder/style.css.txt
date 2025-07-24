@@ -1,0 +1,62 @@
+body {
+  background-color: #111;
+  color: #ffffff;
+  font-family: monospace;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding: 20px;
+}
+
+h1 {
+  color: #00a1a1;
+}
+
+.section-label {
+  color: #ffffff;
+  font-weight: bold;
+  display: block;
+  margin-top: 20px;
+}
+
+textarea, select {
+  width: 100%;
+  background-color: #000;
+  color: #b50025;
+  border: 1px solid #bd3215;
+  padding: 10px;
+  margin-top: 5px;
+  font-family: monospace;
+  font-size: 16px;
+}
+
+button {
+  background-color: #019b76;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  margin: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #00bfff;
+}
+
+.button-group {
+  margin-bottom: 20px;
+}
+
+.output {
+  background-color: #000;
+  border: 1px solid lime;
+  color: lime;
+  padding: 10px;
+  margin-top: 20px;
+  min-height: 50px;
+  white-space: pre-wrap;
+}
